@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\client",
+    "\\client\\src",
+    "\\client\\src\\component",
+    "\\client\\src\\pages",
+    "\\client\\src\\plotters",
+    "\\images",
+    "\\server"
+  ],
+  "SelectedNode": "\\client\\src\\plotters\\Decimal.js",
+  "PreviewInSolutionExplorer": false
+}
