@@ -1,16 +1,26 @@
+import bandConfig from "../layers/bandConfig"
+import decimalConfig from "../layers/decimalConfig";
+import lineConfig from "../layers/lineConfig";
+
+
 export default class Configuration {
-    Mapping = {
-        'line': 'Line Layer',
-        'gauge': 'Gauge Layer',
-        'scatter': 'Scatter Layer',
-        'single stat': 'Single Stat'
+
+    constructor(configType, table, fill) {
+        this.state = {
+            configType,
+            table,
+            fill
+        };
     }
 
-    constructor(configType) {
-        this.type = configType
-    }
-
-    getTitle() {
-        return this.Mapping[this.type]
+    getConfig() {
+        //get config of specified configtype
+        if (this.state.configType === 'band') {
+            return bandConfig(this.state.table, this.state.fill)
+        } else if (this.state.configType === 'line') {
+            return lineConfig(this.state.table, this.state.fill)
+        } else if (this.state.configType === 'single stat') {
+            return decimalConfig(this.state.table, this.state.fill)
+        }
     }
 }

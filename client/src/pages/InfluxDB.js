@@ -1,5 +1,6 @@
-import { Band } from "../plotters/Band";
+
 import { Grid } from '@mui/material';
+import { PlotSelector } from '../component/PlotSelector';
 
 // TODO: add menu options to choose from different examples
 export const InfluxDB = () => {
@@ -14,7 +15,7 @@ export const InfluxDB = () => {
                 spacing={3}
             >
                 <Grid item xs={10} sm={10}>
-                    <Band />
+                    <PlotSelector />
                 </Grid>
             </Grid>
         </div>

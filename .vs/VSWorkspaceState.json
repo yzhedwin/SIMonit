@@ -3,12 +3,14 @@
     "",
     "\\client",
     "\\client\\src",
-    "\\client\\src\\component",
-    "\\client\\src\\pages",
+    "\\client\\src\\config",
+    "\\client\\src\\config\\BandLayer",
+    "\\client\\src\\config\\Configuration",
+    "\\client\\src\\config\\DecimalLayer",
     "\\client\\src\\plotters",
     "\\images",
     "\\server"
   ],
-  "SelectedNode": "\\client\\src\\plotters\\Decimal.js",
+  "SelectedNode": "\\client\\src\\plotters\\Band.js",
   "PreviewInSolutionExplorer": false
 }
