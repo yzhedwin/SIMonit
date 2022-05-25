@@ -14,7 +14,7 @@ export const InfluxDB = () => {
                 direction="row"
                 spacing={3}
             >
-                <Grid item xs={10} sm={10}>
+                <Grid item xs={1} sm={1}>
                     <PlotSelector />
                 </Grid>
             </Grid>

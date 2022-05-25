@@ -1,9 +1,10 @@
+import TestGrid from "../component/GridLayout";
+
 const About = () => {
     return (
         <div>
-            <h1 style={{ color: "green" }}>Test Web App</h1>
+            <TestGrid/>
         </div>
     )
 };
-
 export default About;

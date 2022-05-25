@@ -8,8 +8,8 @@ const { query } = require('express')
 
 // vars to connect to bucket in influxdb
 const baseURL = 'http://localhost:8086' //process.env.INFLUX_URL // url of your cloud instance
-const influxToken = '-ldkgALDsiPln-cyb3pxrtUENgIizoJz2X1vQp8CqDXrupLo0V988f7DFkxHww_teFGxJnCRlpHJ_vtih0-fLQ=='  //To2yNAUkVv8mRImgCNy9sj5UmhX2VIiy0J8GEAJAOoeBia5k_bw7bJ40eZwQd6q8vBgAugsjvfY3qguTvUx3iw==' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
-const orgID = '50cede9cae68c71e' //process.env.ORG_ID // export your org id
+const influxToken = 'q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw=='  //To2yNAUkVv8mRImgCNy9sj5UmhX2VIiy0J8GEAJAOoeBia5k_bw7bJ40eZwQd6q8vBgAugsjvfY3qguTvUx3iw==' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
+const orgID = '7b2a33953b31c6c9' //process.env.ORG_ID // export your org id
 const bucket = 'testbucket' // process.env.BUCKET_NAME //export the name of your bucket
 
 // connect to influxdb
@@ -25,6 +25,13 @@ const influxProxy = axios.create({
   }
 });
 //TODO vary query,buckets
+const nodeRedQuery = `from(bucket: "${bucket}")
+|> range(start: -5m)
+  |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
+  |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+  |> yield(name: "mean")`;
+
 const diskQuery = `from(bucket: "${bucket}")
 |> range(start: -5m)
 |> filter(fn: (r) => r["_measurement"] == "disk")
@@ -131,7 +138,24 @@ app.get('/mem/client', (req, res) => {
         },
     })
 })
-
+app.get('/nodered/client', (req, res) => {
+    let csv = ''
+    let clientNodeRed = flux`` + nodeRedQuery
+    queryApi.queryLines(clientNodeRed, {
+        next(line) {
+            csv = `${csv}${line}\n`;
+        },
+        error(error) {
+            console.error(error)
+            console.log('\nFinished /nodered/client ERROR')
+            res.end()
+        },
+        complete() {
+            console.log('\nFinished /nodered/client SUCCESS')
+            res.end(JSON.stringify({ csv }))
+        },
+    })
+})
 //// get cpu usage data via influxdb api
 //app.get('/cpu/api', (req, res) => {
 //  let apiQuery = cpuQuery.trim();

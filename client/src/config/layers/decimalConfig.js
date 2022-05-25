@@ -8,7 +8,7 @@ export default function decimalConfig(table, fill) {
                 type: 'single stat',
                 x: '_time',
                 y: '_value',
-                fill,
+                fill: fill,
                 colors: NINETEEN_EIGHTY_FOUR,
                 interpolation: "monotoneX",
                 lineWidth: 3,
@@ -24,13 +24,13 @@ export default function decimalConfig(table, fill) {
             }),
             _value: val =>
                 typeof val === 'number'
-                    ? `${val.toFixed(2)}%`
+                    ? `${val.toFixed(2)}s`
                     : val
         },
         xScale: "linear",
         yScale: "linear",
         legendFont: "12px sans-serif",
         tickFont: "12px sans-serif",
-        showAxes: true,
+        showAxes: false,
     };
 }

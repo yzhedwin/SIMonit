@@ -26,8 +26,8 @@ export default function bandConfig(table, fill) {
                 format: "HH:mm",
             }),
             _value: val => typeof val === 'number'
-                ? `${val.toFixed(2)}%`
-                : val,
+                ? `${val.toFixed(2)}s`
+                : val
         },
         xScale: "linear",
         yScale: "linear",

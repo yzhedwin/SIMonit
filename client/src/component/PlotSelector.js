@@ -17,18 +17,22 @@ export class PlotSelector extends React.Component {
         this.state = {
             table: {},
             lastUpdated: '',
-            graphType: types[0]
+            graphType: types[0],
+            query: 'nodered/client'
         };
     }
+
+
     animationFrameId = 0;
     style = {
-        width: "500px",
-        height: "200px",
+        width: '500px',
+        height: '200px',
         margin: "50px",
     };
 
     getDataAndUpdateTable = async () => {
-        const resp = await axios.get('http://localhost:3001/cpu/client');
+        //TODO: Let User Select Query
+        const resp = await axios.get('http://localhost:3001/' + this.state.query);
 
         try {
             let results = fromFlux(resp.data.csv);
@@ -53,13 +57,13 @@ export class PlotSelector extends React.Component {
     }
 
     renderPlot = () => {
-        const fill = findStringColumns(this.state.table)
-        const config = new Configuration(this.state.graphType, this.state.table, fill).getConfig()
-
-
-        const handleChange = (event) => {
+        const fill = findStringColumns(this.state.table);
+        const config = new Configuration(this.state.graphType, this.state.table, fill).getConfig();
+        const handleGraphChange = (event) => {
             this.setState({ graphType: event.target.value });
         };
+
+        //TODO: Allow User To Shift Graphs Around
         return (
             <div style={this.style}>
                 <h2>
@@ -69,7 +73,7 @@ export class PlotSelector extends React.Component {
                             labelId="select"
                             id="select"
                             value={this.state.graphType}
-                            onChange={handleChange}
+                            onChange={handleGraphChange}
                             autoWidth
                             label="Graph Type"
                         >
@@ -79,12 +83,13 @@ export class PlotSelector extends React.Component {
                         </Select>
                     </FormControl>
                 </h2>
-                <h3>CPU Usage</h3>
-                <h5>Last Updated: {this.state.lastUpdated}</h5>
-                <Plot config={config} />
+                        <h3>{this.state.query}</h3>
+                        <h5>Last Updated: {this.state.lastUpdated}</h5>
+                        <Plot config={config} />
             </div>
         )
     }
+
 
     renderEmpty = () => {
         return (

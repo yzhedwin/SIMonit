@@ -1,5 +1,5 @@
 import { NINETEEN_EIGHTY_FOUR, timeFormatter } from '@influxdata/giraffe'
-
+//vary Value formatters
 export default function lineConfig(table, fill) {
     return {
         table: table,
@@ -8,7 +8,7 @@ export default function lineConfig(table, fill) {
                 type: 'line',
                 x: '_time',
                 y: '_value',
-                fill,
+                fill: fill,
                 colors: NINETEEN_EIGHTY_FOUR,
                 interpolation: "monotoneX",
                 lineWidth: 3,
@@ -24,7 +24,7 @@ export default function lineConfig(table, fill) {
             }),
             _value: val =>
                 typeof val === 'number'
-                    ? `${(val / 1000000).toFixed(2)}M`
+                    ? `${val.toFixed(2)}s`
                     : val
         },
         xScale: "linear",
