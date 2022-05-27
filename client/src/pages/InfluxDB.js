@@ -1,6 +1,6 @@
 
 import { Grid } from '@mui/material';
-import { PlotSelector } from '../component/PlotSelector';
+import { Graph } from '../component/Graph';
 
 // TODO: add menu options to choose from different examples
 export const InfluxDB = () => {
@@ -15,7 +15,7 @@ export const InfluxDB = () => {
                 spacing={3}
             >
                 <Grid item xs={1} sm={1}>
-                    <PlotSelector />
+                    <Graph query='nodered/client/memory'/>
                 </Grid>
             </Grid>
         </div>

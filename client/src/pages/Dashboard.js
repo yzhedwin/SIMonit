@@ -1,10 +1,10 @@
 import TestGrid from "../component/GridLayout";
 
-const About = () => {
+const Dashboard = () => {
     return (
         <div>
             <TestGrid/>
         </div>
     )
 };
-export default About;
+export default Dashboard;

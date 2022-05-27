@@ -5,12 +5,12 @@
     "\\client\\src",
     "\\client\\src\\component",
     "\\client\\src\\config",
-    "\\client\\src\\config\\Configuration",
     "\\client\\src\\config\\layers",
+    "\\client\\src\\config\\queries",
     "\\client\\src\\pages",
     "\\images",
     "\\server"
   ],
-  "SelectedNode": "\\client\\src\\component\\PlotSelector.js",
+  "SelectedNode": "\\client\\src\\component\\Storage.js",
   "PreviewInSolutionExplorer": false
 }

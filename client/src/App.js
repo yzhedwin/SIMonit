@@ -3,7 +3,7 @@ import ResponsiveAppBar from './component/AppBar';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
-import About from "./pages/About";
+import Dashboard from "./pages/Dashboard";
 import InfluxDB from "./pages/InfluxDB";
 
 class App extends React.Component {
@@ -14,7 +14,7 @@ class App extends React.Component {
                 <ResponsiveAppBar />
                 <Routes>
                     <Route index element={<Home />} />
-                    <Route path="About" element={<About />} />
+                    <Route path="Dashboard" element={<Dashboard />} />
                     <Route path="InfluxDB" element={<InfluxDB />} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>

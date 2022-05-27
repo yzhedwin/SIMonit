@@ -25,11 +25,23 @@ const influxProxy = axios.create({
   }
 });
 //TODO vary query,buckets
-const nodeRedQuery = `from(bucket: "${bucket}")
+const nodeRedQueryMemory = `from(bucket: "${bucket}")
 |> range(start: -5m)
   |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
   |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+  |> yield(name: "mean")`;
+
+const nodeRedQueryETH = `from(bucket: "${bucket}")
+|> range(start: -5m)
+  |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
+  |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+  |> yield(name: "mean")`;
+
+const nodeRedQueryUptime = `from(bucket: "${bucket}")
+|> range(start: -5m)
+  |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
+  |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
 
 const diskQuery = `from(bucket: "${bucket}")
@@ -138,23 +150,59 @@ app.get('/mem/client', (req, res) => {
         },
     })
 })
-app.get('/nodered/client', (req, res) => {
+app.get('/nodered/client/memory', (req, res) => {
     let csv = ''
-    let clientNodeRed = flux`` + nodeRedQuery
+    let clientNodeRed = flux`` + nodeRedQueryMemory
     queryApi.queryLines(clientNodeRed, {
         next(line) {
             csv = `${csv}${line}\n`;
         },
         error(error) {
             console.error(error)
-            console.log('\nFinished /nodered/client ERROR')
+            console.log('\nFinished /nodered/client/memory ERROR')
             res.end()
         },
         complete() {
-            console.log('\nFinished /nodered/client SUCCESS')
+            console.log('\nFinished /nodered/client/memory SUCCESS')
             res.end(JSON.stringify({ csv }))
         },
     })
+})
+app.get('/nodered/client/eth', (req, res) => {
+    let csv = ''
+    let clientNodeRed = flux`` + nodeRedQueryETH
+    queryApi.queryLines(clientNodeRed, {
+        next(line) {
+            csv = `${csv}${line}\n`;
+        },
+        error(error) {
+            console.error(error)
+            console.log('\nFinished /nodered/client/eth ERROR')
+            res.end()
+        },
+        complete() {
+            console.log('\nFinished /nodered/client/eth SUCCESS')
+            res.end(JSON.stringify({ csv }))
+        },
+    })
+})
+app.get('/nodered/client/uptime', (req, res) => {
+  let csv = ''
+  let clientNodeRed = flux`` + nodeRedQueryUptime
+  queryApi.queryLines(clientNodeRed, {
+      next(line) {
+          csv = `${csv}${line}\n`;
+      },
+      error(error) {
+          console.error(error)
+          console.log('\nFinished /nodered/client/uptime ERROR')
+          res.end()
+      },
+      complete() {
+          console.log('\nFinished /nodered/client/uptime SUCCESS')
+          res.end(JSON.stringify({ csv }))
+      },
+  })
 })
 //// get cpu usage data via influxdb api
 //app.get('/cpu/api', (req, res) => {

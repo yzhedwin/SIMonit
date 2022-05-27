@@ -2,26 +2,27 @@ import React from 'react'
 import { fromFlux, Plot } from '@influxdata/giraffe'
 import axios from 'axios'
 import { findStringColumns } from '../helpers'
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import Configuration from '../config/Configuration/Configuration';
+import DeviceForm from '../forms/DeviceForm';
+import GraphForm from '../forms/GraphForm';
+import QueryForm from '../forms/QueryForm';
 
 const REASONABLE_API_REFRESH_RATE = 5000;
-const types = ['band', 'line', 'single stat'];
 
-export class PlotSelector extends React.Component {
+export class Graph extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             table: {},
             lastUpdated: '',
-            graphType: types[0],
-            query: 'nodered/client'
+            graphType: 'band',
+            query: 'nodered/client/memory',
+            device: 'device1'
         };
+        this.handleGraphChange = this.handleGraphChange.bind(this);
+        this.handleDeviceChange = this.handleDeviceChange.bind(this);
+        this.handleQueryChange = this.handleQueryChange.bind(this);
     }
-
 
     animationFrameId = 0;
     style = {
@@ -31,7 +32,6 @@ export class PlotSelector extends React.Component {
     };
 
     getDataAndUpdateTable = async () => {
-        //TODO: Let User Select Query
         const resp = await axios.get('http://localhost:3001/' + this.state.query);
 
         try {
@@ -55,41 +55,39 @@ export class PlotSelector extends React.Component {
     componentWillUnmount = () => {
         window.clearInterval(this.animationFrameId);
     }
+    handleGraphChange = (event) => {
+         this.setState({ graphType: event.target.value });      
+     };
+
+     handleQueryChange = (event) => {
+         this.setState({ query: event.target.value });
+         
+     };
+
+     handleDeviceChange = (event) => {
+        this.setState({ device: event.target.value });
+     };
+
 
     renderPlot = () => {
         const fill = findStringColumns(this.state.table);
         const config = new Configuration(this.state.graphType, this.state.table, fill).getConfig();
-        const handleGraphChange = (event) => {
-            this.setState({ graphType: event.target.value });
-        };
 
-        //TODO: Allow User To Shift Graphs Around
         return (
+
             <div style={this.style}>
                 <h2>
-                    <FormControl sx={{ m: 1, minWidth: 80 }}>
-                        <InputLabel id="select">Graph Type</InputLabel>
-                        <Select
-                            labelId="select"
-                            id="select"
-                            value={this.state.graphType}
-                            onChange={handleGraphChange}
-                            autoWidth
-                            label="Graph Type"
-                        >
-                            <MenuItem value={"band"}>Band</MenuItem>
-                            <MenuItem value={"line"}>Line</MenuItem>
-                            <MenuItem value={"single stat"}>Single Stat</MenuItem>
-                        </Select>
-                    </FormControl>
-                </h2>
-                        <h3>{this.state.query}</h3>
-                        <h5>Last Updated: {this.state.lastUpdated}</h5>
-                        <Plot config={config} />
+                 <DeviceForm onChange={this.handleDeviceChange} device={this.state.device}/> 
+                 <GraphForm onChange={this.handleGraphChange} graphType={this.state.graphType}/> 
+                 <QueryForm onChange={this.handleQueryChange} query={this.state.query}/> 
+                 </h2>
+                 <h2>{this.state.device}</h2>
+                <h3>{this.state.query}</h3>
+                <h5>Last Updated: {this.state.lastUpdated}</h5>
+                <Plot config={config} />
             </div>
         )
     }
-
 
     renderEmpty = () => {
         return (
