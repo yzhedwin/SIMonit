@@ -1,4 +1,4 @@
-import TestGrid from "../component/GridLayout";
+import TestGrid from "../component/TestGrid";
 
 const Dashboard = () => {
     return (

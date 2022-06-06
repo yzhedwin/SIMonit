@@ -8,9 +8,9 @@ const { query } = require('express')
 
 // vars to connect to bucket in influxdb
 const baseURL = 'http://localhost:8086' //process.env.INFLUX_URL // url of your cloud instance
-const influxToken = 'q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw=='  //To2yNAUkVv8mRImgCNy9sj5UmhX2VIiy0J8GEAJAOoeBia5k_bw7bJ40eZwQd6q8vBgAugsjvfY3qguTvUx3iw==' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
+const influxToken = 'q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw==' //' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
 const orgID = '7b2a33953b31c6c9' //process.env.ORG_ID // export your org id
-const bucket = 'testbucket' // process.env.BUCKET_NAME //export the name of your bucket
+const bucket = 'testbucket2' // process.env.BUCKET_NAME //export the name of your bucket
 
 // connect to influxdb
 const influxDB = new InfluxDB({ url: baseURL, token: influxToken })

@@ -4,7 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import Dashboard from "./pages/Dashboard";
-import InfluxDB from "./pages/InfluxDB";
+import Storage from './component/Storage';
+import Grid from './pages/Grid';
+
 
 class App extends React.Component {
 
@@ -15,7 +17,8 @@ class App extends React.Component {
                 <Routes>
                     <Route index element={<Home />} />
                     <Route path="Dashboard" element={<Dashboard />} />
-                    <Route path="InfluxDB" element={<InfluxDB />} />
+                    <Route path="Grid" element={<Grid />} />
+                    <Route path="Storage" element={<Storage />} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>
             </BrowserRouter>
