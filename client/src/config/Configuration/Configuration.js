@@ -2,7 +2,7 @@ import bandConfig from "../layers/bandConfig"
 import decimalConfig from "../layers/decimalConfig";
 import lineConfig from "../layers/lineConfig";
 
-
+//TODO: Add data formatting depending on data type
 export default class Configuration {
 
     constructor(configType, table, fill) {

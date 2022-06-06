@@ -27,20 +27,20 @@ const influxProxy = axios.create({
 //TODO vary query,buckets
 const nodeRedQueryMemory = `from(bucket: "${bucket}")
 |> range(start: -5m)
-  |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
+  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
   |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
 
 const nodeRedQueryETH = `from(bucket: "${bucket}")
 |> range(start: -5m)
-  |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
+  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
   |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
 
 const nodeRedQueryUptime = `from(bucket: "${bucket}")
 |> range(start: -5m)
-  |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
+  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
   |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
 
@@ -204,30 +204,7 @@ app.get('/nodered/client/uptime', (req, res) => {
       },
   })
 })
-//// get cpu usage data via influxdb api
-//app.get('/cpu/api', (req, res) => {
-//  let apiQuery = cpuQuery.trim();
-//  console.log(apiQuery)
-//  influxProxy.request({
-//    method: 'post',
-//    url: 'api/v2/query',
-//    params: {
-//      orgID
-//    },
-//    data: {
-//      query: apiQuery,
-//      extern: {"type":"File","package":null,"imports":null,"body":[{"type":"OptionStatement","assignment":{"type":"VariableAssignment","id":{"type":"Identifier","name":"v"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"bucket"},"value":{"type":"StringLiteral","value":"telegraf"}},{"type":"Property","key":{"type":"Identifier","name":"timeRangeStart"},"value":{"type":"UnaryExpression","operator":"-","argument":{"type":"DurationLiteral","values":[{"magnitude":1,"unit":"h"}]}}},{"type":"Property","key":{"type":"Identifier","name":"timeRangeStop"},"value":{"type":"CallExpression","callee":{"type":"Identifier","name":"now"}}},{"type":"Property","key":{"type":"Identifier","name":"windowPeriod"},"value":{"type":"DurationLiteral","values":[{"magnitude":10000,"unit":"ms"}]}}]}}}]},
-//      dialect :{"annotations":["group","datatype","default"]}
-//    }
-//  }).then((response) => {
-//    console.log('\nFinished /cpu/api SUCCESS')
-//    res.send(JSON.stringify({csv: response.data}))
-//  }).catch(error => {
-//    console.log(error)
-//    console.log('\nFinished /cpu/api ERROR')
-//    res.send(error.message)
-//  });
-//})
+
 
 app.listen(port, () => {
   console.log(`listening on port :${port}`);
@@ -236,3 +213,30 @@ app.listen(port, () => {
 async function getBuckets() {
   return await bucketsAPI.getBuckets({ orgID })
 }
+
+/*
+// get cpu usage data via influxdb api
+app.get('/cpu/api', (req, res) => {
+ let apiQuery = cpuQuery.trim();
+ console.log(apiQuery)
+ influxProxy.request({
+   method: 'post',
+   url: 'api/v2/query',
+   params: {
+     orgID
+   },
+   data: {
+     query: apiQuery,
+     extern: {"type":"File","package":null,"imports":null,"body":[{"type":"OptionStatement","assignment":{"type":"VariableAssignment","id":{"type":"Identifier","name":"v"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"bucket"},"value":{"type":"StringLiteral","value":"telegraf"}},{"type":"Property","key":{"type":"Identifier","name":"timeRangeStart"},"value":{"type":"UnaryExpression","operator":"-","argument":{"type":"DurationLiteral","values":[{"magnitude":1,"unit":"h"}]}}},{"type":"Property","key":{"type":"Identifier","name":"timeRangeStop"},"value":{"type":"CallExpression","callee":{"type":"Identifier","name":"now"}}},{"type":"Property","key":{"type":"Identifier","name":"windowPeriod"},"value":{"type":"DurationLiteral","values":[{"magnitude":10000,"unit":"ms"}]}}]}}}]},
+     dialect :{"annotations":["group","datatype","default"]}
+   }
+ }).then((response) => {
+   console.log('\nFinished /cpu/api SUCCESS')
+   res.send(JSON.stringify({csv: response.data}))
+ }).catch(error => {
+   console.log(error)
+   console.log('\nFinished /cpu/api ERROR')
+   res.send(error.message)
+ });
+})
+*/

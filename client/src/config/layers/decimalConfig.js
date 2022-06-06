@@ -24,7 +24,7 @@ export default function decimalConfig(table, fill) {
             }),
             _value: val =>
                 typeof val === 'number'
-                    ? `${val.toFixed(2)}s`
+                    ? `${val}`
                     : val
         },
         xScale: "linear",

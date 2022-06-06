@@ -5,14 +5,16 @@ const orgID = '7b2a33953b31c6c9' //process.env.ORG_ID // export your org id
 // connect to influxdb
 const influxDB = new InfluxDB({ url: baseURL, token: influxToken })
 
-const testQ = `from(bucket: "javabucket")
+
+export default function read() {
+  //TODO: Parameterise the query
+  const testQ = `from(bucket: "javabucket")
 |> range(start: -5m)
 |> filter(fn: (r) => r["_measurement"] == "Save")
 |> filter(fn: (r) => r["UID"] == "User2")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")`;
 
-export default function read() {
     console.log('\n*** QUERY ***')
     const queryApi = influxDB.getQueryApi(orgID)
     queryApi.queryRows(testQ, {

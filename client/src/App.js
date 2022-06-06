@@ -6,6 +6,7 @@ import NoPage from "./pages/NoPage";
 import Dashboard from "./pages/Dashboard";
 import Storage from './component/Storage';
 import Grid from './pages/Grid';
+import InfluxDB from './pages/InfluxDB';
 
 
 class App extends React.Component {
@@ -18,6 +19,7 @@ class App extends React.Component {
                     <Route index element={<Home />} />
                     <Route path="Dashboard" element={<Dashboard />} />
                     <Route path="Grid" element={<Grid />} />
+                    <Route path="InfluxDB" element={<InfluxDB />} />
                     <Route path="Storage" element={<Storage />} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>
