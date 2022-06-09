@@ -110,9 +110,9 @@ export class Graph extends React.Component {
       legendFont: "12px sans-serif",
       tickFont: "12px sans-serif",
       showAxes: true,
-      staticLegend: {
-        show: true,
-      },
+      staticLegend: { 
+        heightRatio: .2,
+       },
     };
     return (
       <div style={this.style}>
