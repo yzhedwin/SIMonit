@@ -26,7 +26,7 @@ export default class Grid extends React.PureComponent {
     this.state = {
       layouts: JSON.parse(JSON.stringify(storageLayout)),
       items: JSON.parse(storageItems),
-      toggleLegend: 1
+      toggleLegend: 1,
     };
     this.onBreakpointChange = this.onBreakpointChange.bind(this);
     this.onItemsChange = this.onItemsChange.bind(this);
@@ -96,9 +96,8 @@ export default class Grid extends React.PureComponent {
   }
   onLegendChange(num) {
     const newNum = num * -1;
-    this.setState({ toggleLegend: newNum});
+    this.setState({ toggleLegend: newNum });
   }
-
   reset() {
     localStorage.clear();
     localStorage.setItem("items", JSON.stringify(0));
@@ -109,11 +108,12 @@ export default class Grid extends React.PureComponent {
     return (
       <div>
         <h2>
-          <Button 
-          onClick={() => this.reset()}
-          variant="contained"
-          color="error"
-          >Reset All
+          <Button
+            onClick={() => this.reset()}
+            variant="contained"
+            color="error"
+          >
+            Reset All
           </Button>
           <Button
             onClick={() => this.onItemsChange(this.state.items)}
