@@ -108,13 +108,20 @@ export class Graph extends React.Component {
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
+      legendHide: this.props.toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
       showAxes: true,
       staticLegend: { 
-        heightRatio: .2,
+        heightRatio: .4,
+        border: '2px solid black',
+        fontBrightColor: 'black',
+        backgroundColor:'white',
+        colorizeRows: false,
+        hide:  this.props.toggleLegend === 1 ? false : true
        },
     };
     return (
+
       <div style={this.style}>
         <h2>
           <DeviceForm

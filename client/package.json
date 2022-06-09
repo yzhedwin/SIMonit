@@ -5,7 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@influxdata/giraffe": "^1.0.2",
+    "@influxdata/giraffe": "^2.26.2", 
     "@influxdata/influxdb-client": "^1.9.0",
     "@mui/icons-material": "^5.8.0",
     "@testing-library/jest-dom": "^5.11.4",

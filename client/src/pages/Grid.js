@@ -26,15 +26,17 @@ export default class Grid extends React.PureComponent {
     this.state = {
       layouts: JSON.parse(JSON.stringify(storageLayout)),
       items: JSON.parse(storageItems),
+      toggleLegend: 1
     };
     this.onBreakpointChange = this.onBreakpointChange.bind(this);
     this.onItemsChange = this.onItemsChange.bind(this);
     this.onLayoutChange = this.onLayoutChange.bind(this);
+    this.onLegendChange = this.onLegendChange.bind(this);
   }
   //use index to load config of graph
   generateDOM() {
     const cols = this.state.cols || 6;
-
+    const toggle = this.state.toggleLegend || 1;
     //TODO: Add database query to load config
     return _.map(_.range(this.state.items), function (i) {
       let storageQuery =
@@ -62,6 +64,7 @@ export default class Grid extends React.PureComponent {
               graphType={storageGraph}
               query={storageQuery}
               device={storageDevice}
+              toggleLegend={toggle}
             />
           }
         </div>
@@ -91,6 +94,10 @@ export default class Grid extends React.PureComponent {
       cols: cols,
     });
   }
+  onLegendChange(num) {
+    const newNum = num * -1;
+    this.setState({ toggleLegend: newNum});
+  }
 
   reset() {
     localStorage.clear();
@@ -102,13 +109,25 @@ export default class Grid extends React.PureComponent {
     return (
       <div>
         <h2>
-          <button onClick={() => this.reset()}>Reset All</button>
+          <Button 
+          onClick={() => this.reset()}
+          variant="contained"
+          color="error"
+          >Reset All
+          </Button>
           <Button
             onClick={() => this.onItemsChange(this.state.items)}
             variant="contained"
             color="success"
           >
             Add Graph
+          </Button>
+          <Button
+            onClick={() => this.onLegendChange(this.state.toggleLegend)}
+            variant="contained"
+            color="warning"
+          >
+            Toggle Legend
           </Button>
         </h2>
         <ResponsiveReactGridLayout
