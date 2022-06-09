@@ -37,26 +37,28 @@ export default class Grid extends React.PureComponent {
 
     //TODO: Add database query to load config
     return _.map(_.range(this.state.items), function (i) {
-      let storageQuery = localStorage.getItem("query" + (i+1)) || defaultQuery;
-      let storageGraph = localStorage.getItem("graph" + (i+1)) || defaultGraph;
-      let storageDevice = localStorage.getItem("device" + (i+1)) || defaultDevice;
+      let storageQuery =
+        localStorage.getItem("query" + (i + 1)) || defaultQuery;
+      let storageGraph =
+        localStorage.getItem("graph" + (i + 1)) || defaultGraph;
+      let storageDevice =
+        localStorage.getItem("device" + (i + 1)) || defaultDevice;
       return (
         <div
           key={i}
           data-grid={{
             w: 2,
-            h: 15,
+            h: 20,
             x: (i * 2) % cols,
             y: i,
-            maxH: 20,
-            minH: 15,
+            minH: 20,
             minW: 2,
             i: i.toString(),
           }}
         >
           {
             <Graph
-              id={i+1}
+              id={i + 1}
               graphType={storageGraph}
               query={storageQuery}
               device={storageDevice}
@@ -71,7 +73,7 @@ export default class Grid extends React.PureComponent {
     saveToLS("layouts", layouts);
     this.setState({ layouts });
     if (this.state.items !== 0) {
-      write("" ,"layout", JSON.stringify(layouts));
+      write("", "layout", JSON.stringify(layouts));
     }
   }
 

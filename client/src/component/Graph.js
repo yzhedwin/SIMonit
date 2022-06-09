@@ -1,5 +1,5 @@
 import React from "react";
-import { fromFlux, Plot } from "@influxdata/giraffe";
+import { fromFlux, Plot, timeFormatter } from "@influxdata/giraffe";
 import axios from "axios";
 import { findStringColumns } from "../helpers";
 import Configuration from "../config/Configuration/Configuration";
@@ -31,6 +31,8 @@ export class Graph extends React.Component {
   animationFrameId = 0;
   style = {
     margin: "5px",
+    height: "60%",
+    width: "90%",
   };
 
   getDataAndUpdateTable = async () => {
@@ -93,11 +95,25 @@ export class Graph extends React.Component {
 
   renderPlot = () => {
     const fill = findStringColumns(this.state.table);
-    const config = new Configuration(
-      this.state.graphType,
-      this.state.table,
-      fill
-    ).getConfig();
+    const config = {
+      table: this.state.table,
+      layers: [new Configuration(this.state.graphType, fill).getConfig()],
+      valueFormatters: {
+        _time: timeFormatter({
+          timeFormat: "UTC",
+          format: "HH:mm",
+        }),
+        _value: (val) => (typeof val === "number" ? `${val}` : val),
+      },
+      xScale: "linear",
+      yScale: "linear",
+      legendFont: "12px sans-serif",
+      tickFont: "12px sans-serif",
+      showAxes: true,
+      staticLegend: {
+        show: true,
+      },
+    };
     return (
       <div style={this.style}>
         <h2>

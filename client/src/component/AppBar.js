@@ -14,7 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { useNavigate } from "react-router-dom";
 
-const pages = ['InfluxDB', 'Dashboard', 'Grid', 'Storage'];
+const pages = ['InfluxDB', 'Dashboard', 'Grid', 'Storage', 'Legend'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 

@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Storage from './component/Storage';
 import Grid from './pages/Grid';
 import InfluxDB from './pages/InfluxDB';
+import StaticLegend from './pages/StaticLegend';
 
 
 class App extends React.Component {
@@ -21,6 +22,7 @@ class App extends React.Component {
                     <Route path="Grid" element={<Grid />} />
                     <Route path="InfluxDB" element={<InfluxDB />} />
                     <Route path="Storage" element={<Storage />} />
+                    <Route path="Legend" element={<StaticLegend />} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>
             </BrowserRouter>
