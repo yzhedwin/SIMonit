@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import Dashboard from "./pages/Dashboard";
-import Storage from './component/Storage';
+import Storage from './pages/Storage';
 import Grid from './pages/Grid';
 import InfluxDB from './pages/InfluxDB';
 import StaticLegend from './pages/StaticLegend';

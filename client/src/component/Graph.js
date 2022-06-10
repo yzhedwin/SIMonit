@@ -2,11 +2,11 @@ import React from "react";
 import { fromFlux, Plot, timeFormatter } from "@influxdata/giraffe";
 import axios from "axios";
 import { findStringColumns } from "../helpers";
-import Configuration from "../config/Configuration/Configuration";
 import DeviceForm from "../forms/DeviceForm";
 import GraphForm from "../forms/GraphForm";
 import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
+import LayerConfig from "../config/configuration/LayerConfig";
 
 const REASONABLE_API_REFRESH_RATE = 5000;
 const defaultGraph = "band";
@@ -97,7 +97,7 @@ export class Graph extends React.Component {
     const fill = findStringColumns(this.state.table);
     const config = {
       table: this.state.table,
-      layers: [new Configuration(this.state.graphType, fill).getConfig()],
+      layers: [new LayerConfig(this.state.graphType, fill).getConfig()],
       valueFormatters: {
         _time: timeFormatter({
           timeFormat: "UTC",
@@ -111,16 +111,17 @@ export class Graph extends React.Component {
       legendHide: this.props.toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
       showAxes: true,
-      staticLegend: {
-        heightRatio: 0.4,
-        border: "2px solid black",
-        fontBrightColor: "black",
-        backgroundColor: "white",
+      staticLegend: { 
+        heightRatio: .4,
+        border: '2px solid black',
+        fontBrightColor: 'black',
+        backgroundColor:'white',
         colorizeRows: false,
-        hide: this.props.toggleLegend === 1 ? false : true,
-      },
+        hide:  this.props.toggleLegend === 1 ? false : true
+       },
     };
     return (
+
       <div style={this.style}>
         <h2>
           <DeviceForm

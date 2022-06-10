@@ -3,7 +3,7 @@ import decimalConfig from "../layers/decimalConfig";
 import lineConfig from "../layers/lineConfig";
 
 //TODO: Add data formatting depending on data type
-export default class Configuration {
+export default class LayerConfig {
   constructor(configType, fill) {
     this.state = {
       configType,
