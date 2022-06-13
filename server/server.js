@@ -30,7 +30,21 @@ const nodeRedQueryMemory = `from(bucket: "${bucket}")
   |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
   |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "mean")`;
+  |> yield(name: "mean")
+  
+  from(bucket: "${bucket}")
+|> range(start: -5m)
+|> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+|> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name: "min")
+
+from(bucket: "${bucket}")
+|> range(start: -5m)
+|> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+|> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+|> yield(name: "max")`;
 
 const nodeRedQueryETH = `from(bucket: "${bucket}")
 |> range(start: -5m)

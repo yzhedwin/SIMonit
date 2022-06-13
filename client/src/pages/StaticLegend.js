@@ -1,15 +1,12 @@
 import React, { Component } from "react";
 import { Graph } from "../component/Graph";
+import "./StaticLegend.css";
 
 export default class StaticLegend extends Component {
-    style = {
-        margin: "5px",
-        height: "500px",
-        width: "50%"
-  };
+
   render() {
     return (
-      <div style = {this.style}>
+      <div className="static-legend">
         <Graph
           query="nodered/client/memory"
           graphType="band"

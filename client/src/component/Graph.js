@@ -1,5 +1,5 @@
 import React from "react";
-import { fromFlux, Plot, timeFormatter } from "@influxdata/giraffe";
+import { fromFlux, Plot } from "@influxdata/giraffe";
 import axios from "axios";
 import { findStringColumns } from "../helpers";
 import DeviceForm from "../forms/DeviceForm";
@@ -7,6 +7,7 @@ import GraphForm from "../forms/GraphForm";
 import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
+import DataFormatter from "../config/configuration/DataFormatter";
 
 const REASONABLE_API_REFRESH_RATE = 5000;
 const defaultGraph = "band";
@@ -98,13 +99,7 @@ export class Graph extends React.Component {
     const config = {
       table: this.state.table,
       layers: [new LayerConfig(this.state.graphType, fill).getConfig()],
-      valueFormatters: {
-        _time: timeFormatter({
-          timeFormat: "UTC",
-          format: "HH:mm",
-        }),
-        _value: (val) => (typeof val === "number" ? `${val}` : val),
-      },
+      valueFormatters: new DataFormatter(this.state.query).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
@@ -112,7 +107,7 @@ export class Graph extends React.Component {
       tickFont: "12px sans-serif",
       showAxes: true,
       staticLegend: { 
-        heightRatio: .4,
+        heightRatio: 0.4,
         border: '2px solid black',
         fontBrightColor: 'black',
         backgroundColor:'white',
@@ -122,7 +117,7 @@ export class Graph extends React.Component {
     };
     return (
 
-      <div style={this.style}>
+      <div className="graph-component" style={this.style}>
         <h2>
           <DeviceForm
             onChange={this.handleDeviceChange}

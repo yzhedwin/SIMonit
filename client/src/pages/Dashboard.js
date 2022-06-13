@@ -1,7 +1,7 @@
 import React from "react";
 import _ from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import "../Grid.css";
+import "./Dashboard.css";
 import { Graph } from "../component/Graph";
 import { Button } from "@mui/material";
 import write from "../component/DBWrite";
@@ -15,11 +15,6 @@ const defaultQuery = "nodered/client/memory";
 const defaultDevice = "device1";
 
 export default class Dashboard extends React.PureComponent {
-  static defaultProps = {
-    className: "layout",
-    cols: { lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 },
-    rowHeight: 30,
-  };
 
   constructor(props) {
     super(props);
@@ -103,10 +98,15 @@ export default class Dashboard extends React.PureComponent {
     localStorage.setItem("items", JSON.stringify(0));
     this.setState({ layouts: {}, items: 0 });
   }
-
+//style={{transform: 'scale(0.75) translate(-15%, -15%)'}}>
   render() {
     return (
-      <div>
+      <div className="dashboard" style={
+      {
+      margin: "5px",
+      height: "100%",
+      width: "100%"
+      }}> 
         <h2>
           <Button
             onClick={() => this.reset()}
@@ -139,6 +139,8 @@ export default class Dashboard extends React.PureComponent {
           onLayoutChange={(layout, layouts) =>
             this.onLayoutChange(layout, layouts)
           }
+          isBounded={true}
+          measureBeforeMount={true}
           onBreakpointChange={this.onBreakpointChange}
         >
           {this.generateDOM()}
