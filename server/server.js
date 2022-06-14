@@ -25,7 +25,7 @@ const influxProxy = axios.create({
   }
 });
 //TODO vary query,buckets
-const nodeRedQueryMemory = `from(bucket: "${bucket}")
+const nodeRedQueryMemory01 = `from(bucket: "${bucket}")
 |> range(start: -5m)
   |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
   |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
@@ -46,13 +46,13 @@ from(bucket: "${bucket}")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
-const nodeRedQueryETH = `from(bucket: "${bucket}")
+const nodeRedQueryETH01 = `from(bucket: "${bucket}")
 |> range(start: -5m)
   |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
   |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
 
-const nodeRedQueryUptime = `from(bucket: "${bucket}")
+const nodeRedQueryUptime01 = `from(bucket: "${bucket}")
 |> range(start: -5m)
   |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
   |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
@@ -164,9 +164,9 @@ app.get('/mem/client', (req, res) => {
         },
     })
 })
-app.get('/nodered/client/memory', (req, res) => {
+app.get('/device1/nodered/client/memory', (req, res) => {
     let csv = ''
-    let clientNodeRed = flux`` + nodeRedQueryMemory
+    let clientNodeRed = flux`` + nodeRedQueryMemory01
     queryApi.queryLines(clientNodeRed, {
         next(line) {
             csv = `${csv}${line}\n`;
@@ -182,9 +182,9 @@ app.get('/nodered/client/memory', (req, res) => {
         },
     })
 })
-app.get('/nodered/client/eth', (req, res) => {
+app.get('/device1/nodered/client/eth', (req, res) => {
     let csv = ''
-    let clientNodeRed = flux`` + nodeRedQueryETH
+    let clientNodeRed = flux`` + nodeRedQueryETH01
     queryApi.queryLines(clientNodeRed, {
         next(line) {
             csv = `${csv}${line}\n`;
@@ -200,9 +200,9 @@ app.get('/nodered/client/eth', (req, res) => {
         },
     })
 })
-app.get('/nodered/client/uptime', (req, res) => {
+app.get('/device1/nodered/client/uptime', (req, res) => {
   let csv = ''
-  let clientNodeRed = flux`` + nodeRedQueryUptime
+  let clientNodeRed = flux`` + nodeRedQueryUptime01
   queryApi.queryLines(clientNodeRed, {
       next(line) {
           csv = `${csv}${line}\n`;

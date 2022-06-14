@@ -8,7 +8,6 @@ import Grid from './pages/Grid';
 import ResizableGrid from './pages/ResizableGrid';
 import StaticPage from './pages/StaticPage';
 import ResizablePage from './pages/ResizablePage';
-import TestUrlSearch from './pages/TestUrlSearch';
 import User from './pages/User';
 
 
@@ -26,7 +25,6 @@ class App extends React.Component {
                     <Route path="ResizablePage" element={<ResizablePage />} />
                     <Route path="StaticPage" element={<StaticPage />} />
                     <Route path="StaticPage/:did" element={<StaticPage />} />
-                    <Route path="TestUrlSearch" element={<TestUrlSearch />} />
                     <Route path='user/:userName' element={<User/>} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>

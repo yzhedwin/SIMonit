@@ -15,6 +15,7 @@ const defaultQuery = "nodered/client/memory";
 const defaultDevice = "device1";
 
 export class Graph extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -24,12 +25,14 @@ export class Graph extends React.Component {
       query: props.query,
       device: props.device,
     };
+    console.log(this.state.device)
     this.handleGraphChange = this.handleGraphChange.bind(this);
     this.handleDeviceChange = this.handleDeviceChange.bind(this);
     this.handleQueryChange = this.handleQueryChange.bind(this);
   }
 
   animationFrameId = 0;
+  
   style = {
     margin: "5px",
     height: "60%",
@@ -37,7 +40,7 @@ export class Graph extends React.Component {
   };
 
   getDataAndUpdateTable = async () => {
-    const resp = await axios.get("http://localhost:3001/" + this.state.query);
+    const resp = await axios.get("http://localhost:3001/" + this.state.device + "/" + this.state.query);
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
