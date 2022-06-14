@@ -1,6 +1,6 @@
 import React from 'react';
 import {Resizable, ResizableBox} from 'react-resizable'
-import "./Storage.css";
+import "./ResizablePage.css";
 
 const CustomResizeHandle = React.forwardRef((props, ref) => {
   const {handleAxis, ...restProps} = props;
@@ -13,7 +13,7 @@ const CustomResizeHandle = React.forwardRef((props, ref) => {
   );
 });
 
-export default class Storage extends React.Component {
+export default class ResizablePage extends React.Component {
   state = {
     width: 200,
     height: 200,

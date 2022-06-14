@@ -14,7 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { useNavigate } from "react-router-dom";
 
-const pages = ['ResizableGrid', 'Dashboard', 'Grid', 'Storage', 'Legend'];
+const pages = ['ResizableGrid', 'Dashboard', 'Grid', 'ResizablePage', 'StaticPage', 'TestUrlSearch'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 
