@@ -5,17 +5,15 @@ import "./Dashboard.css";
 import { Graph } from "../component/Graph";
 import { Button } from "@mui/material";
 import write from "../component/DBWrite";
+import { DEFAULT_DEVICE, DEFAULT_QUERY, DEFAULT_GRAPH_TYPE } from "../constants";
 
 //TODO: Load Layout and Items from Database
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const storageLayout = getFromLS("layouts") || {};
 const storageItems = localStorage.getItem("items") || 1;
-const defaultGraph = "band";
-const defaultQuery = "nodered/client/memory";
-const defaultDevice = "device1";
+
 
 export default class Dashboard extends React.PureComponent {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -35,11 +33,11 @@ export default class Dashboard extends React.PureComponent {
     //TODO: Add database query to load config
     return _.map(_.range(this.state.items), function (i) {
       let storageQuery =
-        localStorage.getItem("query" + (i + 1)) || defaultQuery;
+        localStorage.getItem("query" + (i + 1)) || DEFAULT_QUERY;
       let storageGraph =
-        localStorage.getItem("graph" + (i + 1)) || defaultGraph;
+        localStorage.getItem("graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
       let storageDevice =
-        localStorage.getItem("device" + (i + 1)) || defaultDevice;
+        localStorage.getItem("device" + (i + 1)) || DEFAULT_DEVICE;
       return (
         <div
           key={i}
@@ -53,15 +51,13 @@ export default class Dashboard extends React.PureComponent {
             i: i.toString(),
           }}
         >
-          {
-            <Graph
-              id={i + 1}
-              graphType={storageGraph}
-              query={storageQuery}
-              device={storageDevice}
-              toggleLegend={toggle}
-            />
-          }
+          <Graph
+            id={i + 1}
+            graphType={storageGraph}
+            query={storageQuery}
+            device={storageDevice}
+            toggleLegend={toggle}
+          />
         </div>
       );
     });
@@ -98,15 +94,17 @@ export default class Dashboard extends React.PureComponent {
     localStorage.setItem("items", JSON.stringify(0));
     this.setState({ layouts: {}, items: 0 });
   }
-//style={{transform: 'scale(0.75) translate(-15%, -15%)'}}>
+  //style={{transform: 'scale(0.75) translate(-15%, -15%)'}}>
   render() {
     return (
-      <div className="dashboard" style={
-      {
-      margin: "5px",
-      height: "100%",
-      width: "100%"
-      }}> 
+      <div
+        className="dashboard"
+        style={{
+          margin: "5px",
+          height: "100%",
+          width: "100%",
+        }}
+      >
         <h2>
           <Button
             onClick={() => this.reset()}
@@ -172,6 +170,9 @@ function saveToLS(key, value) {
   }
 }
 
-// if (process.env.STATIC_EXAMPLES === true) {
-//   import("../test-hook.jsx").then(fn => fn.default(BoundedLayout));
-// }
+/*
+ if (process.env.STATIC_EXAMPLES === true) {
+   import("../test-hook.jsx").then(fn => fn.default(BoundedLayout));
+ }
+
+*/

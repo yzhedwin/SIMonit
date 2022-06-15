@@ -8,11 +8,7 @@ import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-
-const REASONABLE_API_REFRESH_RATE = 5000;
-const defaultGraph = "band";
-const defaultQuery = "nodered/client/memory";
-const defaultDevice = "device1";
+import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY} from "../constants";
 
 export class Graph extends React.Component {
 
@@ -92,9 +88,9 @@ export class Graph extends React.Component {
       query: "nodered/client/memory",
       device: "device1",
     });
-    localStorage.setItem("graph", defaultGraph);
-    localStorage.setItem("query", defaultQuery);
-    localStorage.setItem("device", defaultDevice);
+    localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
+    localStorage.setItem("query", DEFAULT_QUERY);
+    localStorage.setItem("device", DEFAULT_DEVICE);
   }
 
   renderPlot = () => {

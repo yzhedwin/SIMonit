@@ -7,32 +7,34 @@ import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import { REASONABLE_API_REFRESH_RATE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY, STYLE } from "../constants";
+import DeviceForm from "../forms/DeviceForm";
+import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY} from "../constants";
 
-
+const style = {
+  margin: "5px",
+  height: "60%",
+  width: "90%",
+};
 
 let animationFrameId = 0;
-export default function StaticGraph({
-  id,
-  device,
-  toggleLegend,
-}) {
+export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraphType, toggleLegend }) {
   const [table, setTable] = useState({
     data: {},
     lastUpdated: "",
   });
-  const [graphType, setGraphType] = useState(DEFAULT_GRAPH_TYPE);
-  const [query, setQuery] = useState(DEFAULT_QUERY);
+  const [graphType, setGraphType] = useState(inputGraphType);
+  const [query, setQuery] = useState(inputQuery);
+  const [device, setDevice] = useState(inputDevice);
 
   const getDataAndUpdateTable = async () => {
-    let resp = await axios.get(
-      "http://localhost:3001/" + device + "/" + query
-    );
+    let resp = await axios.get("http://localhost:3001/" + device + "/" + query);
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
-      setTable({data: results.table,
-        lastUpdated: currentDate.toLocaleTimeString()});
+      setTable({
+        data: results.table,
+        lastUpdated: currentDate.toLocaleTimeString(),
+      });
     } catch (error) {
       console.error("error", error.message);
     }
@@ -64,7 +66,7 @@ export default function StaticGraph({
     } catch (error) {
       console.error(error);
     }
-  }, [graphType, query])
+  }, [graphType, query, device]);
 
   const handleGraphChange = (event) => {
     setGraphType(event.target.value);
@@ -73,16 +75,24 @@ export default function StaticGraph({
   };
 
   const handleQueryChange = (event) => {
-    setQuery(event.target.value );
+    setQuery(event.target.value);
     localStorage.setItem("query" + id, event.target.value);
     write(id, "query", event.target.value);
+  };
+
+  const handleDeviceChange = (event) => {
+    setDevice(event.target.value);
+    localStorage.setItem("device" + id, event.target.value);
+    write(id, "device", event.target.value);
   };
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
     setQuery(DEFAULT_QUERY);
+    setDevice(DEFAULT_DEVICE);
     localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
     localStorage.setItem("query", DEFAULT_QUERY);
+    localStorage.setItem("device", DEFAULT_DEVICE);
   };
 
   const renderPlot = () => {
@@ -107,8 +117,9 @@ export default function StaticGraph({
       },
     };
     return (
-      <div className="static-graph-component" style={STYLE}>
+      <div className="static-graph-component" style={style}>
         <h2>
+          <DeviceForm onChange={handleDeviceChange} device={device} />
           <GraphForm onChange={handleGraphChange} graphType={graphType} />
           <QueryForm onChange={handleQueryChange} query={query} />
         </h2>
@@ -120,7 +131,7 @@ export default function StaticGraph({
 
   const renderEmpty = () => {
     return (
-      <div style={STYLE}>
+      <div style={style}>
         <button onClick={() => reset()}>Reboot</button>
         <h3>Loading...</h3>
       </div>
