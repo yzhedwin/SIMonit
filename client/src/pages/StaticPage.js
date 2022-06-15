@@ -10,18 +10,10 @@ function StaticPage() {
       {StaticGraph(
         {
         id: 1,
-        query: "nodered/client/memory",
-        graphType: "band",
         device: did || "device1",
-        toggleLegend: -1 
+        toggleLegend: -1
       })
     }
-      {/* <Graph
-        query="nodered/client/memory"
-        graphType="band"
-        device={did || "device1"}
-        toggleLegend={-1}
-      /> */}
     </div>
   );
 }

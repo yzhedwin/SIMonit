@@ -9,44 +9,37 @@ import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 
 const REASONABLE_API_REFRESH_RATE = 5000;
-const defaultGraph = "band";
-const defaultQuery = "nodered/client/memory";
+const DEFAULT_GRAPH_TYPE = "band";
+const DEFAULT_QUERY = "nodered/client/eth";
 
 const style = {
   margin: "5px",
   height: "60%",
   width: "90%",
 };
+
 let animationFrameId = 0;
 export default function StaticGraph({
   id,
-  graphType,
-  query,
   device,
   toggleLegend,
 }) {
-  const [graph, setGraph] = useState({
-    table: {},
+  let [table, setTable] = useState({
+    data: {},
     lastUpdated: "",
-    graphType: graphType,
-    query: query,
-    device: device,
   });
+  let [graphType, setGraphType] = useState(DEFAULT_GRAPH_TYPE);
+  let [query, setQuery] = useState(DEFAULT_QUERY);
 
-  const getDataAndUpdateTable = async () => {
-    const resp = await axios.get(
-      "http://localhost:3001/" + graph.device + "/" + graph.query
+  let getDataAndUpdateTable = async () => {
+    let resp = await axios.get(
+      "http://localhost:3001/" + device + "/" + query
     );
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
-      setGraph((previousState) => {
-        return {
-          ...previousState,
-          table: results.table,
-          lastUpdated: currentDate.toLocaleTimeString(),
-        };
-      });
+      setTable({data: results.table,
+        lastUpdated: currentDate.toLocaleTimeString()});
     } catch (error) {
       console.error("error", error.message);
     }
@@ -62,48 +55,49 @@ export default function StaticGraph({
     } catch (error) {
       console.error(error);
     }
-  }, []);
-
-  useEffect(() => {
     return () => {
       window.clearInterval(animationFrameId);
     };
   }, []);
-  
+
+  useEffect(() => {
+    window.clearInterval(animationFrameId);
+    try {
+      getDataAndUpdateTable();
+      animationFrameId = window.setInterval(
+        getDataAndUpdateTable,
+        REASONABLE_API_REFRESH_RATE
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }, [graphType, query])
+
   const handleGraphChange = (event) => {
-    setGraph((previousState) => {
-      return { ...previousState, graphType: event.target.value };
-    });
+    setGraphType(event.target.value);
     localStorage.setItem("graph" + id, event.target.value);
     write(id, "graph", event.target.value);
   };
 
   const handleQueryChange = (event) => {
-    setGraph((previousState) => {
-      return { ...previousState, query: event.target.value };
-    });
+    setQuery(event.target.value );
     localStorage.setItem("query" + id, event.target.value);
     write(id, "query", event.target.value);
   };
 
   const reset = () => {
-    setGraph((previousState) => {
-      return {
-        ...previousState,
-        graphType: "band",
-        query: "nodered/client/memory",
-      };
-    });
-    localStorage.setItem("graph", defaultGraph);
-    localStorage.setItem("query", defaultQuery);
+    setGraphType(DEFAULT_GRAPH_TYPE);
+    setQuery(DEFAULT_QUERY);
+    localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
+    localStorage.setItem("query", DEFAULT_QUERY);
   };
 
   const renderPlot = () => {
-    const fill = findStringColumns(graph.table);
+    const fill = findStringColumns(table.data);
     const config = {
-      table: graph.table,
-      layers: [new LayerConfig(graph.graphType, fill).getConfig()],
-      valueFormatters: new DataFormatter(graph.query).getFormat(),
+      table: table.data,
+      layers: [new LayerConfig(graphType, fill).getConfig()],
+      valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
@@ -122,10 +116,10 @@ export default function StaticGraph({
     return (
       <div className="static-graph-component" style={style}>
         <h2>
-          <GraphForm onChange={handleGraphChange} graphType={graph.graphType} />
-          <QueryForm onChange={handleQueryChange} query={graph.query} />
+          <GraphForm onChange={handleGraphChange} graphType={graphType} />
+          <QueryForm onChange={handleQueryChange} query={query} />
         </h2>
-        <h5>Last Updated: {graph.lastUpdated}</h5>
+        <h5>Last Updated: {table.lastUpdated}</h5>
         <Plot config={config} />
       </div>
     );
@@ -140,5 +134,8 @@ export default function StaticGraph({
     );
   };
 
-  return Object.keys(graph.table).length > 0 ? renderPlot() : renderEmpty();
+  const render = () => {
+    return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
+  };
+  return render();
 }
