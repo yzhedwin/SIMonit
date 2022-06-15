@@ -6,6 +6,7 @@ import { Graph } from "../component/Graph";
 import { Button } from "@mui/material";
 import write from "../component/DBWrite";
 import { DEFAULT_DEVICE, DEFAULT_QUERY, DEFAULT_GRAPH_TYPE } from "../constants";
+import OptimisedGraph from "../component/OptimisedGraph";
 
 //TODO: Load Layout and Items from Database
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -51,13 +52,11 @@ export default class Dashboard extends React.PureComponent {
             i: i.toString(),
           }}
         >
-          <Graph
-            id={i + 1}
-            graphType={storageGraph}
-            query={storageQuery}
-            device={storageDevice}
-            toggleLegend={toggle}
-          />
+          <OptimisedGraph id={i + 1}
+            inputGraphType={storageGraph}
+            inputQuery={storageQuery}
+            inputDevice={storageDevice}
+            toggleLegend={toggle}/>
         </div>
       );
     });

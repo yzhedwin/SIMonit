@@ -8,13 +8,7 @@ import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 import DeviceForm from "../forms/DeviceForm";
-import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY} from "../constants";
-
-const style = {
-  margin: "5px",
-  height: "60%",
-  width: "90%",
-};
+import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY, STYLE} from "../constants";
 
 let animationFrameId = 0;
 export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraphType, toggleLegend }) {
@@ -117,7 +111,7 @@ export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraph
       },
     };
     return (
-      <div className="static-graph-component" style={style}>
+      <div className="static-graph-component" style={STYLE}>
         <h2>
           <DeviceForm onChange={handleDeviceChange} device={device} />
           <GraphForm onChange={handleGraphChange} graphType={graphType} />
@@ -131,7 +125,7 @@ export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraph
 
   const renderEmpty = () => {
     return (
-      <div style={style}>
+      <div style={STYLE}>
         <button onClick={() => reset()}>Reboot</button>
         <h3>Loading...</h3>
       </div>
