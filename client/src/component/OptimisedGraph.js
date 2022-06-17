@@ -11,14 +11,14 @@ import DeviceForm from "../forms/DeviceForm";
 import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY, STYLE} from "../constants";
 
 let animationFrameId = 0;
-export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraphType, toggleLegend }) {
+function OptimisedGraph(props) {
   const [table, setTable] = useState({
     data: {},
     lastUpdated: "",
   });
-  const [graphType, setGraphType] = useState(inputGraphType);
-  const [query, setQuery] = useState(inputQuery);
-  const [device, setDevice] = useState(inputDevice);
+  const [graphType, setGraphType] = useState(props.inputGraphType);
+  const [query, setQuery] = useState(props.inputQuery);
+  const [device, setDevice] = useState(props.inputDevice);
 
   const getDataAndUpdateTable = async () => {
     let resp = await axios.get("http://localhost:3001/" + device + "/" + query);
@@ -64,20 +64,20 @@ export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraph
 
   const handleGraphChange = (event) => {
     setGraphType(event.target.value);
-    localStorage.setItem("graph" + id, event.target.value);
-    write(id, "graph", event.target.value);
+    localStorage.setItem("graph" + props.id, event.target.value);
+    write(props.id, "graph", event.target.value);
   };
 
   const handleQueryChange = (event) => {
     setQuery(event.target.value);
-    localStorage.setItem("query" + id, event.target.value);
-    write(id, "query", event.target.value);
+    localStorage.setItem("query" + props.id, event.target.value);
+    write(props.id, "query", event.target.value);
   };
 
   const handleDeviceChange = (event) => {
     setDevice(event.target.value);
-    localStorage.setItem("device" + id, event.target.value);
-    write(id, "device", event.target.value);
+    localStorage.setItem("device" + props.id, event.target.value);
+    write(props.id, "device", event.target.value);
   };
 
   const reset = () => {
@@ -98,7 +98,7 @@ export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraph
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
-      legendHide: toggleLegend === 1 ? true : false,
+      legendHide: props.toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
       showAxes: true,
       staticLegend: {
@@ -107,7 +107,7 @@ export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraph
         fontBrightColor: "black",
         backgroundColor: "white",
         colorizeRows: false,
-        hide: toggleLegend === 1 ? false : true,
+        hide: props.toggleLegend === 1 ? false : true,
       },
     };
     return (
@@ -133,7 +133,9 @@ export default function OptimisedGraph({ id, inputDevice, inputQuery, inputGraph
   };
 
   const render = () => {
+    console.log("graph rendered")
     return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
   };
   return render();
 }
+export default React.memo(OptimisedGraph);

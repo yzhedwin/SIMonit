@@ -10,7 +10,7 @@ import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY} from "../constants";
 
-export class Graph extends React.Component {
+export default class Graph extends React.Component {
 
   constructor(props) {
     super(props);
@@ -147,6 +147,7 @@ export class Graph extends React.Component {
   };
 
   render = () => {
+    console.log("Graph is rendered")
     return Object.keys(this.state.table).length > 0
       ? this.renderPlot()
       : this.renderEmpty();

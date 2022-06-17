@@ -6,20 +6,68 @@ import Dashboard from "./Dashboard";
 import "./Dashboard.css";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
+const storageLayout = getFromLS("GridLayouts") || {};
+
+function getFromLS(key) {
+  let ls = {};
+  if (global.localStorage) {
+    try {
+      ls = JSON.parse(global.localStorage.getItem("rgl-8")) || {};
+    } catch (e) {
+      /*Ignore*/
+    }
+  }
+  return ls[key];
+}
+
+function saveToLS(key, value) {
+  if (global.localStorage) {
+    global.localStorage.setItem(
+      "rgl-8",
+      JSON.stringify({
+        [key]: value,
+      })
+    );
+  }
+}
 
 export default class ResizableGrid extends React.Component {
-
+  constructor(props) {
+    super(props);
+    this.state = {
+      layouts: JSON.parse(JSON.stringify(storageLayout)),
+    };
+    this.onBreakpointChange = this.onBreakpointChange.bind(this);
+    this.onLayoutChange = this.onLayoutChange.bind(this);
+  }
+  onLayoutChange(layout, layouts) {
+    saveToLS("layouts", layouts);
+    this.setState({ layouts });
+    // if (this.state.items !== 0) {
+    //   write("", "layout", JSON.stringify(layouts));
+    // }
+  }
+  onBreakpointChange(breakpoint, cols) {
+    this.setState({
+      breakpoint: breakpoint,
+      cols: cols,
+    });
+  }
   render() {
+
     return (
       <div>
         <h3>Resizable Div</h3>
         <ResponsiveReactGridLayout
           className="dashboard-layout"
           cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
-          layouts={{}}
+          layouts={this.state.layouts}
           isBounded={true}
           isDraggable={false}
-          measureBeforeMount={true}
+          onLayoutChange={(layout, layouts) =>
+            this.onLayoutChange(layout, layouts)
+          }
+          onBreakpointChange={this.onBreakpointChange}
         >
           <div key="1" data-grid={{ w: 3, h: 3, x: 0, y: 0, minW: 3, minH: 3 }}>
             <Dashboard/>

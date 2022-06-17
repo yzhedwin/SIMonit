@@ -24,6 +24,7 @@ const influxProxy = axios.create({
     'Content-Type': 'application/json'
   }
 });
+
 //TODO vary query,buckets
 const nodeRedQueryMemory01 = `from(bucket: "${bucket}")
 |> range(start: -5m)

@@ -17,7 +17,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const pages = [
   "ResizableGrid",
   "Dashboard",
-  "Grid",
+  "OptimisedDashboard",
   "ResizablePage",
   "StaticPage",
   "TestUrlSearch",

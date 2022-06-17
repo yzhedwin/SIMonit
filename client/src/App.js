@@ -4,10 +4,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import Dashboard from "./pages/Dashboard";
-import Grid from './pages/Grid';
 import ResizableGrid from './pages/ResizableGrid';
 import StaticPage from './pages/StaticPage';
 import ResizablePage from './pages/ResizablePage';
+import OptimisedDashboard from './pages/OptimisedDashboard';
 
 
 class App extends React.Component {
@@ -19,7 +19,7 @@ class App extends React.Component {
                 <Routes>
                     <Route index element={<Home />} />
                     <Route path="Dashboard" element={<Dashboard />} />
-                    <Route path="Grid" element={<Grid />} />
+                    <Route path="OptimisedDashboard" element={<OptimisedDashboard/>} />
                     <Route path="ResizableGrid" element={<ResizableGrid />} />
                     <Route path="ResizablePage" element={<ResizablePage />} />
                     <Route path="StaticPage" element={<StaticPage />} />

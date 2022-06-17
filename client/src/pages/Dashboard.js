@@ -2,17 +2,19 @@ import React from "react";
 import _ from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "./Dashboard.css";
-import { Graph } from "../component/Graph";
 import { Button } from "@mui/material";
 import write from "../component/DBWrite";
-import { DEFAULT_DEVICE, DEFAULT_QUERY, DEFAULT_GRAPH_TYPE } from "../constants";
-import OptimisedGraph from "../component/OptimisedGraph";
+import {
+  DEFAULT_DEVICE,
+  DEFAULT_QUERY,
+  DEFAULT_GRAPH_TYPE,
+} from "../constants";
+import Graph from "../component/Graph";
 
 //TODO: Load Layout and Items from Database
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const storageLayout = getFromLS("layouts") || {};
 const storageItems = localStorage.getItem("items") || 1;
-
 
 export default class Dashboard extends React.PureComponent {
   constructor(props) {
@@ -52,11 +54,13 @@ export default class Dashboard extends React.PureComponent {
             i: i.toString(),
           }}
         >
-          <OptimisedGraph id={i + 1}
-            inputGraphType={storageGraph}
-            inputQuery={storageQuery}
-            inputDevice={storageDevice}
-            toggleLegend={toggle}/>
+          <Graph
+            id={i + 1}
+            graphType={storageGraph}
+            query={storageQuery}
+            device={storageDevice}
+            toggleLegend={toggle}
+          />
         </div>
       );
     });
@@ -137,7 +141,6 @@ export default class Dashboard extends React.PureComponent {
             this.onLayoutChange(layout, layouts)
           }
           isBounded={true}
-          measureBeforeMount={true}
           onBreakpointChange={this.onBreakpointChange}
         >
           {this.generateDOM()}
