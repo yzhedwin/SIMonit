@@ -20,7 +20,6 @@ const pages = [
   "OptimisedDashboard",
   "ResizablePage",
   "StaticPage",
-  "TestUrlSearch",
 ];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -177,6 +176,6 @@ const ResponsiveAppBar = () => {
   };
   let location = useLocation();
   //can be refractored to include more pages
-  return location.pathname === "/StaticPage" ? renderEmpty() : render();
+  return location.pathname.indexOf("/StaticPage") === -1 ? render() : renderEmpty();
 };
 export default ResponsiveAppBar;

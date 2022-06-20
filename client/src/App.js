@@ -23,7 +23,7 @@ class App extends React.Component {
                     <Route path="ResizableGrid" element={<ResizableGrid />} />
                     <Route path="ResizablePage" element={<ResizablePage />} />
                     <Route path="StaticPage" element={<StaticPage />} />
-                    <Route path="StaticPage/:did" element={<StaticPage />} />
+                    <Route path="StaticPage/:did/:graphType" element={<StaticPage />} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>
             </BrowserRouter>

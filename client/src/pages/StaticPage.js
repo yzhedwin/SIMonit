@@ -4,16 +4,15 @@ import StaticGraph from "../component/StaticGraph";
 import "./StaticPage.css";
 
 function StaticPage() {
-  const { did } = useParams();
-  return (
+  const { did, graphType } = useParams();
+    return (
     <div className="static-legend">
-      {StaticGraph(
-        {
+      {StaticGraph({
         id: 1,
         device: did || "device1",
-        toggleLegend: -1
-      })
-    }
+        graphType: graphType || "band",
+        toggleLegend: 1,
+      })}
     </div>
   );
 }

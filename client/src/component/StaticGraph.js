@@ -15,13 +15,14 @@ let animationFrameId = 0;
 export default function StaticGraph({
   id,
   device,
+  graphType,
   toggleLegend,
 }) {
   const [table, setTable] = useState({
     data: {},
     lastUpdated: "",
   });
-  const [graphType, setGraphType] = useState(DEFAULT_GRAPH_TYPE);
+ // const [graphType, setGraphType] = useState(DEFAULT_GRAPH_TYPE);
   const [query, setQuery] = useState(DEFAULT_QUERY);
 
   const getDataAndUpdateTable = async () => {
@@ -64,13 +65,13 @@ export default function StaticGraph({
     } catch (error) {
       console.error(error);
     }
-  }, [graphType, query])
+  }, [query])
 
-  const handleGraphChange = (event) => {
-    setGraphType(event.target.value);
-    localStorage.setItem("graph" + id, event.target.value);
-    write(id, "graph", event.target.value);
-  };
+  // const handleGraphChange = (event) => {
+  //   setGraphType(event.target.value);
+  //   localStorage.setItem("graph" + id, event.target.value);
+  //   write(id, "graph", event.target.value);
+  // };
 
   const handleQueryChange = (event) => {
     setQuery(event.target.value );
@@ -79,7 +80,7 @@ export default function StaticGraph({
   };
 
   const reset = () => {
-    setGraphType(DEFAULT_GRAPH_TYPE);
+   // setGraphType(DEFAULT_GRAPH_TYPE);
     setQuery(DEFAULT_QUERY);
     localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
     localStorage.setItem("query", DEFAULT_QUERY);
@@ -106,10 +107,11 @@ export default function StaticGraph({
         hide: toggleLegend === 1 ? false : true,
       },
     };
+ //  <GraphForm onChange={handleGraphChange} graphType={graphType} />
     return (
       <div className="static-graph-component" style={STYLE}>
         <h2>
-          <GraphForm onChange={handleGraphChange} graphType={graphType} />
+
           <QueryForm onChange={handleQueryChange} query={query} />
         </h2>
         <h5>Last Updated: {table.lastUpdated}</h5>
