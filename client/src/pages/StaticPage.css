@@ -1,6 +1,6 @@
 .static-legend {
-    height: 500px;
-    width: 50%;
+    margin: 5px;
+    height: 100%;
+    width: 100%;
     background-color: white;
-    margin:25%;
   }

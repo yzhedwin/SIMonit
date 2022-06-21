@@ -8,7 +8,7 @@ import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY} from "../constants";
+import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY1} from "../constants";
 
 export default class Graph extends React.Component {
 
@@ -89,7 +89,7 @@ export default class Graph extends React.Component {
       device: "device1",
     });
     localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem("query", DEFAULT_QUERY);
+    localStorage.setItem("query", DEFAULT_QUERY1);
     localStorage.setItem("device", DEFAULT_DEVICE);
   }
 

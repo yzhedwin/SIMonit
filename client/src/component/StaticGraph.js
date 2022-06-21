@@ -7,7 +7,7 @@ import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import { REASONABLE_API_REFRESH_RATE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY, STYLE } from "../constants";
+import { REASONABLE_API_REFRESH_RATE, STYLE } from "../constants";
 
 
 
@@ -16,14 +16,13 @@ export default function StaticGraph({
   id,
   device,
   graphType,
+  query,
   toggleLegend,
 }) {
   const [table, setTable] = useState({
     data: {},
     lastUpdated: "",
   });
- // const [graphType, setGraphType] = useState(DEFAULT_GRAPH_TYPE);
-  const [query, setQuery] = useState(DEFAULT_QUERY);
 
   const getDataAndUpdateTable = async () => {
     let resp = await axios.get(
@@ -54,38 +53,6 @@ export default function StaticGraph({
     };
   }, []);
 
-  useEffect(() => {
-    window.clearInterval(animationFrameId);
-    try {
-      getDataAndUpdateTable();
-      animationFrameId = window.setInterval(
-        getDataAndUpdateTable,
-        REASONABLE_API_REFRESH_RATE
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  }, [query])
-
-  // const handleGraphChange = (event) => {
-  //   setGraphType(event.target.value);
-  //   localStorage.setItem("graph" + id, event.target.value);
-  //   write(id, "graph", event.target.value);
-  // };
-
-  const handleQueryChange = (event) => {
-    setQuery(event.target.value );
-    localStorage.setItem("query" + id, event.target.value);
-    write(id, "query", event.target.value);
-  };
-
-  const reset = () => {
-   // setGraphType(DEFAULT_GRAPH_TYPE);
-    setQuery(DEFAULT_QUERY);
-    localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem("query", DEFAULT_QUERY);
-  };
-
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
     const config = {
@@ -107,13 +74,9 @@ export default function StaticGraph({
         hide: toggleLegend === 1 ? false : true,
       },
     };
- //  <GraphForm onChange={handleGraphChange} graphType={graphType} />
     return (
       <div className="static-graph-component" style={STYLE}>
-        <h2>
-
-          <QueryForm onChange={handleQueryChange} query={query} />
-        </h2>
+        <h2>{query}</h2>
         <h5>Last Updated: {table.lastUpdated}</h5>
         <Plot config={config} />
       </div>
@@ -123,7 +86,6 @@ export default function StaticGraph({
   const renderEmpty = () => {
     return (
       <div style={STYLE}>
-        <button onClick={() => reset()}>Reboot</button>
         <h3>Loading...</h3>
       </div>
     );

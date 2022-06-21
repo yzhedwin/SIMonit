@@ -8,7 +8,7 @@ import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 import DeviceForm from "../forms/DeviceForm";
-import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY, STYLE} from "../constants";
+import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY1, STYLE} from "../constants";
 
 let animationFrameId = 0;
 function OptimisedGraph(props) {
@@ -82,10 +82,10 @@ function OptimisedGraph(props) {
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
-    setQuery(DEFAULT_QUERY);
+    setQuery(DEFAULT_QUERY1);
     setDevice(DEFAULT_DEVICE);
     localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem("query", DEFAULT_QUERY);
+    localStorage.setItem("query", DEFAULT_QUERY1);
     localStorage.setItem("device", DEFAULT_DEVICE);
   };
 

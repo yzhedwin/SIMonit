@@ -6,7 +6,7 @@ import { Button } from "@mui/material";
 import write from "../component/DBWrite";
 import {
   DEFAULT_DEVICE,
-  DEFAULT_QUERY,
+  DEFAULT_QUERY1,
   DEFAULT_GRAPH_TYPE,
 } from "../constants";
 import Graph from "../component/Graph";
@@ -36,7 +36,7 @@ export default class Dashboard extends React.PureComponent {
     //TODO: Add database query to load config
     return _.map(_.range(this.state.items), function (i) {
       let storageQuery =
-        localStorage.getItem("query" + (i + 1)) || DEFAULT_QUERY;
+        localStorage.getItem("query" + (i + 1)) || DEFAULT_QUERY1;
       let storageGraph =
         localStorage.getItem("graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
       let storageDevice =
