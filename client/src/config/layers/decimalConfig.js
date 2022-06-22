@@ -13,5 +13,5 @@ export default function decimalConfig(fill) {
     shadeOpacity: 0.3,
     hoverDimension: "auto",
   };
-  // showAxes: false,
+
 }

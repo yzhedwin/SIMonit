@@ -18,12 +18,11 @@ class App extends React.Component {
                 <ResponsiveAppBar />
                 <Routes>
                     <Route index element={<Home />} />
-                    <Route path="Dashboard" element={<Dashboard />} />
-                    <Route path="OptimisedDashboard" element={<OptimisedDashboard/>} />
+                    <Route path="Dashboard" element={<OptimisedDashboard/>} />
                     <Route path="ResizableGrid" element={<ResizableGrid />} />
                     <Route path="ResizablePage" element={<ResizablePage />} />
                     <Route path="StaticPage" element={<StaticPage />} />
-                    <Route path="StaticPage/:did/:graphType" element={<StaticPage />} />
+                    <Route path="StaticPage/:did" element={<StaticPage />} />
                     <Route path="*" element={<NoPage />} />
                 </Routes>
             </BrowserRouter>

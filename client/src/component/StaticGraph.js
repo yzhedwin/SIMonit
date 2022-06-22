@@ -2,14 +2,9 @@ import React, { useEffect, useState } from "react";
 import { fromFlux, Plot } from "@influxdata/giraffe";
 import axios from "axios";
 import { findStringColumns } from "../helpers";
-import GraphForm from "../forms/GraphForm";
-import QueryForm from "../forms/QueryForm";
-import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 import { REASONABLE_API_REFRESH_RATE, STYLE } from "../constants";
-
-
 
 let animationFrameId = 0;
 export default function StaticGraph({
@@ -25,14 +20,14 @@ export default function StaticGraph({
   });
 
   const getDataAndUpdateTable = async () => {
-    let resp = await axios.get(
-      "http://localhost:3001/" + device + "/" + query
-    );
+    let resp = await axios.get("http://localhost:3001/" + device + "/" + query);
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
-      setTable({data: results.table,
-        lastUpdated: currentDate.toLocaleTimeString()});
+      setTable({
+        data: results.table,
+        lastUpdated: currentDate.toLocaleTimeString(),
+      });
     } catch (error) {
       console.error("error", error.message);
     }
@@ -64,14 +59,14 @@ export default function StaticGraph({
       legendFont: "12px sans-serif",
       legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
-      showAxes: true,
+      showAxes: graphType === "single stat" ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "2px solid black",
         fontBrightColor: "black",
         backgroundColor: "white",
         colorizeRows: false,
-        hide: toggleLegend === 1 ? false : true,
+        hide: graphType === "single stat" || toggleLegend !== 1 ? true : false,
       },
     };
     return (

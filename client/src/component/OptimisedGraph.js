@@ -8,7 +8,13 @@ import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 import DeviceForm from "../forms/DeviceForm";
-import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY1, STYLE} from "../constants";
+import {
+  REASONABLE_API_REFRESH_RATE,
+  DEFAULT_DEVICE,
+  DEFAULT_GRAPH_TYPE,
+  DEFAULT_QUERY1,
+  STYLE,
+} from "../constants";
 
 let animationFrameId = 0;
 function OptimisedGraph(props) {
@@ -64,29 +70,38 @@ function OptimisedGraph(props) {
 
   const handleGraphChange = (event) => {
     setGraphType(event.target.value);
-    localStorage.setItem("graph" + props.id, event.target.value);
-    write(props.id, "graph", event.target.value);
+    localStorage.setItem(
+      props.saveName + "_graph" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_graph", event.target.value);
   };
 
   const handleQueryChange = (event) => {
     setQuery(event.target.value);
-    localStorage.setItem("query" + props.id, event.target.value);
-    write(props.id, "query", event.target.value);
+    localStorage.setItem(
+      props.saveName + "_query" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_query", event.target.value);
   };
 
   const handleDeviceChange = (event) => {
     setDevice(event.target.value);
-    localStorage.setItem("device" + props.id, event.target.value);
-    write(props.id, "device", event.target.value);
+    localStorage.setItem(
+      props.saveName + "_device" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_device", event.target.value);
   };
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
     setQuery(DEFAULT_QUERY1);
     setDevice(DEFAULT_DEVICE);
-    localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem("query", DEFAULT_QUERY1);
-    localStorage.setItem("device", DEFAULT_DEVICE);
+    localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
+    localStorage.setItem(props.saveName + "_query", DEFAULT_QUERY1);
+    localStorage.setItem(props.saveName + "_device", DEFAULT_DEVICE);
   };
 
   const renderPlot = () => {
@@ -100,14 +115,17 @@ function OptimisedGraph(props) {
       legendFont: "12px sans-serif",
       legendHide: props.toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
-      showAxes: true,
+      showAxes: graphType === "single stat" ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "2px solid black",
         fontBrightColor: "black",
         backgroundColor: "white",
         colorizeRows: false,
-        hide: props.toggleLegend === 1 ? false : true,
+        hide:
+          graphType === "single stat" || props.toggleLegend !== 1
+            ? true
+            : false,
       },
     };
     return (
@@ -133,7 +151,7 @@ function OptimisedGraph(props) {
   };
 
   const render = () => {
-    console.log("graph rendered")
+    console.log("graph rendered");
     return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
   };
   return render();

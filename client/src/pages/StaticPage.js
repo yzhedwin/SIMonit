@@ -14,6 +14,7 @@ function StaticPage() {
   const items = 3;
   const querySelect = [DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3];
   const graphType = ["band", "line", "single stat"];
+
   const onBreakpointChange = (breakpoint, cols) => {
     setState({
       breakpoint: breakpoint,

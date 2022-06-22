@@ -34,8 +34,8 @@ function saveToLS(key, value) {
   }
 }
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-const storageLayout = getFromLS("layouts") || {};
-const storageItems = localStorage.getItem("items") || 1;
+const storageLayout = getFromLS("dash_layouts") || {};
+const storageItems = localStorage.getItem("dash_items") || 1;
 export default function OptimisedDashboard(props) {
   const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
@@ -51,11 +51,11 @@ export default function OptimisedDashboard(props) {
     //TODO: Add database query to load config
     return _.map(_.range(items), function (i) {
       let storageQuery =
-        localStorage.getItem("query" + (i + 1)) || DEFAULT_QUERY1;
+        localStorage.getItem("dash_query" + (i + 1)) || DEFAULT_QUERY1;
       let storageGraph =
-        localStorage.getItem("graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
+        localStorage.getItem("dash_graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
       let storageDevice =
-        localStorage.getItem("device" + (i + 1)) || DEFAULT_DEVICE;
+        localStorage.getItem("dash_device" + (i + 1)) || DEFAULT_DEVICE;
       return (
         <div
           key={i}
@@ -75,6 +75,7 @@ export default function OptimisedDashboard(props) {
             inputQuery={storageQuery}
             inputDevice={storageDevice}
             toggleLegend={toggle}
+            saveName={"dash"}
           />
         </div>
       );
@@ -82,19 +83,19 @@ export default function OptimisedDashboard(props) {
   };
   //save to db
   const onLayoutChange = (layout, layouts) => {
-    saveToLS("layouts", layouts);
+    saveToLS("dash_layouts", layouts);
     setLayouts(layouts);
     if (items !== 0) {
-      write("", "layout", JSON.stringify(layouts));
+      write("", "dash_layout", JSON.stringify(layouts));
     }
   };
 
   const onItemsChange = (items) => {
     const updateItem = items + 1;
     setItems(updateItem);
-    localStorage.setItem("items", JSON.stringify(updateItem));
+    localStorage.setItem("dash_items", JSON.stringify(updateItem));
     if (items !== 0) {
-      write("", "quantity", JSON.stringify(updateItem));
+      write("", "dash_items", JSON.stringify(updateItem));
     }
   };
   const onBreakpointChange = (breakpoint, cols) => {
@@ -109,7 +110,7 @@ export default function OptimisedDashboard(props) {
   };
   const reset = () => {
     localStorage.clear();
-    localStorage.setItem("items", JSON.stringify(0));
+    localStorage.setItem("dash_items", JSON.stringify(0));
     setLayouts({});
     setItems(0);
   };
