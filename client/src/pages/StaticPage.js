@@ -13,7 +13,7 @@ function StaticPage() {
   const [layouts, setLayouts] = useState({});
   const items = 3;
   const querySelect = [DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3];
-  const graphType = ["band", "line", "single stat"];
+  const graphType = ["band", "line", "gauge"];
 
   const onBreakpointChange = (breakpoint, cols) => {
     setState({
@@ -31,7 +31,7 @@ function StaticPage() {
           key={i}
           data-grid={{
             w: 2,
-            h: 20,
+            h: 25,
             x: i * 2,
             y: i,
             i: i.toString(),
@@ -50,11 +50,11 @@ function StaticPage() {
   };
   return (
     <div className="static-legend">
-      <h2>{did || "Device 1"}</h2>
+      <h2>{did || "Default Device"}</h2>
       <ResponsiveReactGridLayout
         className="layout"
         cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
-        rowHeight={20}
+        rowHeight={10}
         layouts={layouts}
         isDraggable={false}
         isResizable={false}
