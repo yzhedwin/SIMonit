@@ -71,7 +71,7 @@ export default function StaticGraph({
     };
     return (
       <div className="static-graph-component" style={STYLE}>
-        <h2>{query}</h2>
+        <h2>Device Stats: {query.split("/")[2].toUpperCase()}</h2>
         <h5>Last Updated: {table.lastUpdated}</h5>
         <Plot config={config} />
       </div>

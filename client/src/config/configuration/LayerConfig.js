@@ -1,5 +1,5 @@
 import bandConfig from "../layers/bandConfig";
-import decimalConfig from "../layers/decimalConfig";
+import singleStatConfig from "../layers/singleStatConfig";
 import gaugeConfig from "../layers/gaugeConfig";
 import lineConfig from "../layers/lineConfig";
 
@@ -19,7 +19,7 @@ export default class LayerConfig {
     } else if (this.state.configType === "line") {
       return lineConfig(this.state.fill);
     } else if (this.state.configType === "single stat") {
-      return decimalConfig(this.state.fill);
+      return singleStatConfig();
     } else if (this.state.configType === "gauge") {
       return gaugeConfig();
     } 

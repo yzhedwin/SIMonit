@@ -1,21 +1,9 @@
+import { DEFAULT_GAUGE_COLORS, GAUGE_THEME_LIGHT } from "@influxdata/giraffe";
+
 export default function gaugeConfig() {
   return {
     type: "gauge",
-    gaugeColors: [
-      {
-        id: "red",
-        type: "min",
-        hex: "#FF0000",
-        name: "Blue",
-        value: 0,
-      },
-      {
-        id: "green",
-        type: "max",
-        hex: "#00FF00",
-        name: "Purple",
-        value: 10000,
-      },
-    ],
+    gaugeColors: DEFAULT_GAUGE_COLORS,
+    gaugeTheme: GAUGE_THEME_LIGHT,
   };
 }
