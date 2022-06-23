@@ -16,9 +16,9 @@ const QueryForm = (props) => {
           autoWidth
           label="Query"
         >
-          <MenuItem value={"nodered/client/memory"}>Memory</MenuItem>
-          <MenuItem value={"nodered/client/eth"}>ETH</MenuItem>
-          <MenuItem value={"nodered/client/uptime"}>Uptime</MenuItem>
+          <MenuItem value={"memory"}>Memory</MenuItem>
+          <MenuItem value={"eth"}>ETH</MenuItem>
+          <MenuItem value={"uptime"}>Uptime</MenuItem>
         </Select>
       </FormControl>
     </span>

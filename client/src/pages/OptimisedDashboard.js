@@ -34,6 +34,7 @@ function saveToLS(key, value) {
   }
 }
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
+//TODO: Migrate to loading from cloud Database
 const storageLayout = getFromLS("dash_layouts") || {};
 const storageItems = localStorage.getItem("dash_items") || 1;
 export default function OptimisedDashboard(props) {

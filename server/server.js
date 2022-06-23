@@ -79,6 +79,8 @@ const nodeRedQueryUptime01 = `from(bucket: "${bucket}")
   |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
 
+  
+
 const diskQuery = `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "disk")
@@ -118,6 +120,9 @@ const memQuery = `from(bucket: "${bucket}")
     |> filter(fn: (r) => r["_field"] == "used")
     |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
     |> yield(name: "last")`;
+
+const testQuery = `from(bucket: "${bucket}")
+ |> range(start: -1h)`;
 
 // start the server
 const app = express();

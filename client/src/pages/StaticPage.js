@@ -4,7 +4,7 @@ import StaticGraph from "../component/StaticGraph";
 import "./StaticPage.css";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import _ from "lodash";
-import { DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3 } from "../constants";
+import { DEFAULT_DEVICE, DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3 } from "../constants";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 function StaticPage() {
@@ -39,7 +39,7 @@ function StaticPage() {
         >
           <StaticGraph
             id={i}
-            device={did || "device1"}
+            device={did || DEFAULT_DEVICE}
             graphType={graphType[i]}
             query={querySelect[i]}
             toggleLegend={1}

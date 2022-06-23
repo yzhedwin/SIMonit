@@ -2,6 +2,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { DEFAULT_DEVICE } from '../constants';
 
 
 const DeviceForm = (props) => {
@@ -17,7 +18,7 @@ const DeviceForm = (props) => {
           autoWidth
           label="Device"
         >
-          <MenuItem value={"device1"}>Device 1</MenuItem>
+          <MenuItem value={DEFAULT_DEVICE}>Device 1</MenuItem>
           <MenuItem value={"device2"}>Device 2</MenuItem>
           <MenuItem value={"device3"}>Device 3</MenuItem>
         </Select>

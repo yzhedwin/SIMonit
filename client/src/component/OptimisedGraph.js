@@ -15,6 +15,8 @@ import {
   DEFAULT_QUERY1,
   STYLE,
 } from "../constants";
+import {INFLUXDB_BUCKET, QUERY_API } from "../config/configuration/InfluxDBConfig";
+const { flux } = require("@influxdata/influxdb-client");
 
 let animationFrameId = 0;
 function OptimisedGraph(props) {
@@ -25,19 +27,82 @@ function OptimisedGraph(props) {
   const [graphType, setGraphType] = useState(props.inputGraphType);
   const [query, setQuery] = useState(props.inputQuery);
   const [device, setDevice] = useState(props.inputDevice);
-
+  const queryMemory = `from(bucket: "${INFLUXDB_BUCKET}")
+  |> range(start: -60m)
+  |> filter(fn: (r) => r["_measurement"] == "${device}")
+  |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
+  |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+  |> yield(name: "mean")
+    
+    from(bucket: "${INFLUXDB_BUCKET}")
+  |> range(start: -60m)
+  |> filter(fn: (r) => r["_measurement"] == "${device}")
+  |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
+  |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+  |> yield(name: "min")
+  
+  from(bucket: "${INFLUXDB_BUCKET}")
+  |> range(start: -60m)
+  |> filter(fn: (r) => r["_measurement"] == "${device}")
+  |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
+  |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+  |> yield(name: "max")`;
+  
+  const queryETH = `from(bucket: "${INFLUXDB_BUCKET}")
+  |> range(start: -60m)
+    |> filter(fn: (r) => r["_measurement"] == "${device}")
+    |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+    |> yield(name: "min")
+  from(bucket: "${INFLUXDB_BUCKET}")
+    |> range(start: -60m)
+    |> filter(fn: (r) => r["_measurement"] == "${device}")
+    |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+    |> yield(name: "max")
+  from(bucket: "${INFLUXDB_BUCKET}")
+    |> range(start: -60m)
+    |> filter(fn: (r) => r["_measurement"] == "${device}")
+    |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+    |> yield(name: "mean")`;
+  
+  const queryUptime = `from(bucket: "${INFLUXDB_BUCKET}")
+  |> range(start: -60m)
+    |> filter(fn: (r) => r["_measurement"] == "${device}")
+    |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+    |> yield(name: "min")
+    from(bucket: "${INFLUXDB_BUCKET}")
+  |> range(start: -60m)
+    |> filter(fn: (r) => r["_measurement"] == "${device}")
+    |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+    |> yield(name: "max")
+    from(bucket: "${INFLUXDB_BUCKET}")
+  |> range(start: -60m)
+    |> filter(fn: (r) => r["_measurement"] == "${device}")
+    |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+    |> yield(name: "mean")`;
+  
   const getDataAndUpdateTable = async () => {
-    let resp = await axios.get("http://localhost:3001/" + device + "/" + query);
-    try {
-      let results = fromFlux(resp.data.csv);
-      let currentDate = new Date();
-      setTable({
-        data: results.table,
-        lastUpdated: currentDate.toLocaleTimeString(),
-      });
-    } catch (error) {
-      console.error("error", error.message);
-    }
+    let csv = "";
+    let querySelect = query.toLowerCase() === 'memory' ? queryMemory : 
+    query.toLowerCase() === 'eth' ? queryETH : queryUptime;
+    let clientNodeRed = flux`` + querySelect;
+    QUERY_API.queryLines(clientNodeRed, {
+      next(line) {
+        csv = `${csv}${line}\n`;
+      },
+      error(error) {
+        console.error(error);
+        console.log("\nFinished /nodered/client/memory ERROR");
+      },
+      complete() {
+        console.log("\nFinished /nodered/client/memory SUCCESS");
+        let results = fromFlux(csv);
+        let currentDate = new Date();
+        setTable({
+          data: results.table,
+          lastUpdated: currentDate.toLocaleTimeString(),
+        });
+      },
+    });
   };
   useEffect(() => {
     //Runs on the first render
