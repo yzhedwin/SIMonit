@@ -13,11 +13,20 @@ import {
   DEFAULT_GRAPH_TYPE,
   DEFAULT_QUERY1,
   STYLE,
+  FLUX_QUERY_MEMORY,
+  FLUX_QUERY_ETH,
+  FLUX_QUERY_UPTIME,
+  FLUX_QUERY_ETH_BAND,
+  FLUX_QUERY_UPTIME_BAND,
 } from "../constants";
-import {INFLUXDB_BUCKET, QUERY_API } from "../config/configuration/InfluxDBConfig";
+import {
+  INFLUXDB_BUCKET,
+  QUERY_API,
+} from "../config/configuration/InfluxDBConfig";
 const { flux } = require("@influxdata/influxdb-client");
 
 let animationFrameId = 0;
+
 function OptimisedGraph(props) {
   const [table, setTable] = useState({
     data: {},
@@ -26,63 +35,19 @@ function OptimisedGraph(props) {
   const [graphType, setGraphType] = useState(props.inputGraphType);
   const [query, setQuery] = useState(props.inputQuery);
   const [device, setDevice] = useState(props.inputDevice);
-  const queryMemory = `from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "${device}")
-  |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
-  |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "mean")
-    
-    from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "${device}")
-  |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
-  |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
-  |> yield(name: "min")
-  
-  from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "${device}")
-  |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
-  |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
-  |> yield(name: "max")`;
-  
-  const queryETH = `from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-    |> filter(fn: (r) => r["_measurement"] == "${device}")
-    |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-    |> yield(name: "min")
-  from(bucket: "${INFLUXDB_BUCKET}")
-    |> range(start: -60m)
-    |> filter(fn: (r) => r["_measurement"] == "${device}")
-    |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-    |> yield(name: "max")
-  from(bucket: "${INFLUXDB_BUCKET}")
-    |> range(start: -60m)
-    |> filter(fn: (r) => r["_measurement"] == "${device}")
-    |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-    |> yield(name: "mean")`;
-  
-  const queryUptime = `from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-    |> filter(fn: (r) => r["_measurement"] == "${device}")
-    |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-    |> yield(name: "min")
-    from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-    |> filter(fn: (r) => r["_measurement"] == "${device}")
-    |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-    |> yield(name: "max")
-    from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-    |> filter(fn: (r) => r["_measurement"] == "${device}")
-    |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-    |> yield(name: "mean")`;
-  
+
   const getDataAndUpdateTable = async () => {
     let csv = "";
-    let querySelect = query.toLowerCase() === 'memory' ? queryMemory : 
-    query.toLowerCase() === 'eth' ? queryETH : queryUptime;
+    let querySelect =
+      query.toLowerCase() === "eth" && graphType === "band"
+        ? FLUX_QUERY_ETH_BAND(INFLUXDB_BUCKET, device)
+        : query.toLowerCase() === "eth" && graphType !== "band"
+        ? FLUX_QUERY_ETH(INFLUXDB_BUCKET, device)
+        : query.toLowerCase() === "uptime" && graphType === "band"
+        ? FLUX_QUERY_UPTIME_BAND(INFLUXDB_BUCKET, device)
+        : query.toLowerCase() === "uptime" && graphType !== "band"
+        ? FLUX_QUERY_UPTIME(INFLUXDB_BUCKET, device)
+        : FLUX_QUERY_MEMORY(INFLUXDB_BUCKET, device);
     let clientNodeRed = flux`` + querySelect;
     QUERY_API.queryLines(clientNodeRed, {
       next(line) {
@@ -90,10 +55,10 @@ function OptimisedGraph(props) {
       },
       error(error) {
         console.error(error);
-        console.log("\nFinished /nodered/client/memory ERROR");
+        console.log("\nFinish with ERROR on " + query);
       },
       complete() {
-        console.log("\nFinished /nodered/client/memory SUCCESS");
+        console.log("\nFinish with SUCCESS on " + query);
         let results = fromFlux(csv);
         let currentDate = new Date();
         setTable({
@@ -117,6 +82,7 @@ function OptimisedGraph(props) {
     return () => {
       window.clearInterval(animationFrameId);
     };
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -130,6 +96,7 @@ function OptimisedGraph(props) {
     } catch (error) {
       console.error(error);
     }
+    // eslint-disable-next-line
   }, [graphType, query, device]);
 
   const handleGraphChange = (event) => {
@@ -215,7 +182,6 @@ function OptimisedGraph(props) {
   };
 
   const render = () => {
-    console.log("graph rendered");
     return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
   };
   return render();

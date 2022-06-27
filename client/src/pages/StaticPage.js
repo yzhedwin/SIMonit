@@ -14,7 +14,6 @@ import {
 const ReactGridLayout = WidthProvider(RGL);
 function StaticPage() {
   const { did } = useParams();
-  const [state, setState] = useState({ cols: {}, breakpoint: "" });
   const [layouts, setLayouts] = useState({});
   const items = 4;
   const queries = [DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3, DEFAULT_QUERY3];
