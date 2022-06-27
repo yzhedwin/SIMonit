@@ -2,25 +2,24 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import StaticGraph from "../component/StaticGraph";
 import "./StaticPage.css";
-import { Responsive, WidthProvider } from "react-grid-layout";
+import RGL, { WidthProvider } from "react-grid-layout";
 import _ from "lodash";
-import { DEFAULT_DEVICE, DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3 } from "../constants";
+import {
+  DEFAULT_DEVICE,
+  DEFAULT_QUERY1,
+  DEFAULT_QUERY2,
+  DEFAULT_QUERY3,
+} from "../constants";
 
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
+const ReactGridLayout = WidthProvider(RGL);
 function StaticPage() {
   const { did } = useParams();
   const [state, setState] = useState({ cols: {}, breakpoint: "" });
   const [layouts, setLayouts] = useState({});
-  const items = 3;
-  const queries = [DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3];
-  const graphType = ["band", "line", "gauge"];
+  const items = 4;
+  const queries = [DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3, DEFAULT_QUERY3];
+  const graphType = ["band", "line", "line", "single stat"];
 
-  const onBreakpointChange = (breakpoint, cols) => {
-    setState({
-      breakpoint: breakpoint,
-      cols: cols,
-    });
-  };
   const onLayoutChange = (layout, layouts) => {
     setLayouts(layouts);
   };
@@ -30,9 +29,9 @@ function StaticPage() {
         <div
           key={i}
           data-grid={{
-            w: 2,
+            w: 1,
             h: 25,
-            x: i * 2,
+            x: i,
             y: i,
             i: i.toString(),
           }}
@@ -49,21 +48,21 @@ function StaticPage() {
     });
   };
   return (
-    <div className="static-legend">
-      <h2>Hostname: {did || "Default Device"}</h2>
-      <ResponsiveReactGridLayout
-        className="layout"
-        cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
-        rowHeight={10}
-        layouts={layouts}
-        isDraggable={false}
-        isResizable={false}
-        onBreakpointChange={onBreakpointChange}
-        onLayoutChange={(layout, layouts) => onLayoutChange(layout, layouts)}
-      >
-        {generateDOM()}
-      </ResponsiveReactGridLayout>
-    </div>
+    <ReactGridLayout
+      className="static"
+      style={{
+        background: "white",
+        border: "1px solid white"
+      }}
+      cols={4}
+      rowHeight={4}
+      layouts={layouts}
+      isDraggable={false}
+      isResizable={false}
+      onLayoutChange={(layout, layouts) => onLayoutChange(layout, layouts)}
+    >
+      {generateDOM()}
+    </ReactGridLayout>
   );
 }
 export default StaticPage;

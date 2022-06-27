@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { fromFlux, Plot } from "@influxdata/giraffe";
-import axios from "axios";
 import { findStringColumns } from "../helpers";
 import GraphForm from "../forms/GraphForm";
 import QueryForm from "../forms/QueryForm";

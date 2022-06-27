@@ -1,9 +1,5 @@
-const { InfluxDB } = require('@influxdata/influxdb-client')
-const baseURL = 'http://localhost:8086' //process.env.INFLUX_URL // url of your cloud instance
-const influxToken = 'q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw==' //' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
-const orgID = '7b2a33953b31c6c9' //process.env.ORG_ID // export your org id
-// connect to influxdb
-const influxDB = new InfluxDB({ url: baseURL, token: influxToken })
+import { QUERY_API } from '../config/configuration/InfluxDBConfig';
+
 
 
 export default function read() {
@@ -16,8 +12,7 @@ export default function read() {
 |> yield(name: "last")`;
 
     console.log('\n*** QUERY ***')
-    const queryApi = influxDB.getQueryApi(orgID)
-    queryApi.queryRows(testQ, {
+    QUERY_API.queryRows(testQ, {
       next(row, tableMeta) {
         const o = tableMeta.toObject(row)
         if (o.example){

@@ -1,85 +1,91 @@
 #!/usr/bin/env node
-const express = require('express')
-const cors = require('cors')
-const axios = require('axios')
-const { InfluxDB, flux } = require('@influxdata/influxdb-client')
-const { BucketsAPI } = require('@influxdata/influxdb-client-apis')
-const { query } = require('express')
+//Rest API
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
+const { InfluxDB, flux } = require("@influxdata/influxdb-client");
+const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
+const { query } = require("express");
 
 // vars to connect to bucket in influxdb
-const baseURL = 'http://localhost:8086' //process.env.INFLUX_URL // url of your cloud instance
-const influxToken = 'q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw==' //' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
-const orgID = '7b2a33953b31c6c9' //process.env.ORG_ID // export your org id
-const bucket = 'testbucket2' // process.env.BUCKET_NAME //export the name of your bucket
+const baseURL = "http://localhost:8086"; //process.env.INFLUX_URL // url of your cloud instance
+const influxToken =
+  "q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw=="; //' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
+const orgID = "7b2a33953b31c6c9"; //process.env.ORG_ID // export your org id
+const bucket = "testbucket2"; // process.env.BUCKET_NAME //export the name of your bucket
 
 // connect to influxdb
-const influxDB = new InfluxDB({ url: baseURL, token: influxToken })
-const queryApi = influxDB.getQueryApi(orgID)
-const bucketsAPI = new BucketsAPI(influxDB)
+const influxDB = new InfluxDB({ url: baseURL, token: influxToken });
+const queryApi = influxDB.getQueryApi(orgID);
+const bucketsAPI = new BucketsAPI(influxDB);
 
 const influxProxy = axios.create({
   baseURL,
   headers: {
-    'Authorization': `Token ${influxToken}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Token ${influxToken}`,
+    "Content-Type": "application/json",
+  },
 });
 
 //TODO vary query,buckets
-const nodeRedQueryMemory01 = `from(bucket: "${bucket}")
+const deviceMemory = (did) => {
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+  |> filter(fn: (r) => r["_measurement"] == "${did}")
   |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")
   
   from(bucket: "${bucket}")
 |> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+|> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
 from(bucket: "${bucket}")
 |> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+|> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "mem_free" or r["_field"] == "mem_swapfree" or r["_field"] == "mem_used" or r["_field"] == "mem_swapused")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
+};
 
-const nodeRedQueryETH01 = `from(bucket: "${bucket}")
+const deviceETH = (did) => {
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+  |> filter(fn: (r) => r["_measurement"] == "${did}")
   |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "min")
 from(bucket: "${bucket}")
   |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+  |> filter(fn: (r) => r["_measurement"] == "${did}")
   |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "max")
 from(bucket: "${bucket}")
   |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+  |> filter(fn: (r) => r["_measurement"] == "${did}")
   |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
+};
 
-const nodeRedQueryUptime01 = `from(bucket: "${bucket}")
+const deviceUptime = (did) => {
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+  |> filter(fn: (r) => r["_measurement"] == "${did}")
   |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "min")
   from(bucket: "${bucket}")
 |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+  |> filter(fn: (r) => r["_measurement"] == "${did}")
   |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "max")
   from(bucket: "${bucket}")
 |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "7d7836cf520e")
+  |> filter(fn: (r) => r["_measurement"] == "${did}")
   |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
   |> yield(name: "mean")`;
-
-  
+};
 
 const diskQuery = `from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -88,7 +94,6 @@ const diskQuery = `from(bucket: "${bucket}")
 |> filter(fn: (r) => r["device"] == "sdc")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")`;
-
 
 const cpuQuery = `from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -126,132 +131,134 @@ const testQuery = `from(bucket: "${bucket}")
 
 // start the server
 const app = express();
-app.use(cors())
+app.use(cors());
 const port = 3001;
 
 // get available buckets
-app.get('/buckets', (req, res) => {
-  getBuckets().then((b) => res.end(JSON.stringify(b)))
-})
+app.get("/buckets", (req, res) => {
+  getBuckets().then((b) => res.end(JSON.stringify(b)));
+});
 
 // get cpu usage data via influxdb-client-js library and push to :3001/cpu/client
-app.get('/cpu/client', (req, res) => {
-  let csv = ''
-  let clientQuery = flux``+ cpuQuery
+app.get("/cpu/client", (req, res) => {
+  let csv = "";
+  let clientQuery = flux`` + cpuQuery;
   queryApi.queryLines(clientQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
     error(error) {
-      console.error(error)
-      console.log('\nFinished /cpu/client ERROR')
-      res.end()
+      console.error(error);
+      console.log("\nFinished /cpu/client ERROR");
+      res.end();
     },
     complete() {
-      console.log('\nFinished /cpu/client SUCCESS')
-      res.end(JSON.stringify({ csv }))
+      console.log("\nFinished /cpu/client SUCCESS");
+      res.end(JSON.stringify({ csv }));
     },
-  })
-})
+  });
+});
 
-app.get('/disk/client', (req, res) => {
-    let csv = ''
-    let clientQueryDisk = flux`` + diskQuery
-    queryApi.queryLines(clientQueryDisk, {
-        next(line) {
-            csv = `${csv}${line}\n`;
-        },
-        error(error) {
-            console.error(error)
-            console.log('\nFinished /disk/client ERROR')
-            res.end()
-        },
-        complete() {
-            console.log('\nFinished /disk/client SUCCESS')
-            res.end(JSON.stringify({ csv }))
-        },
-    })
-})
-app.get('/mem/client', (req, res) => {
-    let csv = ''
-    let clientQueryMem = flux`` + memQuery
-    queryApi.queryLines(clientQueryMem, {
-        next(line) {
-            csv = `${csv}${line}\n`;
-        },
-        error(error) {
-            console.error(error)
-            console.log('\nFinished /mem/client ERROR')
-            res.end()
-        },
-        complete() {
-            console.log('\nFinished /mem/client SUCCESS')
-            res.end(JSON.stringify({ csv }))
-        },
-    })
-})
-app.get('/device1/nodered/client/memory', (req, res) => {
-    let csv = ''
-    let clientNodeRed = flux`` + nodeRedQueryMemory01
-    queryApi.queryLines(clientNodeRed, {
-        next(line) {
-            csv = `${csv}${line}\n`;
-        },
-        error(error) {
-            console.error(error)
-            console.log('\nFinished /nodered/client/memory ERROR')
-            res.end()
-        },
-        complete() {
-            console.log('\nFinished /nodered/client/memory SUCCESS')
-            res.end(JSON.stringify({ csv }))
-        },
-    })
-})
-app.get('/device1/nodered/client/eth', (req, res) => {
-    let csv = ''
-    let clientNodeRed = flux`` + nodeRedQueryETH01
-    queryApi.queryLines(clientNodeRed, {
-        next(line) {
-            csv = `${csv}${line}\n`;
-        },
-        error(error) {
-            console.error(error)
-            console.log('\nFinished /nodered/client/eth ERROR')
-            res.end()
-        },
-        complete() {
-            console.log('\nFinished /nodered/client/eth SUCCESS')
-            res.end(JSON.stringify({ csv }))
-        },
-    })
-})
-app.get('/device1/nodered/client/uptime', (req, res) => {
-  let csv = ''
-  let clientNodeRed = flux`` + nodeRedQueryUptime01
+app.get("/disk/client", (req, res) => {
+  let csv = "";
+  let clientQueryDisk = flux`` + diskQuery;
+  queryApi.queryLines(clientQueryDisk, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished /disk/client ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished /disk/client SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+app.get("/mem/client", (req, res) => {
+  let csv = "";
+  let clientQueryMem = flux`` + memQuery;
+  queryApi.queryLines(clientQueryMem, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished /mem/client ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished /mem/client SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+app.get("/:did/memory", (req, res) => {
+  const { did } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + deviceMemory(did);
   queryApi.queryLines(clientNodeRed, {
-      next(line) {
-          csv = `${csv}${line}\n`;
-      },
-      error(error) {
-          console.error(error)
-          console.log('\nFinished /nodered/client/uptime ERROR')
-          res.end()
-      },
-      complete() {
-          console.log('\nFinished /nodered/client/uptime SUCCESS')
-          res.end(JSON.stringify({ csv }))
-      },
-  })
-})
-
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + " memory ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " memory SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+app.get("/:did/eth", (req, res) => {
+  const { did } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + deviceETH(did);
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + " eth ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " eth SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+app.get("/:did/uptime", (req, res) => {
+  const { did } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + deviceUptime(did);
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + "nuptime ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " uptime SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
 
 app.listen(port, () => {
   console.log(`listening on port :${port}`);
 });
 
 async function getBuckets() {
-  return await bucketsAPI.getBuckets({ orgID })
+  return await bucketsAPI.getBuckets({ orgID });
 }
 
 /*

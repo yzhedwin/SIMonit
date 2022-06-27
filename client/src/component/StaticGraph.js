@@ -4,7 +4,10 @@ import { findStringColumns } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 import { REASONABLE_API_REFRESH_RATE, STYLE } from "../constants";
-import {INFLUXDB_BUCKET, QUERY_API } from "../config/configuration/InfluxDBConfig";
+import {
+  INFLUXDB_BUCKET,
+  QUERY_API,
+} from "../config/configuration/InfluxDBConfig";
 const { flux } = require("@influxdata/influxdb-client");
 
 let animationFrameId = 0;
@@ -40,42 +43,26 @@ from(bucket: "${INFLUXDB_BUCKET}")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
-const queryETH = `from(bucket: "${INFLUXDB_BUCKET}")
-|> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "${device}")
-  |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "min")
-from(bucket: "${INFLUXDB_BUCKET}")
+  const queryETH = `from(bucket: "${INFLUXDB_BUCKET}")
   |> range(start: -60m)
   |> filter(fn: (r) => r["_measurement"] == "${device}")
   |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "max")
-from(bucket: "${INFLUXDB_BUCKET}")
-  |> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "${device}")
-  |> filter(fn: (r) => r["_field"] == "nw_eth0_rx" or r["_field"] == "nw_eth0_tx")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "mean")`;
+  |> yield(name: "last")`;
 
-const queryUptime = `from(bucket: "${INFLUXDB_BUCKET}")
+  const queryUptime = `from(bucket: "${INFLUXDB_BUCKET}")
 |> range(start: -60m)
   |> filter(fn: (r) => r["_measurement"] == "${device}")
   |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "min")
-  from(bucket: "${INFLUXDB_BUCKET}")
-|> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "${device}")
-  |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "max")
-  from(bucket: "${INFLUXDB_BUCKET}")
-|> range(start: -60m)
-  |> filter(fn: (r) => r["_measurement"] == "${device}")
-  |> filter(fn: (r) => r["_field"] == "uptime")|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-  |> yield(name: "mean")`;
+  |> yield(name: "last")`;
 
   const getDataAndUpdateTable = async () => {
     let csv = "";
-    let querySelect = query.toLowerCase() === 'memory' ? queryMemory : 
-    query.toLowerCase() === 'eth' ? queryETH : queryUptime;
+    let querySelect =
+      query.toLowerCase() === "memory"
+        ? queryMemory
+        : query.toLowerCase() === "eth"
+        ? queryETH
+        : queryUptime;
     let clientNodeRed = flux`` + querySelect;
     QUERY_API.queryLines(clientNodeRed, {
       next(line) {
@@ -115,9 +102,10 @@ const queryUptime = `from(bucket: "${INFLUXDB_BUCKET}")
 
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
+    //console.log(table.data.columns._value)
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, fill).getConfig()],
+      layers: [new LayerConfig(graphType, fill.slice(0, 3)).getConfig()], //slice array to modify columns
       valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",

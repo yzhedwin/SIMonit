@@ -1,15 +1,9 @@
-const { InfluxDB, Point } = require("@influxdata/influxdb-client");
-const baseURL = "http://localhost:8086"; //process.env.INFLUX_URL // url of your cloud instance
-const influxToken =
-  "q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw=="; //' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
-const orgID = "7b2a33953b31c6c9"; //process.env.ORG_ID // export your org id
+import { INFLUXDB_CLIENT, INFLUX_ORGID } from "../config/configuration/InfluxDBConfig";
+const { Point } = require("@influxdata/influxdb-client");
 const tbucket = "javabucket"; // process.env.BUCKET_NAME //export the name of your bucket
 
-// connect to influxdb
-const influxDB = new InfluxDB({ url: baseURL, token: influxToken });
-
 export default function write(tag, field, value) {
-  const writeApi = influxDB.getWriteApi(orgID, tbucket);
+  const writeApi = INFLUXDB_CLIENT.getWriteApi(INFLUX_ORGID, tbucket);
   // setup default tags for all writes through this API
   writeApi.useDefaultTags({ location: "browser" });
 

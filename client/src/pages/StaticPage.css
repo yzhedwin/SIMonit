@@ -3,4 +3,13 @@
     height: 100%;
     width: 100%;
     background-color: white;
+    border: 2px solid black;
+
   }
+h2.title {
+  width: 50%;
+  transform: translate(50%,25%);
+  text-align: center;
+  background-color: white;
+  border: 2px solid black;
+}
