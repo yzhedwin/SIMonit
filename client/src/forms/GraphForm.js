@@ -16,9 +16,9 @@ const GraphForm = (props) => {
           autoWidth
           label="Graph Type"
         >
-          <MenuItem value={'band'}>Band</MenuItem>
-          <MenuItem value={'line'}>Line</MenuItem>
-          <MenuItem value={'single stat'}>Single Stat</MenuItem>
+          <MenuItem value={"band"}>Band</MenuItem>
+          <MenuItem value={"line"}>Line</MenuItem>
+          <MenuItem value={"single stat"}>Single Stat</MenuItem>
         </Select>
       </FormControl>
     </span>

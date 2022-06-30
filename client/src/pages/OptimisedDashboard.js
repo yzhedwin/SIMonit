@@ -6,8 +6,9 @@ import { Button } from "@mui/material";
 import write from "../component/DBWrite";
 import {
   DEFAULT_DEVICE,
-  DEFAULT_QUERY1,
+  DEFAULT_QUERY_1,
   DEFAULT_GRAPH_TYPE,
+  DEFAULT_CPU,
 } from "../constants";
 import OptimisedGraph from "../component/OptimisedGraph";
 
@@ -52,11 +53,13 @@ export default function OptimisedDashboard(props) {
     //TODO: Add database query to load config
     return _.map(_.range(items), function (i) {
       let storageQuery =
-        localStorage.getItem("dash_query" + (i + 1)) || DEFAULT_QUERY1;
+        localStorage.getItem("dash_query" + (i + 1)) || DEFAULT_QUERY_1;
       let storageGraph =
         localStorage.getItem("dash_graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
       let storageDevice =
         localStorage.getItem("dash_device" + (i + 1)) || DEFAULT_DEVICE;
+      let storageCPU =
+        localStorage.getItem("dash_cpu" + (i + 1)) || DEFAULT_CPU;
       return (
         <div
           key={i}
@@ -75,6 +78,7 @@ export default function OptimisedDashboard(props) {
             inputGraphType={storageGraph}
             inputQuery={storageQuery}
             inputDevice={storageDevice}
+            inputCPUID={storageCPU}
             toggleLegend={toggle}
             saveName={"dash"}
           />

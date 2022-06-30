@@ -6,9 +6,10 @@ import RGL, { WidthProvider } from "react-grid-layout";
 import _ from "lodash";
 import {
   DEFAULT_DEVICE,
-  DEFAULT_QUERY1,
-  DEFAULT_QUERY2,
-  DEFAULT_QUERY3,
+  DEFAULT_QUERY_1,
+  DEFAULT_QUERY_2,
+  DEFAULT_QUERY_3,
+  DEFAULT_QUERY_4,
 } from "../constants";
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -16,8 +17,8 @@ function StaticPage() {
   const { did } = useParams();
   const [layouts, setLayouts] = useState({});
   const items = 4;
-  const queries = [DEFAULT_QUERY1, DEFAULT_QUERY2, DEFAULT_QUERY3, DEFAULT_QUERY3];
-  const graphType = ["band", "line", "line", "single stat"];
+  const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
+  const graphType = ["line", "line", "line", "line"];
 
   const onLayoutChange = (layout, layouts) => {
     setLayouts(layouts);

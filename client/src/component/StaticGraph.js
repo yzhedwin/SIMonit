@@ -3,7 +3,7 @@ import { fromFlux, Plot } from "@influxdata/giraffe";
 import { findStringColumns } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import { FLUX_QUERY_ETH, FLUX_QUERY_MEMORY, FLUX_QUERY_UPTIME, REASONABLE_API_REFRESH_RATE, STYLE } from "../constants";
+import { DEFAULT_CPU, DEFAULT_DRIVE, FLUX_QUERY_CPU, FLUX_QUERY_DRIVE, FLUX_QUERY_LOAD, FLUX_QUERY_MEMORY, FLUX_QUERY_UPTIME, REASONABLE_API_REFRESH_RATE, STYLE } from "../constants";
 import {
   INFLUXDB_BUCKET,
   QUERY_API,
@@ -28,8 +28,12 @@ export default function StaticGraph({
     let querySelect =
       query.toLowerCase() === "memory"
         ? FLUX_QUERY_MEMORY(INFLUXDB_BUCKET, device)
-        : query.toLowerCase() === "eth"
-        ? FLUX_QUERY_ETH(INFLUXDB_BUCKET, device)
+        : query.toLowerCase() === "load"
+        ? FLUX_QUERY_LOAD(INFLUXDB_BUCKET, device)
+        : query.toLowerCase() === "cpu"
+        ? FLUX_QUERY_CPU(INFLUXDB_BUCKET, device, DEFAULT_CPU)
+        : query.toLowerCase() === "drive"
+        ? FLUX_QUERY_DRIVE(INFLUXDB_BUCKET, device, DEFAULT_DRIVE)
         : FLUX_QUERY_UPTIME(INFLUXDB_BUCKET, device);
     let clientNodeRed = flux`` + querySelect;
     QUERY_API.queryLines(clientNodeRed, {
@@ -93,7 +97,7 @@ export default function StaticGraph({
     };
     return (
       <div className="static-graph-component" style={STYLE}>
-        <h2>Device Stats: {query.toUpperCase()}</h2>
+        <h4>Device Stats: {query.toUpperCase()}</h4>
         <h5>Last Updated: {table.lastUpdated}</h5>
         <Plot config={config} />
       </div>

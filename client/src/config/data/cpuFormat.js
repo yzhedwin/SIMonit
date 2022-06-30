@@ -1,11 +1,10 @@
 import { timeFormatter } from "@influxdata/giraffe";
 
-const memFormat = {
+const cpuFormat = {
   _time: timeFormatter({
     timeFormat: "UTC",
     format: "HH:mm",
   }),
-  _value: (val) => (typeof val === "number" ? `${(val / 1000000).toFixed(1)}MB` : val),
+  _value: (val) => (typeof val === "number" ? `${val}` : val),
 };
-
-export default memFormat;
+export default cpuFormat;

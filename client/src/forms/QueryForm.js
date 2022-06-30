@@ -17,7 +17,8 @@ const QueryForm = (props) => {
           label="Query"
         >
           <MenuItem value={"memory"}>Memory</MenuItem>
-          <MenuItem value={"eth"}>ETH</MenuItem>
+          <MenuItem value={"load"}>Load</MenuItem>
+          <MenuItem value={"cpu"}>CPU</MenuItem>
           <MenuItem value={"uptime"}>Uptime</MenuItem>
         </Select>
       </FormControl>
