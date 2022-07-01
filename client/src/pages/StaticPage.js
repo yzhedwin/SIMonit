@@ -11,14 +11,14 @@ import {
   DEFAULT_QUERY_3,
   DEFAULT_QUERY_4,
 } from "../constants";
-
+ 
 const ReactGridLayout = WidthProvider(RGL);
 function StaticPage() {
   const { did } = useParams();
   const [layouts, setLayouts] = useState({});
   const items = 4;
   const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
-  const graphType = ["line", "line", "line", "line"];
+  const graphType = ["line", "line", "line","line"];
 
   const onLayoutChange = (layout, layouts) => {
     setLayouts(layouts);
@@ -37,7 +37,6 @@ function StaticPage() {
           }}
         >
           <StaticGraph
-            id={i}
             device={did || DEFAULT_DEVICE}
             graphType={graphType[i]}
             query={queries[i]}

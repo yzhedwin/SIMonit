@@ -8,7 +8,7 @@ import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
 import DeviceForm from "../forms/DeviceForm";
 import {
-  REASONABLE_API_REFRESH_RATE,
+  API_REFRESH_RATE,
   DEFAULT_DEVICE,
   DEFAULT_GRAPH_TYPE,
   DEFAULT_QUERY_1,
@@ -42,7 +42,7 @@ function OptimisedGraph(props) {
   const [device, setDevice] = useState(props.inputDevice);
   const [cpuID, setCPUID] = useState(props.inputCPUID);
 
-  const getDataAndUpdateTable = async () => {
+  const getData = async () => {
     let csv = "";
     let querySelect = querySelector(query, graphType, device, cpuID);
     let clientNodeRed = flux`` + querySelect;
@@ -72,10 +72,10 @@ function OptimisedGraph(props) {
     //Runs on the first render
     isMount.current = true;
     try {
-      getDataAndUpdateTable();
+      getData();
       animationFrameId = window.setInterval(
-        getDataAndUpdateTable,
-        REASONABLE_API_REFRESH_RATE
+        getData,
+        API_REFRESH_RATE
       );
     } catch (error) {
       console.error(error);
@@ -88,15 +88,22 @@ function OptimisedGraph(props) {
   }, []);
 
   useEffect(() => {
-    window.clearInterval(animationFrameId);
+    //reset table
+    setTable(prevState => ({ ...prevState, data: {}}))
+    window.clearInterval(animationFrameId)
+    getData()
     try {
       animationFrameId = window.setInterval(
-        getDataAndUpdateTable,
-        REASONABLE_API_REFRESH_RATE
+        getData,
+        API_REFRESH_RATE
       );
     } catch (error) {
       console.error(error);
     }
+    return () => {
+      console.log("unmount")
+      window.clearInterval(animationFrameId);
+    };
     // eslint-disable-next-line
   }, [graphType, query, device, cpuID, props.toggleLegend]);
 
@@ -145,12 +152,16 @@ function OptimisedGraph(props) {
     localStorage.setItem(props.saveName + "_device", DEFAULT_DEVICE);
     localStorage.setItem(props.saveName + "_cpu", DEFAULT_CPU);
   };
+  function checkFills(fill) {
+    return fill !== "topic";
+  }
 
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
+    const newFill = fill.filter(checkFills);
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, fill).getConfig()],
+      layers: [new LayerConfig(graphType, newFill).getConfig()],
       valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",

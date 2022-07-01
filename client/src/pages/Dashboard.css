@@ -29,7 +29,7 @@ body {
 }
 .react-grid-item:not(.react-grid-placeholder) {
   background: rgb(248, 248, 248);
-  border: 3px solid black;
+  border: 1px solid black;
 }
 .react-grid-item.resizing {
   opacity: 0.9;

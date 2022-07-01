@@ -3,16 +3,16 @@ import { fromFlux, Plot } from "@influxdata/giraffe";
 import { findStringColumns } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import { DEFAULT_CPU, DEFAULT_DRIVE, FLUX_QUERY_CPU, FLUX_QUERY_DRIVE, FLUX_QUERY_LOAD, FLUX_QUERY_MEMORY, FLUX_QUERY_UPTIME, REASONABLE_API_REFRESH_RATE, STYLE } from "../constants";
 import {
-  INFLUXDB_BUCKET,
-  QUERY_API,
-} from "../config/configuration/InfluxDBConfig";
-const { flux } = require("@influxdata/influxdb-client");
+  DEFAULT_CPU,
+  API_REFRESH_RATE,
+  REST_URL,
+  STYLE,
+} from "../constants";
+import axios from "axios";
 
 let animationFrameId = 0;
 export default function StaticGraph({
-  id,
   device,
   graphType,
   query,
@@ -22,55 +22,45 @@ export default function StaticGraph({
     data: {},
     lastUpdated: "",
   });
-
-  const getDataAndUpdateTable = async () => {
-    let csv = "";
-    let querySelect =
+  const getData = async () => {
+    let uri =
       query.toLowerCase() === "memory"
-        ? FLUX_QUERY_MEMORY(INFLUXDB_BUCKET, device)
+        ? "/memory/" + device
         : query.toLowerCase() === "load"
-        ? FLUX_QUERY_LOAD(INFLUXDB_BUCKET, device)
+        ? "/load/" + device
         : query.toLowerCase() === "cpu"
-        ? FLUX_QUERY_CPU(INFLUXDB_BUCKET, device, DEFAULT_CPU)
+        ? "/cpu/" + device + "/" + DEFAULT_CPU
         : query.toLowerCase() === "drive"
-        ? FLUX_QUERY_DRIVE(INFLUXDB_BUCKET, device, DEFAULT_DRIVE)
-        : FLUX_QUERY_UPTIME(INFLUXDB_BUCKET, device);
-    let clientNodeRed = flux`` + querySelect;
-    QUERY_API.queryLines(clientNodeRed, {
-      next(line) {
-        csv = `${csv}${line}\n`;
-      },
-      error(error) {
-        console.error(error);
-        console.log("\nFinish with ERROR on " + query);
-      },
-      complete() {
-        console.log("\nFinish with SUCCESS on " + query);
-        let results = fromFlux(csv);
-        let currentDate = new Date();
-        setTable({
-          data: results.table,
-          lastUpdated: currentDate.toLocaleTimeString(),
-        });
-      },
-    });
-  };
+        ? "/drive/" + device
+        : "/uptime/" + device;
+    const resp = await axios.get(REST_URL + uri);
+    try {
+      let results = fromFlux(resp.data.csv);
+      let currentDate = new Date();
+      setTable({
+        data: results.table,
+        lastUpdated: currentDate.toLocaleTimeString(),
+      })
+    } catch (error) {
+      console.error("error", error.message);
+    }
+  }
 
-  useEffect(() => {
+  useEffect(()  => {
     //Runs on the first render
     try {
-      getDataAndUpdateTable();
+      getData();
       animationFrameId = window.setInterval(
-        getDataAndUpdateTable,
-        REASONABLE_API_REFRESH_RATE
-      );
+        getData,
+        API_REFRESH_RATE
+      )
     } catch (error) {
       console.error(error);
     }
     return () => {
       window.clearInterval(animationFrameId);
-    };
- // eslint-disable-next-line
+    }
+    // eslint-disable-next-line
   }, []);
 
   function checkFills(fill) {
@@ -89,14 +79,20 @@ export default function StaticGraph({
       legendFont: "12px sans-serif",
       legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
-      showAxes: graphType === "single stat" ? false : true,
+      showAxes:
+        graphType === "bar" || graphType === "single stat" ? false : true,
       staticLegend: {
         heightRatio: 0.4,
-        border: "2px solid black",
+        border: "1px solid black",
         fontBrightColor: "black",
         backgroundColor: "white",
         colorizeRows: false,
-        hide: graphType === "single stat" || toggleLegend !== 1 ? true : false,
+        hide:
+          graphType === "bar" ||
+          graphType === "single stat" ||
+          toggleLegend !== 1
+            ? true
+            : false,
       },
     };
     return (

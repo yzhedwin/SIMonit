@@ -8,7 +8,7 @@ import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import {REASONABLE_API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY_1} from "../constants";
+import {API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY_1} from "../constants";
 
 export default class Graph extends React.Component {
 
@@ -21,7 +21,7 @@ export default class Graph extends React.Component {
       query: props.query,
       device: props.device,
     };
-    console.log(this.state.device)
+    console.log(this.state.query)
     this.handleGraphChange = this.handleGraphChange.bind(this);
     this.handleDeviceChange = this.handleDeviceChange.bind(this);
     this.handleQueryChange = this.handleQueryChange.bind(this);
@@ -36,7 +36,7 @@ export default class Graph extends React.Component {
   };
 
   getDataAndUpdateTable = async () => {
-    const resp = await axios.get("http://localhost:3001/" + this.state.device + "/" + this.state.query);
+    const resp = await axios.get("http://localhost:3001/" + this.state.query + "/" + this.state.device);
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
@@ -54,7 +54,7 @@ export default class Graph extends React.Component {
       this.getDataAndUpdateTable();
       this.animationFrameId = window.setInterval(
         this.getDataAndUpdateTable,
-        REASONABLE_API_REFRESH_RATE
+        API_REFRESH_RATE
       );
     } catch (error) {
       console.error(error);

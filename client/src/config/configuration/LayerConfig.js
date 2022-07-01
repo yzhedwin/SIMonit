@@ -2,6 +2,7 @@ import bandConfig from "../layers/bandConfig";
 import singleStatConfig from "../layers/singleStatConfig";
 import gaugeConfig from "../layers/gaugeConfig";
 import lineConfig from "../layers/lineConfig";
+import barConfig from "../layers/barConfig";
 
 //TODO: Add data formatting depending on data type
 export default class LayerConfig {
@@ -16,12 +17,14 @@ export default class LayerConfig {
     //get config of specified configtype
     if (this.state.configType === "band") {
       return bandConfig(this.state.fill);
-    } else if (this.state.configType === "line") {
+    }  if (this.state.configType === "line") {
       return lineConfig(this.state.fill);
-    } else if (this.state.configType === "single stat") {
+    }  if (this.state.configType === "single stat") {
       return singleStatConfig();
-    } else if (this.state.configType === "gauge") {
+    } if (this.state.configType === "gauge") {
       return gaugeConfig();
+    }  if (this.state.configType === "bar") {
+      return barConfig();
     } 
   }
 }
