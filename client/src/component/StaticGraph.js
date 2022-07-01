@@ -73,12 +73,16 @@ export default function StaticGraph({
  // eslint-disable-next-line
   }, []);
 
+  function checkFills(fill) {
+    return fill !== "topic";
+  }
+
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
-    //console.log(table.data.columns._value)
+    const newFill = fill.filter(checkFills);
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, fill.slice(0, 3)).getConfig()], //slice array to modify columns
+      layers: [new LayerConfig(graphType, newFill).getConfig()], //slice array to modify columns
       valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",
@@ -97,8 +101,8 @@ export default function StaticGraph({
     };
     return (
       <div className="static-graph-component" style={STYLE}>
-        <h4>Device Stats: {query.toUpperCase()}</h4>
-        <h5>Last Updated: {table.lastUpdated}</h5>
+        <h5>Device Stats: {query.toUpperCase()}</h5>
+        <span>Last Updated: {table.lastUpdated}</span>
         <Plot config={config} />
       </div>
     );
