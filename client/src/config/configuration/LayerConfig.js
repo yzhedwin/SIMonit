@@ -4,12 +4,15 @@ import gaugeConfig from "../layers/gaugeConfig";
 import lineConfig from "../layers/lineConfig";
 import barConfig from "../layers/barConfig";
 
+function checkFills(fill) {
+  return fill !== "topic";
+}
 //TODO: Add data formatting depending on data type
 export default class LayerConfig {
   constructor(configType, fill) {
     this.state = {
       configType,
-      fill,
+      fill: fill.filter(checkFills),
     };
   }
 

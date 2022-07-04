@@ -43,7 +43,7 @@ export default function OptimisedDashboard(props) {
     JSON.parse(JSON.stringify(storageLayout))
   );
   const [items, setItems] = useState(JSON.parse(storageItems));
-  const [toggleLegend, setToggelLegend] = useState(1);
+  const [toggleLegend, setToggleLegend] = useState(1);
   const [state, setState] = useState({ cols: {}, breakpoint: "" });
 
   //use index to load config of graph
@@ -111,7 +111,7 @@ export default function OptimisedDashboard(props) {
   };
   const onLegendChange = (num) => {
     const newNum = num * -1;
-    setToggelLegend(newNum);
+    setToggleLegend(newNum);
   };
   const reset = () => {
     localStorage.clear();

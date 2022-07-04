@@ -22,6 +22,8 @@ import {
   FLUX_QUERY_LOAD_BAND,
   FLUX_QUERY_CPU_BAND,
   FLUX_QUERY_MEMORY_BAND,
+  FLUX_QUERY_DRIVE,
+  DEFAULT_DRIVE,
 } from "../constants";
 import {
   INFLUXDB_BUCKET,
@@ -41,6 +43,7 @@ function OptimisedGraph(props) {
   const [query, setQuery] = useState(props.inputQuery);
   const [device, setDevice] = useState(props.inputDevice);
   const [cpuID, setCPUID] = useState(props.inputCPUID);
+  const [toggleLegend, setToggleLegend] = useState("");
 
   const getData = async () => {
     let csv = "";
@@ -61,10 +64,17 @@ function OptimisedGraph(props) {
         if (!isMount.current) {
           return null;
         }
-        setTable({
-          data: results.table,
-          lastUpdated: currentDate.toLocaleTimeString(),
-        });
+        if (results.table.length > 0) {
+          setTable({
+            data: results.table,
+            lastUpdated: currentDate.toLocaleTimeString(),
+          });
+        } else {
+          setTable({
+            data: {},
+            lastUpdated: currentDate.toLocaleTimeString(),
+          });
+        }
       },
     });
   };
@@ -80,12 +90,15 @@ function OptimisedGraph(props) {
     return () => {
       window.clearInterval(animationFrameId);
       isMount.current = false;
+      setToggleLegend(1);
     };
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     //reset table
+    setToggleLegend(props.toggleLegend);
+    console.log(toggleLegend);
     setTable((prevState) => ({ ...prevState, data: {} }));
     window.clearInterval(animationFrameId);
     getData();
@@ -96,6 +109,8 @@ function OptimisedGraph(props) {
     }
     return () => {
       console.log("unmount");
+      console.log("AFTER " + toggleLegend);
+      setToggleLegend(1);
       window.clearInterval(animationFrameId);
     };
     // eslint-disable-next-line
@@ -146,21 +161,17 @@ function OptimisedGraph(props) {
     localStorage.setItem(props.saveName + "_device", DEFAULT_DEVICE);
     localStorage.setItem(props.saveName + "_cpu", DEFAULT_CPU);
   };
-  function checkFills(fill) {
-    return fill !== "topic";
-  }
 
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
-    const newFill = fill.filter(checkFills);
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, newFill).getConfig()],
+      layers: [new LayerConfig(graphType, fill).getConfig()],
       valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
-      legendHide: props.toggleLegend === 1 ? true : false,
+      legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
       showAxes: graphType === "single stat" ? false : true,
       staticLegend: {
@@ -172,7 +183,7 @@ function OptimisedGraph(props) {
         hide:
           graphType === "bar" ||
           graphType === "single stat" ||
-          props.toggleLegend !== 1
+          toggleLegend !== 1
             ? true
             : false,
       },
@@ -201,7 +212,11 @@ function OptimisedGraph(props) {
   };
 
   const render = () => {
-    return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
+    try {
+      return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
+    } catch (error) {
+      console.log(error);
+    }
   };
   return render();
 }
@@ -212,6 +227,8 @@ function querySelector(query, graphType, device, cpuID) {
     ? FLUX_QUERY_LOAD_BAND(INFLUXDB_BUCKET, device)
     : query.toLowerCase() === "load" && graphType !== "band"
     ? FLUX_QUERY_LOAD(INFLUXDB_BUCKET, device)
+    : query.toLowerCase() === "drive" && graphType !== "band"
+    ? FLUX_QUERY_DRIVE(INFLUXDB_BUCKET, device, DEFAULT_DRIVE)
     : query.toLowerCase() === "uptime" && graphType !== "band"
     ? FLUX_QUERY_UPTIME(INFLUXDB_BUCKET, device)
     : query.toLowerCase() === "uptime" && graphType === "band"

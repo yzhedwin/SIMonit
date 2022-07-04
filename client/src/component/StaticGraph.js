@@ -59,16 +59,11 @@ export default function StaticGraph({
     // eslint-disable-next-line
   }, []);
 
-  function checkFills(fill) {
-    return fill !== "topic";
-  }
-
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
-    const newFill = fill.filter(checkFills);
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, newFill).getConfig()],
+      layers: [new LayerConfig(graphType, fill).getConfig()],
       valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",
