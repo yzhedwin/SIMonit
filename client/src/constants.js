@@ -143,3 +143,26 @@ export const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")`;
+
+export const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "min")
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "mean")
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "max")`;

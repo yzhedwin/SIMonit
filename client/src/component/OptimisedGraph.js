@@ -24,6 +24,7 @@ import {
   FLUX_QUERY_MEMORY_BAND,
   FLUX_QUERY_DRIVE,
   DEFAULT_DRIVE,
+  FLUX_QUERY_DRIVE_BAND,
 } from "../constants";
 import {
   INFLUXDB_BUCKET,
@@ -43,7 +44,7 @@ function OptimisedGraph(props) {
   const [query, setQuery] = useState(props.inputQuery);
   const [device, setDevice] = useState(props.inputDevice);
   const [cpuID, setCPUID] = useState(props.inputCPUID);
-  const [toggleLegend, setToggleLegend] = useState("");
+  const [toggleLegend, setToggleLegend] = useState(1);
 
   const getData = async () => {
     let csv = "";
@@ -89,16 +90,15 @@ function OptimisedGraph(props) {
     }
     return () => {
       window.clearInterval(animationFrameId);
+      setToggleLegend(2);
       isMount.current = false;
-      setToggleLegend(1);
     };
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     //reset table
-    setToggleLegend(props.toggleLegend);
-    console.log(toggleLegend);
+    setToggleLegend(-1)
     setTable((prevState) => ({ ...prevState, data: {} }));
     window.clearInterval(animationFrameId);
     getData();
@@ -109,12 +109,15 @@ function OptimisedGraph(props) {
     }
     return () => {
       console.log("unmount");
-      console.log("AFTER " + toggleLegend);
-      setToggleLegend(1);
       window.clearInterval(animationFrameId);
+      setTable((prevState) => ({ ...prevState, data: {} }));
     };
     // eslint-disable-next-line
-  }, [graphType, query, device, cpuID, props.toggleLegend]);
+  }, [graphType, query, device, cpuID]);
+
+  useEffect(() => {
+    setToggleLegend(props.toggleLegend);
+  }, [props.toggleLegend]);
 
   const handleGraphChange = (event) => {
     setGraphType(event.target.value);
@@ -229,6 +232,8 @@ function querySelector(query, graphType, device, cpuID) {
     ? FLUX_QUERY_LOAD(INFLUXDB_BUCKET, device)
     : query.toLowerCase() === "drive" && graphType !== "band"
     ? FLUX_QUERY_DRIVE(INFLUXDB_BUCKET, device, DEFAULT_DRIVE)
+    : query.toLowerCase() === "drive" && graphType === "band"
+    ? FLUX_QUERY_DRIVE_BAND(INFLUXDB_BUCKET, device, DEFAULT_DRIVE)
     : query.toLowerCase() === "uptime" && graphType !== "band"
     ? FLUX_QUERY_UPTIME(INFLUXDB_BUCKET, device)
     : query.toLowerCase() === "uptime" && graphType === "band"
