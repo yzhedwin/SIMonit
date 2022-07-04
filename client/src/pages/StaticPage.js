@@ -18,7 +18,7 @@ function StaticPage() {
   const [layouts, setLayouts] = useState({});
   const items = 4;
   const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
-  const graphType = ["line", "line", "line","bar"];
+  const graphType = ["band", "line", "band", "bar"];
 
   const onLayoutChange = (layout, layouts) => {
     setLayouts(layouts);

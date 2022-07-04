@@ -39,44 +39,37 @@ app.get("/buckets", (req, res) => {
 
 /* QUERIES */
 const FLUX_QUERY_MEMORY = (bucket, did) =>
-`from(bucket: "${bucket}")
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")
+|> yield(name: "last")`;
+
+const FLUX_QUERY_MEMORY_BAND = (bucket, did) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "max")
 
 from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
-|> yield(name: "min")
+|> yield(name: "mean")
 
 from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
-|> yield(name: "max")
+|> yield(name: "min")`;
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")`;
-
-const FLUX_QUERY_MEMORY_BAR = (bucket, did) => 
-`from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")`;
-
- const FLUX_QUERY_LOAD = (bucket, did) =>
-`from(bucket: "${bucket}")
+const FLUX_QUERY_LOAD_BAND = (bucket, did) =>
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
@@ -95,17 +88,18 @@ from(bucket: "${bucket}")
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")
-from(bucket: "${bucket}")
+|> yield(name: "max")`;
+
+const FLUX_QUERY_LOAD = (bucket, did) =>
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")       
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")`;
 
-
- const FLUX_QUERY_CPU = (bucket, did, cpuID) =>
-`from(bucket: "${bucket}")
+const FLUX_QUERY_CPU_BAND = (bucket, did, cpuID) =>
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["cpu"] == "${cpuID}")
@@ -127,9 +121,10 @@ from(bucket: "${bucket}")
 |> filter(fn: (r) => r["cpu"] == "${cpuID}")
 |> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")
+|> yield(name: "min")`;
 
-from(bucket: "${bucket}")
+const FLUX_QUERY_CPU = (bucket, did, cpuID) =>
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["cpu"] == "${cpuID}")
@@ -137,14 +132,13 @@ from(bucket: "${bucket}")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")`;
 
-
- const FLUX_QUERY_UPTIME = (bucket, did) =>
-`from(bucket: "${bucket}")
+const FLUX_QUERY_UPTIME_BAND = (bucket, did) =>
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "uptime")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")
+|> yield(name: "max")
 
 from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -158,29 +152,23 @@ from(bucket: "${bucket}")
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "uptime")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")
+|> yield(name: "mean")`;
 
-from(bucket: "${bucket}")
+const FLUX_QUERY_UPTIME = (bucket, did) =>
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "uptime")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")`;
+|> yield(name: "last")`;
 
- const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
+const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
   `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["mount"] == "${mount}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["mount"] == "${mount}")
-|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "min")
 from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -197,20 +185,19 @@ from(bucket: "${bucket}")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "max")`;
 
-const FLUX_QUERY_DRIVE_BAR = (bucket, did, mount) =>
-`from(bucket: "${bucket}")
+const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
+  `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["mount"] == "${mount}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")`;
-
+|> yield(name: "last")`;
 
 app.get("/drive/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_DRIVE(bucket, did, '/');
+  let clientNodeRed = flux`` + FLUX_QUERY_DRIVE(bucket, did, "/");
   queryApi.queryLines(clientNodeRed, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -227,10 +214,10 @@ app.get("/drive/:did", (req, res) => {
   });
 });
 
-app.get("/drivebar/:did", (req, res) => {
+app.get("/drive-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_DRIVE_BAR(bucket, did, '/');
+  let clientNodeRed = flux`` + FLUX_QUERY_DRIVE_BAND(bucket, did, "/");
   queryApi.queryLines(clientNodeRed, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -266,21 +253,21 @@ app.get("/memory/:did", (req, res) => {
     },
   });
 });
-app.get("/memorybar/:did", (req, res) => {
+app.get("/memory-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_MEMORY_BAR(bucket, did);
+  let clientNodeRed = flux`` + FLUX_QUERY_MEMORY_BAND(bucket, did);
   queryApi.queryLines(clientNodeRed, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
     error(error) {
       console.error(error);
-      console.log("\nFinished " + did + " memory_bar ERROR");
+      console.log("\nFinished " + did + " memory_band ERROR");
       res.end();
     },
     complete() {
-      console.log("\nFinished " + did + " memory_bar SUCCESS");
+      console.log("\nFinished " + did + " memory_band SUCCESS");
       res.end(JSON.stringify({ csv }));
     },
   });
@@ -304,10 +291,50 @@ app.get("/load/:did", (req, res) => {
     },
   });
 });
+
+app.get("/load-band/:did", (req, res) => {
+  const { did } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + FLUX_QUERY_LOAD_BAND(bucket, did);
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + " load ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " load SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+
 app.get("/cpu/:did/:cpuID", (req, res) => {
   const { did, cpuID } = req.params;
   let csv = "";
   let clientNodeRed = flux`` + FLUX_QUERY_CPU(bucket, did, cpuID);
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + " " + cpuID + " CPU ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " " + cpuID + " CPU SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+app.get("/cpu-band/:did/:cpuID", (req, res) => {
+  const { did, cpuID } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + FLUX_QUERY_CPU_BAND(bucket, did, cpuID);
   queryApi.queryLines(clientNodeRed, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -328,6 +355,26 @@ app.get("/uptime/:did/", (req, res) => {
   const { did } = req.params;
   let csv = "";
   let clientNodeRed = flux`` + FLUX_QUERY_UPTIME(bucket, did);
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + " uptime ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " uptime SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+
+app.get("/uptime-band/:did/", (req, res) => {
+  const { did } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + FLUX_QUERY_UPTIME_BAND(bucket, did);
   queryApi.queryLines(clientNodeRed, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -376,4 +423,3 @@ app.listen(port, () => {
 async function getBuckets() {
   return await bucketsAPI.getBuckets({ orgID });
 }
-

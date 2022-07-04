@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fromFlux, Plot } from "@influxdata/giraffe";
+import { fromFlux, Plot, NINETEEN_EIGHTY_FOUR  } from "@influxdata/giraffe";
 import { findStringColumns } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
@@ -19,18 +19,28 @@ export default function StaticGraph({
   });
   const getData = async () => {
     let uri =
-      query.toLowerCase() === "memory"
+      graphType.toLowerCase() === "band" && query.toLowerCase() === "memory"
+        ? "/memory-band/" + device
+        : query.toLowerCase() === "memory"
         ? "/memory/" + device
-        : graphType.toLowerCase() === "bar" && query.toLowerCase() === "memory"
-        ? "/memorybar/" + device
-        : graphType.toLowerCase() === "bar" && query.toLowerCase() === "drive"
-        ? "/drivebar/" + device
-        : query.toLowerCase() === "load"
-        ? "/load/" + device
-        : query.toLowerCase() === "cpu"
-        ? "/cpu/" + device + "/" + DEFAULT_CPU
+        : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
+        ? "/drive-band/" + device
         : query.toLowerCase() === "drive"
         ? "/drive/" + device
+        : graphType.toLowerCase() === "band" && query.toLowerCase() === "load"
+        ? "/load-band/" + device
+        : query.toLowerCase() === "load"
+        ? "/load/" + device
+        : graphType.toLowerCase() === "band" && query.toLowerCase() === "cpu"
+        ? "/cpu-band/" + device + "/" + DEFAULT_CPU
+        : graphType.toLowerCase() === "bar" && query.toLowerCase() === "cpu"
+        ? "/cpu/" + device + "/" + DEFAULT_CPU
+        : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
+        ? "/drive-band/" + device
+        : query.toLowerCase() === "drive"
+        ? "/drive/" + device
+        : graphType.toLowerCase() === "band" && query.toLowerCase() === "uptime"
+        ? "/uptime-band/" + device
         : "/uptime/" + device;
     const resp = await axios.get(REST_URL + uri);
     try {
@@ -60,8 +70,10 @@ export default function StaticGraph({
   }, []);
 
   function checkFills(fill) {
-    return fill !== "topic" &&
-    fill !== "result";
+    if (graphType !== "band") {
+    return fill !== "topic" && fill !== "result";
+    } 
+    return fill !== "topic";
   }
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
