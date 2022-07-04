@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fromFlux, Plot, NINETEEN_EIGHTY_FOUR  } from "@influxdata/giraffe";
+import { fromFlux, Plot, NINETEEN_EIGHTY_FOUR } from "@influxdata/giraffe";
 import { findStringColumns } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
@@ -18,30 +18,7 @@ export default function StaticGraph({
     lastUpdated: "",
   });
   const getData = async () => {
-    let uri =
-      graphType.toLowerCase() === "band" && query.toLowerCase() === "memory"
-        ? "/memory-band/" + device
-        : query.toLowerCase() === "memory"
-        ? "/memory/" + device
-        : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
-        ? "/drive-band/" + device
-        : query.toLowerCase() === "drive"
-        ? "/drive/" + device
-        : graphType.toLowerCase() === "band" && query.toLowerCase() === "load"
-        ? "/load-band/" + device
-        : query.toLowerCase() === "load"
-        ? "/load/" + device
-        : graphType.toLowerCase() === "band" && query.toLowerCase() === "cpu"
-        ? "/cpu-band/" + device + "/" + DEFAULT_CPU
-        : graphType.toLowerCase() === "bar" && query.toLowerCase() === "cpu"
-        ? "/cpu/" + device + "/" + DEFAULT_CPU
-        : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
-        ? "/drive-band/" + device
-        : query.toLowerCase() === "drive"
-        ? "/drive/" + device
-        : graphType.toLowerCase() === "band" && query.toLowerCase() === "uptime"
-        ? "/uptime-band/" + device
-        : "/uptime/" + device;
+    let uri = uriSelector(graphType, query, device);
     const resp = await axios.get(REST_URL + uri);
     try {
       let results = fromFlux(resp.data.csv);
@@ -71,8 +48,8 @@ export default function StaticGraph({
 
   function checkFills(fill) {
     if (graphType !== "band") {
-    return fill !== "topic" && fill !== "result";
-    } 
+      return fill !== "topic" && fill !== "result";
+    }
     return fill !== "topic";
   }
   const renderPlot = () => {
@@ -121,4 +98,29 @@ export default function StaticGraph({
     return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
   };
   return render();
+}
+function uriSelector(graphType, query, device) {
+  return graphType.toLowerCase() === "band" && query.toLowerCase() === "memory"
+    ? "/memory-band/" + device
+    : query.toLowerCase() === "memory"
+    ? "/memory/" + device
+    : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
+    ? "/drive-band/" + device
+    : query.toLowerCase() === "drive"
+    ? "/drive/" + device
+    : graphType.toLowerCase() === "band" && query.toLowerCase() === "load"
+    ? "/load-band/" + device
+    : query.toLowerCase() === "load"
+    ? "/load/" + device
+    : graphType.toLowerCase() === "band" && query.toLowerCase() === "cpu"
+    ? "/cpu-band/" + device + "/" + DEFAULT_CPU
+    : graphType.toLowerCase() === "bar" && query.toLowerCase() === "cpu"
+    ? "/cpu/" + device + "/" + DEFAULT_CPU
+    : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
+    ? "/drive-band/" + device
+    : query.toLowerCase() === "drive"
+    ? "/drive/" + device
+    : graphType.toLowerCase() === "band" && query.toLowerCase() === "uptime"
+    ? "/uptime-band/" + device
+    : "/uptime/" + device;
 }
