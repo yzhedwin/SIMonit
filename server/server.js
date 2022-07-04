@@ -67,6 +67,14 @@ from(bucket: "${bucket}")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")`;
 
+const FLUX_QUERY_MEMORY_BAR = (bucket, did) => 
+`from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "last")`;
+
  const FLUX_QUERY_LOAD = (bucket, did) =>
 `from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -189,6 +197,15 @@ from(bucket: "${bucket}")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "max")`;
 
+const FLUX_QUERY_DRIVE_BAR = (bucket, did, mount) =>
+`from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "mean")`;
+
 
 app.get("/drive/:did", (req, res) => {
   const { did } = req.params;
@@ -209,6 +226,27 @@ app.get("/drive/:did", (req, res) => {
     },
   });
 });
+
+app.get("/drivebar/:did", (req, res) => {
+  const { did } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + FLUX_QUERY_DRIVE_BAR(bucket, did, '/');
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + " drive ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " drive SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+
 app.get("/memory/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
@@ -224,6 +262,25 @@ app.get("/memory/:did", (req, res) => {
     },
     complete() {
       console.log("\nFinished " + did + " memory SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+app.get("/memorybar/:did", (req, res) => {
+  const { did } = req.params;
+  let csv = "";
+  let clientNodeRed = flux`` + FLUX_QUERY_MEMORY_BAR(bucket, did);
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished " + did + " memory_bar ERROR");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished " + did + " memory_bar SUCCESS");
       res.end(JSON.stringify({ csv }));
     },
   });

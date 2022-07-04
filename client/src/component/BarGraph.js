@@ -7,12 +7,7 @@ import { DEFAULT_CPU, API_REFRESH_RATE, REST_URL, STYLE } from "../constants";
 import axios from "axios";
 
 let animationFrameId = 0;
-export default function StaticGraph({
-  device,
-  graphType,
-  query,
-  toggleLegend,
-}) {
+export default function BarGraph({ device, graphType, query, toggleLegend }) {
   const [table, setTable] = useState({
     data: {},
     lastUpdated: "",
@@ -68,13 +63,6 @@ export default function StaticGraph({
     const newFill = fill.filter(checkFills);
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, newFill).getConfig()],
-      valueFormatters: new DataFormatter(query).getFormat(),
-      xScale: "linear",
-      yScale: "linear",
-      legendFont: "12px sans-serif",
-      legendHide: graphType !== "bar" && toggleLegend === 1 ? true : false,
-      showAxes: graphType === "single stat" ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "1px solid black",
@@ -82,12 +70,19 @@ export default function StaticGraph({
         backgroundColor: "white",
         colorizeRows: false,
         hide:
-          graphType === "bar" ||
+        graphType === "bar" ||
           graphType === "single stat" ||
           toggleLegend !== 1
             ? true
             : false,
       },
+      layers: [new LayerConfig(graphType, newFill).getConfig()],
+      valueFormatters: new DataFormatter(query).getFormat(),
+      xScale: "linear",
+      yScale: "linear",
+      legendFont: "12px sans-serif",
+      legendHide: graphType !== "bar" && toggleLegend === 1 ? true : false,
+      showAxes: graphType === "single stat" ? false : true,
     };
     return (
       <div className="static-graph-component" style={STYLE}>

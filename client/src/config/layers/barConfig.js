@@ -7,6 +7,6 @@ export default function barConfig(fill) {
     fill: fill,
     colors: NINETEEN_EIGHTY_FOUR,
     position: "stacked",
-    binCount: 30,
+    binCount: 5,
   };
 }

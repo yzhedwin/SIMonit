@@ -15,7 +15,7 @@ import AdbIcon from "@mui/icons-material/Adb";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const pages = [
-  "ResizableGrid",
+  "Bar",
   "Dashboard",
   "ResizablePage",
   "StaticPage",

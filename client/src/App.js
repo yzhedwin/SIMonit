@@ -3,10 +3,10 @@ import ResponsiveAppBar from "./component/AppBar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
-import ResizableGrid from "./pages/ResizableGrid";
 import StaticPage from "./pages/StaticPage";
 import ResizablePage from "./pages/ResizablePage";
 import OptimisedDashboard from "./pages/OptimisedDashboard";
+import BarTest from "./pages/BarTest";
 
 class App extends React.Component {
   render() {
@@ -16,7 +16,7 @@ class App extends React.Component {
         <Routes>
           <Route index element={<Home />} />
           <Route path="Dashboard" element={<OptimisedDashboard />} />
-          <Route path="ResizableGrid" element={<ResizableGrid />} />
+          <Route path="Bar" element={<BarTest/>}/>
           <Route path="ResizablePage" element={<ResizablePage />} />
           <Route path="StaticPage" element={<StaticPage />} />
           <Route path="StaticPage/:did" element={<StaticPage />} />

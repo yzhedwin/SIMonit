@@ -73,10 +73,7 @@ function OptimisedGraph(props) {
     isMount.current = true;
     try {
       getData();
-      animationFrameId = window.setInterval(
-        getData,
-        API_REFRESH_RATE
-      );
+      animationFrameId = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.error(error);
     }
@@ -89,19 +86,16 @@ function OptimisedGraph(props) {
 
   useEffect(() => {
     //reset table
-    setTable(prevState => ({ ...prevState, data: {}}))
-    window.clearInterval(animationFrameId)
-    getData()
+    setTable((prevState) => ({ ...prevState, data: {} }));
+    window.clearInterval(animationFrameId);
+    getData();
     try {
-      animationFrameId = window.setInterval(
-        getData,
-        API_REFRESH_RATE
-      );
+      animationFrameId = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.error(error);
     }
     return () => {
-      console.log("unmount")
+      console.log("unmount");
       window.clearInterval(animationFrameId);
     };
     // eslint-disable-next-line
@@ -176,7 +170,9 @@ function OptimisedGraph(props) {
         backgroundColor: "white",
         colorizeRows: false,
         hide:
-          graphType === "single stat" || props.toggleLegend !== 1
+          graphType === "bar" ||
+          graphType === "single stat" ||
+          props.toggleLegend !== 1
             ? true
             : false,
       },

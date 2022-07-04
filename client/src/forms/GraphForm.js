@@ -19,6 +19,7 @@ const GraphForm = (props) => {
           <MenuItem value={"band"}>Band</MenuItem>
           <MenuItem value={"line"}>Line</MenuItem>
           <MenuItem value={"single stat"}>Single Stat</MenuItem>
+          <MenuItem value={"bar"}>Histogram</MenuItem>
         </Select>
       </FormControl>
     </span>

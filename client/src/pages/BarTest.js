@@ -1,24 +1,21 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import StaticGraph from "../component/StaticGraph";
 import "./StaticPage.css";
 import RGL, { WidthProvider } from "react-grid-layout";
 import _ from "lodash";
 import {
-  DEFAULT_DEVICE,
-  DEFAULT_QUERY_1,
-  DEFAULT_QUERY_2,
-  DEFAULT_QUERY_3,
-  DEFAULT_QUERY_4,
+    DEFAULT_DEVICE,
+    DEFAULT_QUERY_4,
 } from "../constants";
+import BarGraph from "../component/BarGraph";
  
 const ReactGridLayout = WidthProvider(RGL);
-function StaticPage() {
+function BarTest() {
   const { did } = useParams();
   const [layouts, setLayouts] = useState({});
-  const items = 4;
-  const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
-  const graphType = ["line", "line", "line","bar"];
+  const items = 2;
+  const queries = [DEFAULT_QUERY_4, DEFAULT_QUERY_4];
+  const graphType = ["bar", "line"];
 
   const onLayoutChange = (layout, layouts) => {
     setLayouts(layouts);
@@ -36,7 +33,7 @@ function StaticPage() {
             i: i.toString(),
           }}
         >
-          <StaticGraph
+          <BarGraph
             device={did || DEFAULT_DEVICE}
             graphType={graphType[i]}
             query={queries[i]}
@@ -53,7 +50,7 @@ function StaticPage() {
         background: "white",
         border: "1px solid white"
       }}
-      cols={4}
+      cols={2}
       rowHeight={4}
       layouts={layouts}
       isDraggable={false}
@@ -64,4 +61,4 @@ function StaticPage() {
     </ReactGridLayout>
   );
 }
-export default StaticPage;
+export default BarTest;

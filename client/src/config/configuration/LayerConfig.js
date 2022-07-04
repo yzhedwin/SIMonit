@@ -24,7 +24,7 @@ export default class LayerConfig {
     } if (this.state.configType === "gauge") {
       return gaugeConfig();
     }  if (this.state.configType === "bar") {
-      return barConfig();
+      return barConfig(this.state.fill);
     } 
   }
 }
