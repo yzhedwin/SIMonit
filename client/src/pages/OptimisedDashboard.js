@@ -3,6 +3,7 @@ import _ from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "./Dashboard.css";
 import { Button } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete"; 
 import write from "../component/DBWrite";
 import {
   DEFAULT_DEVICE,
@@ -125,13 +126,13 @@ export default function OptimisedDashboard(props) {
     <div
       className="dashboard"
       style={{
-        margin: "5px",
+        marginTop: "60px",
         height: "100%",
         width: "100%",
       }}
     >
       <h2>
-        <Button onClick={() => reset()} variant="contained" color="error">
+        <Button onClick={() => reset()} variant="contained" color="error" startIcon={<DeleteIcon/>}>
           Reset All
         </Button>
         <Button

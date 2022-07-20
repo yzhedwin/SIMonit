@@ -1,25 +1,48 @@
 import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
+import "./AppBar.css";
 import AdbIcon from "@mui/icons-material/Adb";
-import { Icon } from "@material-ui/core";
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Menu,
+  Container,
+  Button,
+  MenuItem,
+  Icon,
+} from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const pages = ["Dashboard", "ResizablePage"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+//const settings = ["Profile", "Account", "Dashboard", "Logout"];
+
 
 const ResponsiveAppBar = () => {
   //MENU STUFF
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   // const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [navBackground, setNavBackground] = React.useState("transparent");
+  
+  const navRef = React.useRef();
+  navRef.current = navBackground;
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const show = window.scrollY > 300;
+      if (show) {
+        setNavBackground("#2E3B55");
+      } else {
+        setNavBackground("transparent");
+      }
+    };
+    document.addEventListener("scroll", handleScroll);
+    return () => {
+      document.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -46,21 +69,20 @@ const ResponsiveAppBar = () => {
   const render = () => {
     return (
       <AppBar
-        position="static"
         style={{
-          background: "#2E3B55",
+          backgroundColor: navRef.current,
         }}
+        position="fixed"
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Icon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
-              <img 
+            <Icon sx={{ fontSize: 50, display: "flex" }}>
+              <img
                 src={
                   "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"
                 }
-                height={25}
-                width={25}
-                
+                height={50}
+                width={50}
                 alt=""
               />
             </Icon>
@@ -70,6 +92,7 @@ const ResponsiveAppBar = () => {
               component="a"
               href="/"
               sx={{
+                ml: 2,
                 mr: 2,
                 display: { xs: "none", md: "flex" },
                 fontFamily: "monospace",

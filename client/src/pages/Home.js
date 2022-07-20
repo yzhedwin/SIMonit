@@ -18,6 +18,13 @@ const Home = () => {
           className="Influx-logo"
           alt="logo"
         />
+          <img
+          src={
+           "https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg"
+          }
+          className="Nodejs-logo"
+          alt="logo"
+        />
       </div>
     </div>
   );

@@ -8,6 +8,8 @@
   margin-left: -45%;
   width: 50%;
   pointer-events: none;
+  animation: React-logo-move 1s forwards, React-logo-spin 1s forwards 0.2s;
+  position: absolute;
 }
 
 .Influx-logo {
@@ -15,21 +17,24 @@
   margin-left: 90%;
   width: 50%;
   pointer-events: none;
-}
-.Home-title {
-  display:block;
-  color:white;
-  animation: Home-title-fade 5s forwards;
+  animation: Influx-logo-move 1s forwards;
   position: relative;
 }
-.React-logo {
-  animation: 
-  React-logo-move 1s forwards,
-  React-logo-spin 5s forwards 0.2s;
-  position: absolute;
-}
-.Influx-logo {
+.Nodejs-logo {
+  display: block;
+  transform: scale(0.5);
+  margin-top: -100px;
+  margin-left: 90%;
+  width: 50%;
+  pointer-events: none;
   animation: Influx-logo-move 1s forwards;
+  position: relative;
+}
+.Home-title {
+  display: block;
+  color: white;
+  animation: Home-title-fade 5s forwards;
+  margin-top: 50px;
   position: relative;
 }
 .Home-header {
