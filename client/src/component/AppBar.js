@@ -7,39 +7,33 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { Icon } from "@material-ui/core";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const pages = [
-  "Bar",
-  "Dashboard",
-  "ResizablePage",
-  "StaticPage",
-];
+const pages = ["Dashboard", "ResizablePage"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const ResponsiveAppBar = () => {
   //MENU STUFF
   const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  // const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
+  // const handleOpenUserMenu = (event) => {
+  //   setAnchorElUser(event.currentTarget);
+  // };
+
+  // const handleCloseUserMenu = () => {
+  //   setAnchorElUser(null);
+  // };
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
   };
 
   //Redirection
@@ -51,10 +45,25 @@ const ResponsiveAppBar = () => {
 
   const render = () => {
     return (
-      <AppBar position="static">
+      <AppBar
+        position="static"
+        style={{
+          background: "#2E3B55",
+        }}
+      >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+            <Icon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
+              <img 
+                src={
+                  "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"
+                }
+                height={25}
+                width={25}
+                
+                alt=""
+              />
+            </Icon>
             <Typography
               variant="h6"
               noWrap
@@ -103,7 +112,12 @@ const ResponsiveAppBar = () => {
                 }}
               >
                 {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <MenuItem
+                    key={page}
+                    onClick={() => {
+                      navigate("/" + page);
+                    }}
+                  >
                     <Typography textAlign="center">{page}</Typography>
                   </MenuItem>
                 ))}
@@ -122,7 +136,7 @@ const ResponsiveAppBar = () => {
                 fontFamily: "monospace",
                 fontWeight: 700,
                 letterSpacing: ".3rem",
-                color: "inherit",
+                color: "black",
                 textDecoration: "none",
               }}
             >
@@ -139,7 +153,7 @@ const ResponsiveAppBar = () => {
                 </Button>
               ))}
             </Box>
-            <Box sx={{ flexGrow: 0 }}>
+            {/* <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -167,7 +181,7 @@ const ResponsiveAppBar = () => {
                   </MenuItem>
                 ))}
               </Menu>
-            </Box>
+            </Box> */}
           </Toolbar>
         </Container>
       </AppBar>
@@ -175,6 +189,8 @@ const ResponsiveAppBar = () => {
   };
   let location = useLocation();
   //can be refractored to include more pages
-  return location.pathname.indexOf("/StaticPage") === -1 ? render() : renderEmpty();
+  return location.pathname.indexOf("/StaticPage") === -1
+    ? render()
+    : renderEmpty();
 };
 export default ResponsiveAppBar;

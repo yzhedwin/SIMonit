@@ -1,19 +1,36 @@
 .Home {
   text-align: center;
+  overflow: hidden;
 }
 
-.Home-logo {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
-    pointer-events: none;
+.React-logo {
+  display: block;
+  margin-left: -45%;
+  width: 50%;
+  pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .Home-logo {
-    animation: Home-logo-spin infinite 20s linear;
-  }
+.Influx-logo {
+  display: block;
+  margin-left: 90%;
+  width: 50%;
+  pointer-events: none;
+}
+.Home-title {
+  display:block;
+  color:white;
+  animation: Home-title-fade 5s forwards;
+  position: relative;
+}
+.React-logo {
+  animation: 
+  React-logo-move 1s forwards,
+  React-logo-spin 5s forwards 0.2s;
+  position: absolute;
+}
+.Influx-logo {
+  animation: Influx-logo-move 1s forwards;
+  position: relative;
 }
 .Home-header {
   background-color: #282c34;
@@ -29,12 +46,37 @@
 .Home-link {
   color: #61dafb;
 }
+@keyframes Influx-logo-move {
+  from {
+    right: 0px;
+  }
+  to {
+    right: 50%;
+  }
+}
 
-@keyframes Home-logo-spin {
+@keyframes React-logo-move {
+  from {
+    left: 0px;
+  }
+  to {
+    left: 50%;
+  }
+}
+
+@keyframes React-logo-spin {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
+  }
+}
+@keyframes Home-title-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
