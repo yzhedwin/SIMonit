@@ -61,7 +61,7 @@ export default class ResizablePage extends React.Component {
   render() {
     return (
       <div>
-        <h3 style={{marginTop:"50px",}}>Statically Positioned Layout</h3>
+        <h3 style={{marginTop:"70px",}}>Statically Positioned Layout</h3>
         <div className="layoutRoot">
           <Resizable className="box" height={this.state.height} width={this.state.width} onResize={this.onFirstBoxResize} resizeHandles={['sw', 'se', 'nw', 'ne', 'w', 'e', 'n', 's']}>
             <div style={{width: this.state.width + 'px', height: this.state.height + 'px'}}>

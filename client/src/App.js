@@ -6,6 +6,7 @@ import NoPage from "./pages/NoPage";
 import StaticPage from "./pages/StaticPage";
 import ResizablePage from "./pages/ResizablePage";
 import OptimisedDashboard from "./pages/OptimisedDashboard";
+import ToolboxLayout from "./pages/Toolbox";
 
 class App extends React.Component {
   constructor(props) {
@@ -31,7 +32,8 @@ class App extends React.Component {
         <Routes>
           <Route index element={<Home  openDrawer={this.state.openDrawer}/>} />
           <Route path="Dashboard" element={<OptimisedDashboard openDrawer={this.state.openDrawer}/>} />
-          <Route path="ResizablePage" element={<ResizablePage />} />
+          <Route path="Toolbox" element={<ToolboxLayout/>} />
+          <Route path="ResizablePage" element={<ResizablePage  />} />
           <Route path="StaticPage" element={<StaticPage />} />
           <Route path="StaticPage/:did" element={<StaticPage />} />
           <Route path="*" element={<NoPage />} />
