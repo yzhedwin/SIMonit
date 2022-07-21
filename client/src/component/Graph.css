@@ -1,0 +1,65 @@
+.draghandle {
+  position: absolute;
+  width: 20px;
+  height: 20;
+  top: 0;
+  right: 0;
+  background-position: top right;
+  padding: 0 3px 0 0;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+}
+
+.dotwrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: 125px;
+}
+
+.loading {
+  margin: 0 5px;
+  font-size: 2rem;
+}
+
+.dot0 {
+  background-color: #61dafb;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin: 0 5px;
+  animation: BounceAnimation 0.5s linear infinite;
+  animation-delay: 0;
+}
+
+.dot1 {
+  background-color: #61dafb;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin: 0 5px;
+  animation: BounceAnimation 0.5s linear infinite;
+  animation-delay: 0.1s;
+}
+
+.dot2 {
+  background-color: #61dafb;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin: 0 5px;
+  animation: BounceAnimation 0.5s linear infinite;
+  animation-delay: 0.2s;
+}
+
+@keyframes BounceAnimation {
+  0% {
+    margin-bottom: 0;
+  }
+  50% {
+    margin-bottom: 15px;
+  }
+  100% {
+    margin-bottom: 0;
+  }
+}

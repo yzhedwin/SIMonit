@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fromFlux, Plot, NINETEEN_EIGHTY_FOUR } from "@influxdata/giraffe";
+import { fromFlux, Plot } from "@influxdata/giraffe";
 import { findStringColumns } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";

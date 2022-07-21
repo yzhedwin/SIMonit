@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import _ from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "./Dashboard.css";
-import { Button } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete"; 
+import { Button, ButtonGroup } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import write from "../component/DBWrite";
 import {
   DEFAULT_DEVICE,
@@ -12,6 +13,7 @@ import {
   DEFAULT_CPU,
 } from "../constants";
 import OptimisedGraph from "../component/OptimisedGraph";
+import { Main } from "../component/Drawer";
 
 //TODO: Load Layout and Items from Database
 function getFromLS(key) {
@@ -39,7 +41,7 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 //TODO: Migrate to loading from cloud Database
 const storageLayout = getFromLS("dash_layouts") || {};
 const storageItems = localStorage.getItem("dash_items") || 1;
-export default function OptimisedDashboard(props) {
+export default function OptimisedDashboard({ openDrawer }) {
   const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
   );
@@ -123,33 +125,37 @@ export default function OptimisedDashboard(props) {
 
   //style={{transform: 'scale(0.75) translate(-15%, -15%)'}}>
   return (
-    <div
+    <Main
+      openDrawer={openDrawer}
       className="dashboard"
       style={{
-        marginTop: "60px",
+        marginTop: "50px",
         height: "100%",
         width: "100%",
       }}
     >
-      <h2>
-        <Button onClick={() => reset()} variant="contained" color="error" startIcon={<DeleteIcon/>}>
+      <ButtonGroup
+        variant="contained"
+        aria-label="outlined primary button group"
+      >
+        <Button
+          onClick={() => reset()}
+          color="error"
+          startIcon={<DeleteIcon />}
+        >
           Reset All
         </Button>
         <Button
           onClick={() => onItemsChange(items)}
-          variant="contained"
           color="success"
+          startIcon={<AddIcon />}
         >
-          Add Graph
+          Graph
         </Button>
-        <Button
-          onClick={() => onLegendChange(toggleLegend)}
-          variant="contained"
-          color="warning"
-        >
+        <Button onClick={() => onLegendChange(toggleLegend)} color="warning">
           Toggle Legend
         </Button>
-      </h2>
+      </ButtonGroup>
       <ResponsiveReactGridLayout
         className="layout"
         cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
@@ -159,10 +165,11 @@ export default function OptimisedDashboard(props) {
         onLayoutChange={(layout, layouts) => onLayoutChange(layout, layouts)}
         isBounded={true}
         onBreakpointChange={onBreakpointChange}
+        draggableHandle=".draghandle"
       >
         {generateDOM()}
       </ResponsiveReactGridLayout>
-    </div>
+    </Main>
   );
 }
 
