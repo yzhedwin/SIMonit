@@ -1,15 +1,16 @@
+import { DrawerHeader, Main } from "../component/Drawer";
 import logo from "../logo.svg";
-// import React, { useState } from "react";
 import "./Home.css";
-// import DragMove from '../component/DragMove';
 
-const Home = () => {
+const Home = ({openDrawer}) => {
   return (
-    <div className="Home">
+    
+    <Main className="Home" openDrawer={openDrawer}>
+      <DrawerHeader/>
       <h1 className="Home-title">
         Built with
       </h1>
-      <div>
+      <div className="Home-images">
         <img src={logo} className="React-logo" alt="logo" />
         <img
           src={
@@ -26,22 +27,9 @@ const Home = () => {
           alt="logo"
         />
       </div>
-    </div>
+    </Main>
+
   );
 };
 
 export default Home;
-// style={{
-//     transform: `translateX(${translate.x}px) translateY(${translate.y}px)`
-// }}
-// const [translate, setTranslate] = useState({
-//     x: 0,
-//     y: 0
-// });
-
-// const handleDragMove = (e) => {
-//     setTranslate({
-//         x: translate.x + e.movementX,
-//         y: translate.y + e.movementY
-//     });
-// };

@@ -6,7 +6,9 @@ import QueryForm from "../forms/QueryForm";
 import write from "./DBWrite";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
 import DeviceForm from "../forms/DeviceForm";
+import "./Graph.css";
 import {
   API_REFRESH_RATE,
   DEFAULT_DEVICE,
@@ -98,7 +100,7 @@ function OptimisedGraph(props) {
 
   useEffect(() => {
     //reset table
-    setToggleLegend(-1)
+    setToggleLegend(-1);
     setTable((prevState) => ({ ...prevState, data: {} }));
     window.clearInterval(animationFrameId);
     getData();
@@ -209,7 +211,15 @@ function OptimisedGraph(props) {
     return (
       <div style={STYLE}>
         <button onClick={() => reset()}>Reboot</button>
-        <h3>Loading...</h3>
+        <div className="draghandle">
+          <DragHandleIcon />
+        </div>
+        <div className="dotwrapper">
+          <p className="loading">Loading</p>
+          <div className="dot0" />
+          <div className="dot1" />
+          <div className="dot2" />
+        </div>
       </div>
     );
   };
