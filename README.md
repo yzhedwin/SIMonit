@@ -2,6 +2,10 @@
 
 This is a project built using ReactJS and Giraffe Library integrated with InfluxDB.
 
+## Objective
+Visualise data using different kinds of plots offered by Giraffe library. Users will be able to 
+customise their dashboard to fit any number of different graphs.
+
 ## What's inside:
 
 **Client:**
@@ -12,7 +16,7 @@ React app created with [create-react-app](https://github.com/facebook/create-rea
 
 ExpressJS server that uses both the [InfluxDB API](https://docs.influxdata.com/influxdb/v2.0/reference/api/) and the [influxdb-client-js](https://github.com/influxdata/influxdb-client-js) library to query data from an InfluxDB instance. See `server` directory.
 
-## How to:
+## Setup and Usage:
 
 **Start server**
 1. Navigate to `server` directory
