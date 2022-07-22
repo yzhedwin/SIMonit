@@ -4,7 +4,6 @@ import "./Home.css";
 
 const Home = ({openDrawer}) => {
   return (
-    
     <Main className="Home" openDrawer={openDrawer}>
       <DrawerHeader/>
       <h1 className="Home-title">

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import * as React from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import "./AppBar.css";
@@ -24,7 +25,10 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
 
   //MENU STUFF
   const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [navBackground, setNavBackground] = React.useState("transparent");
+  const [navOpacity, setNavOpacity] = React.useState(1);
+  const [direction, setDirection] = React.useState("up");
+  const [scrollPos, setScrollPos] = React.useState(0);
+  let prevScrollY = 0;
 
   const handleDrawerOpen = () => {
     onOpenDrawerChange(true);
@@ -35,22 +39,37 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
   };
 
   const navRef = React.useRef();
-
-  navRef.current = navBackground;
+  let count = 0;
+  navRef.current = navOpacity;
+  const handleScroll = () => {
+    const pos = window.scrollY;
+    setScrollPos(pos);
+    if (window.scrollY > prevScrollY) {
+      if (count < 10) {
+        count++;
+      }
+      navRef.current = navRef.current - count / 10;
+      setNavOpacity(navRef.current);
+      setDirection("down");
+    } else {
+      count = 0;
+      setDirection("up");
+    }
+    prevScrollY = window.scrollY;
+  };
 
   React.useEffect(() => {
-    const handleScroll = () => {
-      const show = window.scrollY > 300;
-      if (show) {
-        setNavBackground("#2E3B55");
-      } else {
-        setNavBackground("transparent");
-      }
-    };
+    if (direction === "up") {
+      setNavOpacity(1);
+    }
+  }, [direction]);
+
+  React.useEffect(() => {
     document.addEventListener("scroll", handleScroll);
     return () => {
       document.removeEventListener("scroll", handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOpenNavMenu = (event) => {
@@ -73,7 +92,8 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
       <div>
         <AppBar
           style={{
-            backgroundColor: navRef.current,
+            opacity: navRef.current,
+            backgroundColor: "#2E3B55",
           }}
           position="fixed"
         >
@@ -194,7 +214,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
     );
   };
   //can be refractored to include more pages
-  return location.pathname.indexOf("/StaticPage") === -1
+  return location.pathname.indexOf("/StaticPage") === -1 && navRef.current > 0
     ? render()
     : renderEmpty();
 };

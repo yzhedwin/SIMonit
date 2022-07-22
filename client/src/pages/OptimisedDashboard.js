@@ -131,7 +131,6 @@ export default function OptimisedDashboard({ openDrawer }) {
       style={{
         marginTop: "50px",
         height: "100%",
-        width: "100%",
       }}
     >
       <ButtonGroup
