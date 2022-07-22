@@ -15,8 +15,9 @@ ExpressJS server that uses both the [InfluxDB API](https://docs.influxdata.com/i
 ## How to:
 
 **Start server**
-1. `npm install`
-1. `npm run server`
+1. Navigate to `server` directory
+2. `npm install`
+1. `npm start`
 1. Server starts at `localhost:3001`
 
 **Start UI**

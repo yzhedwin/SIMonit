@@ -44,6 +44,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
   const handleScroll = () => {
     const pos = window.scrollY;
     setScrollPos(pos);
+    //Nav Bar Animation
     if (window.scrollY > prevScrollY) {
       if (count < 10) {
         count++;
