@@ -92,7 +92,7 @@ function OptimisedGraph(props) {
     }
     return () => {
       window.clearInterval(animationFrameId);
-      setToggleLegend(2);
+      setToggleLegend(-1);
       isMount.current = false;
     };
     // eslint-disable-next-line

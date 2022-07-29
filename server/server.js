@@ -1,18 +1,21 @@
 #!/usr/bin/env node
 //Rest API
+const dotenv = require('dotenv/config');
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const { InfluxDB, flux } = require("@influxdata/influxdb-client");
 const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
-const { query } = require("express");
 
 // vars to connect to bucket in influxdb
-const baseURL = "http://localhost:8086"; //process.env.INFLUX_URL // url of your cloud instance
-const influxToken =
-  "q2H3H17WktGDhPOfZey38XRHW6RiTagbEDyJGuttmimwXsUvIgK2nPYyb0tccej9ZrTD5Tv9_FXdr84ZF7LfFw=="; //' //process.env.INFLUX_TOKEN; // create an all access token in the UI, export it as INFLUX_TOKEN
-const orgID = "7b2a33953b31c6c9"; //process.env.ORG_ID // export your org id
-const bucket = "tb"; // process.env.BUCKET_NAME //export the name of your bucket
+const baseURL = process.env.INFLUX_URL;
+const influxToken = process.env.INFLUX_TOKEN;
+const orgID = process.env.ORG_ID; 
+const bucket = process.env.BUCKET_NAME;
+const user = process.env.MYSQL_USER;
+const pass = process.env.MYSQL_PASS;
+const url = process.env.DB_URL;
+const db = process.env.DB_NAME;
 
 // connect to influxdb
 const influxDB = new InfluxDB({ url: baseURL, token: influxToken });
@@ -36,163 +39,6 @@ const port = 3001;
 app.get("/buckets", (req, res) => {
   getBuckets().then((b) => res.end(JSON.stringify(b)));
 });
-
-/* QUERIES */
-const FLUX_QUERY_MEMORY = (bucket, did) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")`;
-
-const FLUX_QUERY_MEMORY_BAND = (bucket, did) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
-|> yield(name: "mean")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
-|> yield(name: "min")`;
-
-const FLUX_QUERY_LOAD_BAND = (bucket, did) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")`;
-
-const FLUX_QUERY_LOAD = (bucket, did) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")       
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")`;
-
-const FLUX_QUERY_CPU_BAND = (bucket, did, cpuID) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["cpu"] == "${cpuID}")
-|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["cpu"] == "${cpuID}")
-|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["cpu"] == "${cpuID}")
-|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")`;
-
-const FLUX_QUERY_CPU = (bucket, did, cpuID) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["cpu"] == "${cpuID}")
-|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")`;
-
-const FLUX_QUERY_UPTIME_BAND = (bucket, did) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "uptime")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "uptime")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")
-
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "uptime")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")`;
-
-const FLUX_QUERY_UPTIME = (bucket, did) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "uptime")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")`;
-
-const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["mount"] == "${mount}")
-|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["mount"] == "${mount}")
-|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["mount"] == "${mount}")
-|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")`;
-
-const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
-  `from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["mount"] == "${mount}")
-|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")`;
 
 app.get("/drive/:did", (req, res) => {
   const { did } = req.params;
@@ -391,6 +237,25 @@ app.get("/uptime-band/:did/", (req, res) => {
   });
 });
 
+app.get("/influxsql", (req, res) => {
+  let csv = "";
+  let clientNodeRed = flux`` + INFLUX_MYSQL_QUERY;
+  queryApi.queryLines(clientNodeRed, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished influxsql query with error");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished influxsql query with SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
+  });
+});
+
 // app.get('/uptime/:did', (req, res) => {
 //   const { did } = req.params;
 //   let apiQuery = flux`` + FLUX_QUERY_UPTIME(bucket, did);
@@ -423,3 +288,195 @@ app.listen(port, () => {
 async function getBuckets() {
   return await bucketsAPI.getBuckets({ orgID });
 }
+
+/* Queries */
+const FLUX_QUERY_MEMORY = (bucket, did) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "last")`;
+
+const FLUX_QUERY_MEMORY_BAND = (bucket, did) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "max")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name: "mean")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+|> yield(name: "min")`;
+
+const FLUX_QUERY_LOAD_BAND = (bucket, did) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "min")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "mean")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "max")`;
+
+const FLUX_QUERY_LOAD = (bucket, did) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")       
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "last")`;
+
+const FLUX_QUERY_CPU_BAND = (bucket, did, cpuID) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "mean")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "max")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "min")`;
+
+const FLUX_QUERY_CPU = (bucket, did, cpuID) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "last")`;
+
+const FLUX_QUERY_UPTIME_BAND = (bucket, did) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "max")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "min")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "mean")`;
+
+const FLUX_QUERY_UPTIME = (bucket, did) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "last")`;
+
+const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "min")
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "mean")
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "max")`;
+
+const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
+  `from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
+|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "last")`;
+
+/* Influx - MySQL */
+/* Influx - MySQL */
+const INFLUX_MYSQL_QUERY = () =>
+`
+import "system"
+import "influxdata/influxdb/secrets"
+import "sql"
+
+
+gateway = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as gateway_id from Gateway",
+)
+device = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as device_id, gateway_id from Device",
+)
+metric = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as metric_id, device_id, uom from Metric",
+)
+a = join(tables: {key1: gateway, key2: device}, on: ["gateway_id"], method: "inner")
+b = join(tables: {key1: metric, key2: a}, on: ["device_id"], method: "inner")
+|> map(fn: (r) => ({ r with uom: string(v: r.uom), device_id: string(v: r.device_id), gateway_id: string(v: r.gateway_id), metric_id: string(v: r.metric_id) }))
+
+c = from(bucket: "mysql")
+|> range(start: -1h)
+|> group()
+
+out = join(tables: {key1: b, key2: c}, on: ["device_id", "metric_id", "gateway_id"], method: "inner")
+out`;

@@ -13,6 +13,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.0",
+    "dotenv": "^16.0.1",
     "express": "^4.17.1",
     "json-2-csv": "^3.8.0",
     "react": "^17.0.1",
