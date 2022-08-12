@@ -1,155 +1,202 @@
-import React from "react";
 import { fromFlux, Plot } from "@influxdata/giraffe";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
 import axios from "axios";
-import { findStringColumns } from "../helpers";
+import React, { useEffect, useRef, useState } from "react";
+import DataFormatter from "../config/configuration/DataFormatter";
+import LayerConfig from "../config/configuration/LayerConfig";
+import {
+  API_REFRESH_RATE, DEFAULT_CPU, DEFAULT_DEVICE,
+  DEFAULT_GRAPH_TYPE,
+  DEFAULT_QUERY_1, REST_URL, STYLE
+} from "../constants";
+import CPUForm from "../forms/CPUForm";
 import DeviceForm from "../forms/DeviceForm";
 import GraphForm from "../forms/GraphForm";
 import QueryForm from "../forms/QueryForm";
+import { findStringColumns, uriSelector } from "../helpers";
 import write from "./DBWrite";
-import LayerConfig from "../config/configuration/LayerConfig";
-import DataFormatter from "../config/configuration/DataFormatter";
-import {API_REFRESH_RATE, DEFAULT_DEVICE, DEFAULT_GRAPH_TYPE, DEFAULT_QUERY_1} from "../constants";
+import "./Graph.css";
 
-export default class Graph extends React.Component {
+let animationFrameId = 0;
+function Graph(props) {
+  let isMount = useRef(false);
+  const [table, setTable] = useState({
+    data: {},
+    lastUpdated: "",
+  });
+  const [graphType, setGraphType] = useState(props.inputGraphType);
+  const [query, setQuery] = useState(props.inputQuery);
+  const [device, setDevice] = useState(props.inputDevice);
+  const [cpuID, setCPUID] = useState(props.inputCPUID);
+  const [toggleLegend, setToggleLegend] = useState(1);
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      table: {},
-      lastUpdated: "",
-      graphType: props.graphType,
-      query: props.query,
-      device: props.device,
-    };
-    console.log(this.state.query)
-    this.handleGraphChange = this.handleGraphChange.bind(this);
-    this.handleDeviceChange = this.handleDeviceChange.bind(this);
-    this.handleQueryChange = this.handleQueryChange.bind(this);
-  }
-
-  animationFrameId = 0;
-  
-  style = {
-    margin: "5px",
-    height: "60%",
-    width: "90%",
-  };
-
-  getDataAndUpdateTable = async () => {
-    const resp = await axios.get("http://localhost:3001/" + this.state.query + "/" + this.state.device);
+  const getData = async () => {
+    let uri = uriSelector(graphType, query, device);
     try {
+      const resp = await axios.get(REST_URL + uri);
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
-      this.setState({
-        table: results.table,
-        lastUpdated: currentDate.toLocaleTimeString(),
-      });
+      if (results.table.length > 0) {
+        setTable({
+          data: results.table,
+          lastUpdated: currentDate.toLocaleTimeString(),
+        });
+      } else {
+        setTable({
+          data: {},
+          lastUpdated: currentDate.toLocaleTimeString(),
+        });
+      }
     } catch (error) {
-      console.error("error", error.message);
+      console.log(error);
     }
   };
+  useEffect(() => {
+    //Runs on the first render
+    isMount.current = true;
+    return () => {
+      window.clearInterval(animationFrameId);
+      setToggleLegend(-1);
+      isMount.current = false;
+    };
+    // eslint-disable-next-line
+  }, []);
 
-  async componentDidMount() {
+  useEffect(() => {
+    //reset table
+    //window.clearInterval(animationFrameId);
+    setToggleLegend(-1);
+    setTable((prevState) => ({ ...prevState, data: {} }));
     try {
-      this.getDataAndUpdateTable();
-      this.animationFrameId = window.setInterval(
-        this.getDataAndUpdateTable,
-        API_REFRESH_RATE
-      );
+      getData();
+      animationFrameId = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
-  }
+    return () => {
+      window.clearInterval(animationFrameId);
+      setTable((prevState) => ({ ...prevState, data: {} }));
+    };
+    // eslint-disable-next-line
+  }, [graphType, query, device, cpuID]);
 
-  componentWillUnmount = () => {
-    window.clearInterval(this.animationFrameId);
-  };
-  handleGraphChange = (event) => {
-    this.setState({ graphType: event.target.value });
-    localStorage.setItem("graph" + this.props.id, event.target.value);
-    write(this.props.id, "graph", event.target.value);
-  };
+  useEffect(() => {
+    setToggleLegend(props.toggleLegend);
+  }, [props.toggleLegend]);
 
-  handleQueryChange = (event) => {
-    this.setState({ query: event.target.value });
-    localStorage.setItem("query" + this.props.id, event.target.value);
-    write(this.props.id, "query", event.target.value);
-  };
-
-  handleDeviceChange = (event) => {
-    this.setState({ device: event.target.value });
-    localStorage.setItem("device" + this.props.id, event.target.value);
-    write(this.props.id, "device", event.target.value);
+  const handleGraphChange = (event) => {
+    setGraphType(event.target.value);
+    localStorage.setItem(
+      props.saveName + "_graph" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_graph", event.target.value);
   };
 
-  reset() {
-    this.setState({
-      graphType: "band",
-      query: "nodered/client/memory",
-      device: "device1",
-    });
-    localStorage.setItem("graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem("query", DEFAULT_QUERY_1);
-    localStorage.setItem("device", DEFAULT_DEVICE);
-  }
+  const handleQueryChange = (event) => {
+    setQuery(event.target.value);
+    localStorage.setItem(
+      props.saveName + "_query" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_query", event.target.value);
+  };
 
-  renderPlot = () => {
-    const fill = findStringColumns(this.state.table);
+  const handleDeviceChange = (event) => {
+    setDevice(event.target.value);
+    localStorage.setItem(
+      props.saveName + "_device" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_device", event.target.value);
+  };
+  const handleCPUChange = (event) => {
+    setCPUID(event.target.value);
+    localStorage.setItem(
+      props.saveName + "_cpu" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_cpu", event.target.value);
+  };
+
+  const reset = () => {
+    setGraphType(DEFAULT_GRAPH_TYPE);
+    setQuery(DEFAULT_QUERY_1);
+    setDevice(DEFAULT_DEVICE);
+    setCPUID(DEFAULT_CPU);
+    localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
+    localStorage.setItem(props.saveName + "_query", DEFAULT_QUERY_1);
+    localStorage.setItem(props.saveName + "_device", DEFAULT_DEVICE);
+    localStorage.setItem(props.saveName + "_cpu", DEFAULT_CPU);
+  };
+
+  const renderPlot = () => {
+    const fill = findStringColumns(table.data);
     const config = {
-      table: this.state.table,
-      layers: [new LayerConfig(this.state.graphType, fill).getConfig()],
-      valueFormatters: new DataFormatter(this.state.query).getFormat(),
+      table: table.data,
+      layers: [new LayerConfig(graphType, fill).getConfig()],
+      valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
-      legendHide: this.props.toggleLegend === 1 ? true : false,
+      legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
-      showAxes: true,
-      staticLegend: { 
+      showAxes: graphType === "single stat" ? false : true,
+      staticLegend: {
         heightRatio: 0.4,
-        border: '2px solid black',
-        fontBrightColor: 'black',
-        backgroundColor:'white',
+        border: "2px solid black",
+        fontBrightColor: "black",
+        backgroundColor: "white",
         colorizeRows: false,
-        hide:  this.props.toggleLegend === 1 ? false : true
-       },
+        hide:
+          graphType === "bar" ||
+          graphType === "single stat" ||
+          toggleLegend !== 1
+            ? true
+            : false,
+      },
     };
     return (
-
-      <div className="graph-component" style={this.style}>
+      <div className="static-graph-component" style={STYLE}>
+        <div className="draghandle">
+          <DragHandleIcon />
+        </div>
         <h2>
-          <DeviceForm
-            onChange={this.handleDeviceChange}
-            device={this.state.device}
-          />
-          <GraphForm
-            onChange={this.handleGraphChange}
-            graphType={this.state.graphType}
-          />
-          <QueryForm
-            onChange={this.handleQueryChange}
-            query={this.state.query}
-          />
+          <DeviceForm onChange={handleDeviceChange} device={device} />
+          <GraphForm onChange={handleGraphChange} graphType={graphType} />
+          <QueryForm onChange={handleQueryChange} query={query} />
+          <CPUForm onChange={handleCPUChange} cpuID={cpuID} query={query} />
         </h2>
-        <h5>Last Updated: {this.state.lastUpdated}</h5>
+        <h5>Last Updated: {table.lastUpdated}</h5>
         <Plot config={config} />
       </div>
     );
   };
 
-  renderEmpty = () => {
+  const renderEmpty = () => {
     return (
-      <div style={this.style}>
-        <button onClick={() => this.reset()}>Reboot</button>
-        <h3>Loading...</h3>
+      <div style={STYLE}>
+        <button onClick={() => reset()}>Reboot</button>
+        <div className="draghandle">
+          <DragHandleIcon />
+        </div>
+        <div className="dotwrapper">
+          <p className="loading">Loading</p>
+          <div className="dot0" />
+          <div className="dot1" />
+          <div className="dot2" />
+        </div>
       </div>
     );
   };
 
-  render = () => {
-    console.log("Graph is rendered")
-    return Object.keys(this.state.table).length > 0
-      ? this.renderPlot()
-      : this.renderEmpty();
+  const render = () => {
+    try {
+      return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
+    } catch (error) {
+      console.log(error);
+    }
   };
+  return render();
 }
+export default React.memo(Graph);

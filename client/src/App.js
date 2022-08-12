@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import StaticPage from "./pages/StaticPage";
 import ResizablePage from "./pages/ResizablePage";
-import OptimisedDashboard from "./pages/OptimisedDashboard";
+import Dashboard from "./pages/Dashboard";
 import ToolboxLayout from "./pages/Toolbox";
 
 class App extends React.Component {
@@ -31,7 +31,7 @@ class App extends React.Component {
         />
         <Routes>
           <Route index element={<Home  openDrawer={this.state.openDrawer}/>} />
-          <Route path="Dashboard" element={<OptimisedDashboard openDrawer={this.state.openDrawer}/>} />
+          <Route path="Dashboard" element={<Dashboard openDrawer={this.state.openDrawer}/>} />
           <Route path="Toolbox" element={<ToolboxLayout/>} />
           <Route path="ResizablePage" element={<ResizablePage  />} />
           <Route path="StaticPage" element={<StaticPage />} />

@@ -3,7 +3,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-const QueryForm = (props) => {
+const GatewayForm = (props) => {
   return (
     <span>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
@@ -26,4 +26,4 @@ const QueryForm = (props) => {
     </span>
   );
 };
-export default QueryForm;
+export default GatewayForm;
