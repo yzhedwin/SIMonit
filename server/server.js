@@ -237,22 +237,23 @@ app.get("/uptime-band/:did/", (req, res) => {
   });
 });
 
-app.get("/influxsql", (req, res) => {
+app.get("/influxsql/:bucket/:measurement", (req, res) => {
+  const { bucket, measurement } = req.params
   let csv = "";
-  let clientNodeRed = flux`` + INFLUX_MYSQL_QUERY;
+  let clientNodeRed = flux`` + INFLUX_MYSQL_QUERY(bucket, measurement);
   queryApi.queryLines(clientNodeRed, {
-    next(line) {
-      csv = `${csv}${line}\n`;
-    },
-    error(error) {
-      console.error(error);
-      console.log("\nFinished influxsql query with error");
-      res.end();
-    },
-    complete() {
-      console.log("\nFinished influxsql query with SUCCESS");
-      res.end(JSON.stringify({ csv }));
-    },
+      next(line) {
+          csv = `${csv}${line}\n`;
+      },
+      error(error) {
+          console.error(error);
+          console.log("\nFinished influxsql query with error");
+          res.end();
+      },
+      complete() {
+          console.log("\nFinished influxsql query with SUCCESS");
+          res.end(JSON.stringify({ csv }));
+      },
   });
 });
 
@@ -447,8 +448,7 @@ const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
 |> yield(name: "last")`;
 
 /* Influx - MySQL */
-/* Influx - MySQL */
-const INFLUX_MYSQL_QUERY = () =>
+const INFLUX_MYSQL_QUERY = (bucket, measurement) =>
 `
 import "system"
 import "influxdata/influxdb/secrets"
@@ -474,8 +474,9 @@ a = join(tables: {key1: gateway, key2: device}, on: ["gateway_id"], method: "inn
 b = join(tables: {key1: metric, key2: a}, on: ["device_id"], method: "inner")
 |> map(fn: (r) => ({ r with uom: string(v: r.uom), device_id: string(v: r.device_id), gateway_id: string(v: r.gateway_id), metric_id: string(v: r.metric_id) }))
 
-c = from(bucket: "mysql")
-|> range(start: -1h)
+c = from(bucket: "${bucket}")
+|> range(start: -30d)
+|> filter(fn: (r) => r["_measurement"] == "${measurement}")
 |> group()
 
 out = join(tables: {key1: b, key2: c}, on: ["device_id", "metric_id", "gateway_id"], method: "inner")

@@ -1,4 +1,7 @@
-import { INFLUXDB_CLIENT, INFLUX_ORGID } from "../config/configuration/InfluxDBConfig";
+import {
+  INFLUXDB_CLIENT,
+  INFLUX_ORGID,
+} from "../config/configuration/InfluxDBConfig";
 const { Point } = require("@influxdata/influxdb-client");
 const tbucket = "javabucket"; // process.env.BUCKET_NAME //export the name of your bucket
 
@@ -11,7 +14,11 @@ export default function write(tag, field, value) {
     .tag("UID", "User1")
     .tag("Graph", tag)
     .stringField(field, value);
-  writeApi.writePoint(point1);
+    try {
+      writeApi.writePoint(point1);
+    } catch(error) {
+      console.log("Write Error" + error)
+    }
   // flush pending writes and close writeApi
   writeApi
     .close()

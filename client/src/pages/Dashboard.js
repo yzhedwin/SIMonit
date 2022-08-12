@@ -1,46 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import _ from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "./Dashboard.css";
-import { Button } from "@mui/material";
+import { Button, ButtonGroup } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import write from "../component/DBWrite";
 import {
   DEFAULT_DEVICE,
   DEFAULT_QUERY_1,
   DEFAULT_GRAPH_TYPE,
+  DEFAULT_CPU,
 } from "../constants";
+import { Main } from "../component/Drawer";
 import Graph from "../component/Graph";
 
 //TODO: Load Layout and Items from Database
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
-const storageLayout = getFromLS("layouts") || {};
-const storageItems = localStorage.getItem("items") || 1;
-
-export default class Dashboard extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      layouts: JSON.parse(JSON.stringify(storageLayout)),
-      items: JSON.parse(storageItems),
-      toggleLegend: 1,
-    };
-    this.onBreakpointChange = this.onBreakpointChange.bind(this);
-    this.onItemsChange = this.onItemsChange.bind(this);
-    this.onLayoutChange = this.onLayoutChange.bind(this);
-    this.onLegendChange = this.onLegendChange.bind(this);
+function getFromLS(key) {
+  let ls = {};
+  if (global.localStorage) {
+    try {
+      ls = JSON.parse(global.localStorage.getItem("rgl-8")) || {};
+    } catch (e) {
+      /*Ignore*/
+    }
   }
+  return ls[key];
+}
+function saveToLS(key, value) {
+  if (global.localStorage) {
+    global.localStorage.setItem(
+      "rgl-8",
+      JSON.stringify({
+        [key]: value,
+      })
+    );
+  }
+}
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
+//TODO: Migrate to loading from cloud Database
+const storageLayout = getFromLS("dash_layouts") || {};
+const storageItems = localStorage.getItem("dash_items") || 1;
+export default function Dashboard({ openDrawer }) {
+  const [layouts, setLayouts] = useState(
+    JSON.parse(JSON.stringify(storageLayout))
+  );
+  const [items, setItems] = useState(JSON.parse(storageItems));
+  const [toggleLegend, setToggleLegend] = useState(1);
+  const [state, setState] = useState({ cols: {}, breakpoint: "" });
+
   //use index to load config of graph
-  generateDOM() {
-    const cols = this.state.cols || 6;
-    const toggle = this.state.toggleLegend || 1;
+  const generateDOM = () => {
+    const cols = state.cols || 6;
+    const toggle = toggleLegend || 1;
     //TODO: Add database query to load config
-    return _.map(_.range(this.state.items), function (i) {
+    return _.map(_.range(items), function (i) {
       let storageQuery =
-        localStorage.getItem("query" + (i + 1)) || DEFAULT_QUERY_1;
+        localStorage.getItem("dash_query" + (i + 1)) || DEFAULT_QUERY_1;
       let storageGraph =
-        localStorage.getItem("graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
+        localStorage.getItem("dash_graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
       let storageDevice =
-        localStorage.getItem("device" + (i + 1)) || DEFAULT_DEVICE;
+        localStorage.getItem("dash_device" + (i + 1)) || DEFAULT_DEVICE;
+      let storageCPU =
+        localStorage.getItem("dash_cpu" + (i + 1)) || DEFAULT_CPU;
       return (
         <div
           key={i}
@@ -56,120 +78,98 @@ export default class Dashboard extends React.PureComponent {
         >
           <Graph
             id={i + 1}
-            graphType={storageGraph}
-            query={storageQuery}
-            device={storageDevice}
+            inputGraphType={storageGraph}
+            inputQuery={storageQuery}
+            inputDevice={storageDevice}
+            inputCPUID={storageCPU}
             toggleLegend={toggle}
+            saveName={"dash"}
           />
         </div>
       );
     });
-  }
+  };
   //save to db
-  onLayoutChange(layout, layouts) {
-    saveToLS("layouts", layouts);
-    this.setState({ layouts });
-    if (this.state.items !== 0) {
-      write("", "layout", JSON.stringify(layouts));
+  const onLayoutChange = (layout, layouts) => {
+    saveToLS("dash_layouts", layouts);
+    setLayouts(layouts);
+    if (items !== 0) {
+      write("", "dash_layout", JSON.stringify(layouts));
     }
-  }
+  };
 
-  onItemsChange(items) {
+  const onItemsChange = (items) => {
     const updateItem = items + 1;
-    this.setState({ items: updateItem });
-    localStorage.setItem("items", JSON.stringify(updateItem));
-    if (this.state.items !== 0) {
-      write("", "quantity", JSON.stringify(updateItem));
+    setItems(updateItem);
+    localStorage.setItem("dash_items", JSON.stringify(updateItem));
+    if (items !== 0) {
+      write("", "dash_items", JSON.stringify(updateItem));
     }
-  }
-  onBreakpointChange(breakpoint, cols) {
-    this.setState({
+  };
+  const onBreakpointChange = (breakpoint, cols) => {
+    setState({
       breakpoint: breakpoint,
       cols: cols,
     });
-  }
-  onLegendChange(num) {
+  };
+  const onLegendChange = (num) => {
     const newNum = num * -1;
-    this.setState({ toggleLegend: newNum });
-  }
-  reset() {
+    setToggleLegend(newNum);
+  };
+  const reset = () => {
     localStorage.clear();
-    localStorage.setItem("items", JSON.stringify(0));
-    this.setState({ layouts: {}, items: 0 });
-  }
-  //style={{transform: 'scale(0.75) translate(-15%, -15%)'}}>
-  render() {
-    return (
-      <div
-        className="dashboard"
-        style={{
-          margin: "5px",
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        <h2>
-          <Button
-            onClick={() => this.reset()}
-            variant="contained"
-            color="error"
-          >
-            Reset All
-          </Button>
-          <Button
-            onClick={() => this.onItemsChange(this.state.items)}
-            variant="contained"
-            color="success"
-          >
-            Add Graph
-          </Button>
-          <Button
-            onClick={() => this.onLegendChange(this.state.toggleLegend)}
-            variant="contained"
-            color="warning"
-          >
-            Toggle Legend
-          </Button>
-        </h2>
-        <ResponsiveReactGridLayout
-          className="layout"
-          cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
-          rowHeight={10}
-          layouts={this.state.layouts}
-          items={this.state.items}
-          onLayoutChange={(layout, layouts) =>
-            this.onLayoutChange(layout, layouts)
-          }
-          isBounded={true}
-          onBreakpointChange={this.onBreakpointChange}
-        >
-          {this.generateDOM()}
-        </ResponsiveReactGridLayout>
-      </div>
-    );
-  }
-}
-function getFromLS(key) {
-  let ls = {};
-  if (global.localStorage) {
-    try {
-      ls = JSON.parse(global.localStorage.getItem("rgl-8")) || {};
-    } catch (e) {
-      /*Ignore*/
-    }
-  }
-  return ls[key];
-}
+    localStorage.setItem("dash_items", JSON.stringify(0));
+    setLayouts({});
+    setItems(0);
+  };
 
-function saveToLS(key, value) {
-  if (global.localStorage) {
-    global.localStorage.setItem(
-      "rgl-8",
-      JSON.stringify({
-        [key]: value,
-      })
-    );
-  }
+  //style={{transform: 'scale(0.75) translate(-15%, -15%)'}}>
+  return (
+    <Main
+      openDrawer={openDrawer}
+      className="dashboard"
+      style={{
+        marginTop: "50px",
+        height: "100%",
+      }}
+    >
+      <ButtonGroup
+        variant="contained"
+        aria-label="outlined primary button group"
+      >
+        <Button
+          onClick={() => reset()}
+          color="error"
+          startIcon={<DeleteIcon />}
+        >
+          Reset All
+        </Button>
+        <Button
+          onClick={() => onItemsChange(items)}
+          color="success"
+          startIcon={<AddIcon />}
+        >
+          Graph
+        </Button>
+        <Button onClick={() => onLegendChange(toggleLegend)} color="warning">
+          Toggle Legend
+        </Button>
+      </ButtonGroup>
+      <ResponsiveReactGridLayout
+        className="layout"
+        cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
+        rowHeight={10}
+        layouts={layouts}
+        items={items}
+        onLayoutChange={(layout, layouts) => onLayoutChange(layout, layouts)}
+        isBounded={true}
+        onBreakpointChange={onBreakpointChange}
+        draggableHandle=".draghandle"
+      >
+        {generateDOM()}
+      </ResponsiveReactGridLayout>
+    </Main>
+  );
 }
 
 /*
