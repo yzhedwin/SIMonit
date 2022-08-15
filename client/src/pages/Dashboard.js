@@ -41,58 +41,49 @@ function saveToLS(key, value) {
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 //TODO: Migrate to loading from cloud Database
 const storageLayout = getFromLS("dash_layouts") || {};
-const storageItems = localStorage.getItem("dash_items") || 1;
+const storageCount = localStorage.getItem("dash_count") || 0;
+const storageItems = localStorage.getItem("dash_items") || [];
+
 export default function Dashboard({ openDrawer }) {
   const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
   );
   const [items, setItems] = useState(JSON.parse(storageItems));
+  const [count, setCount] = useState(JSON.parse(storageCount));
   const [toggleLegend, setToggleLegend] = useState(1);
   const [state, setState] = useState({ cols: {}, breakpoint: "" });
 
   //use index to load config of graph
-  const generateDOM = () => {
-    const cols = state.cols || 6;
+  const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
+    let storageQuery =
+      localStorage.getItem("dash_query" + (count + 1)) || DEFAULT_QUERY_1;
+    let storageGraph =
+      localStorage.getItem("dash_graph" + (count + 1)) || DEFAULT_GRAPH_TYPE;
+    let storageDevice =
+      localStorage.getItem("dash_device" + (count + 1)) || DEFAULT_DEVICE;
+    let storageCPU =
+      localStorage.getItem("dash_cpu" + (count + 1)) || DEFAULT_CPU;
+    let storageDrive =
+      localStorage.getItem("dash_drive" + (count + 1)) || DEFAULT_DRIVE;
+
     //TODO: Add database query to load config
-    return _.map(_.range(items), function (i) {
-      let storageQuery =
-        localStorage.getItem("dash_query" + (i + 1)) || DEFAULT_QUERY_1;
-      let storageGraph =
-        localStorage.getItem("dash_graph" + (i + 1)) || DEFAULT_GRAPH_TYPE;
-      let storageDevice =
-        localStorage.getItem("dash_device" + (i + 1)) || DEFAULT_DEVICE;
-      let storageCPU =
-        localStorage.getItem("dash_cpu" + (i + 1)) || DEFAULT_CPU;
-      let storageDrive =
-        localStorage.getItem("dash_drive" + (i + 1)) || DEFAULT_DRIVE;
-      return (
-        <div
-          key={i}
-          data-grid={{
-            w: 2,
-            h: 20,
-            x: (i * 2) % cols,
-            y: i,
-            minH: 20,
-            minW: 2,
-            i: i.toString(),
-          }}
-        >
-          <Graph
-            id={i + 1}
-            inputGraphType={storageGraph}
-            inputQuery={storageQuery}
-            inputDevice={storageDevice}
-            inputCPUID={storageCPU}
-            inputDrive={storageDrive}
-            toggleLegend={toggle}
-            saveName={"dash"}
-          />
-        </div>
-      );
-    });
+    return (
+      <div key={item.i} data-grid={item}>
+        <Graph
+          id={count + 1}
+          inputGraphType={storageGraph}
+          inputQuery={storageQuery}
+          inputDevice={storageDevice}
+          inputCPUID={storageCPU}
+          inputDrive={storageDrive}
+          toggleLegend={toggle}
+          saveName={"dash"}
+        />
+      </div>
+    );
   };
+
   //save to db
   const onLayoutChange = (layout, layouts) => {
     saveToLS("dash_layouts", layouts);
@@ -102,14 +93,15 @@ export default function Dashboard({ openDrawer }) {
     }
   };
 
-  const onItemsChange = (items) => {
-    const updateItem = items + 1;
-    setItems(updateItem);
-    localStorage.setItem("dash_items", JSON.stringify(updateItem));
-    if (items !== 0) {
-      write("", "dash_items", JSON.stringify(updateItem));
-    }
-  };
+  // const onItemsChange = (items, count) => {
+  //   const newCount = count + 1;
+  //   setCount(newCount);
+  //   localStorage.setItem("dash_count", JSON.stringify(newCount));
+  //   if (items !== 0) {
+  //     write("", "dash_count", JSON.stringify(newCount));
+  //   }
+  // };
+
   const onBreakpointChange = (breakpoint, cols) => {
     setState({
       breakpoint: breakpoint,
@@ -120,14 +112,35 @@ export default function Dashboard({ openDrawer }) {
     const newNum = num * -1;
     setToggleLegend(newNum);
   };
-  const reset = () => {
-    localStorage.clear();
-    localStorage.setItem("dash_items", JSON.stringify(0));
-    setLayouts({});
-    setItems(0);
+  // const handleRemove = () => {
+  //   setIsRemove(true);
+  // };
+
+  const onAddItem = () => {
+    /*eslint no-console: 0*/
+    const newItem = items.concat({
+      // Add a new item. It must have a unique key!
+      i: "n" + count,
+      x: (count * 2) % (state.cols || 6),
+      y: count, // puts it at the bottom
+      w: 2,
+      h: 20,
+      minH: 20,
+      minW: 1,
+    });
+    const newCount = count + 1;
+    setItems(newItem);
+    setCount(newCount);
+    localStorage.setItem("dash_count", JSON.stringify(newCount));
+    localStorage.setItem("dash_items", JSON.stringify(newItem));
   };
 
-  //style={{transform: 'scale(0.75) translate(-15%, -15%)'}}>
+  const reset = () => {
+    localStorage.clear();
+    setLayouts({});
+    setItems([]);
+    setCount(0);
+  };
   return (
     <Main
       openDrawer={openDrawer}
@@ -149,7 +162,7 @@ export default function Dashboard({ openDrawer }) {
           Reset All
         </Button>
         <Button
-          onClick={() => onItemsChange(items)}
+          onClick={() => onAddItem()}
           color="success"
           startIcon={<AddIcon />}
         >
@@ -164,13 +177,13 @@ export default function Dashboard({ openDrawer }) {
         cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
         rowHeight={10}
         layouts={layouts}
-        items={items}
+        items={count}
         onLayoutChange={(layout, layouts) => onLayoutChange(layout, layouts)}
         isBounded={true}
         onBreakpointChange={onBreakpointChange}
         draggableHandle=".draghandle"
       >
-        {generateDOM()}
+        {_.map(items, (item) => generateDOM(item))}
       </ResponsiveReactGridLayout>
     </Main>
   );

@@ -20,7 +20,7 @@ const DrivesForm = (props) => {
             label="Drive"
           >
           {items.map((item) => {
-            return <MenuItem value={item}>{item}</MenuItem>;
+            return <MenuItem key={items.indexOf(item)} value={item}>{item}</MenuItem>;
           })}
           </Select>
         </FormControl>

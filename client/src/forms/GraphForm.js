@@ -7,10 +7,10 @@ const GraphForm = (props) => {
   return (
     <span>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
-        <InputLabel id="graph">Graph Type</InputLabel>
+        <InputLabel id="select">Graph Type</InputLabel>
         <Select
-          labelId="graph"
-          id="graph"
+          labelId="select"
+          id="select"
           value={props.graphType}
           onChange={props.onChange}
           autoWidth

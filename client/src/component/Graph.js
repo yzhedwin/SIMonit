@@ -204,6 +204,12 @@ function Graph(props) {
     };
     return (
       <div className="static-graph-component">
+        <span
+          className="removebutton"
+          onClick={props.handleRemove}
+        >
+          X
+        </span>
         <div className="draghandle">
           <DragHandleIcon />
         </div>
