@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 //Rest API
-const dotenv = require('dotenv/config');
+const dotenv = require("dotenv/config");
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -10,7 +10,7 @@ const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
 // vars to connect to bucket in influxdb
 const baseURL = process.env.INFLUX_URL;
 const influxToken = process.env.INFLUX_TOKEN;
-const orgID = process.env.ORG_ID; 
+const orgID = process.env.ORG_ID;
 const bucket = process.env.BUCKET_NAME;
 const user = process.env.MYSQL_USER;
 const pass = process.env.MYSQL_PASS;
@@ -29,7 +29,6 @@ const influxProxy = axios.create({
     "Content-Type": "application/json",
   },
 });
-
 // start the server
 const app = express();
 app.use(cors());
@@ -39,12 +38,32 @@ const port = 3001;
 app.get("/buckets", (req, res) => {
   getBuckets().then((b) => res.end(JSON.stringify(b)));
 });
+app.get("/list/:tag", (req, res) => {
+  const { tag } = req.params;
+  let list = [];
+  let fluxQuery = flux`` + GET_LIST(bucket, tag);
+  queryApi.queryRows(fluxQuery, {
+    next(row, tableMeta) {
+      const o = tableMeta.toObject(row);
+      list.push(o._value);
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished ERROR");
+    },
+    complete() {
+      console.log("\nFinished SUCCESS");
+      res.end(JSON.stringify({ list }));
+    },
+  });
+});
 
 app.get("/drive/:did", (req, res) => {
   const { did } = req.params;
+  const mount = req.query.mount;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_DRIVE(bucket, did, "/");
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_DRIVE(bucket, did, mount);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -62,19 +81,20 @@ app.get("/drive/:did", (req, res) => {
 
 app.get("/drive-band/:did", (req, res) => {
   const { did } = req.params;
+  const mount = req.query.mount;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_DRIVE_BAND(bucket, did, "/");
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_DRIVE_BAND(bucket, did, mount);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
     error(error) {
       console.error(error);
-      console.log("\nFinished " + did + " drive ERROR");
+      console.log("\nFinished " + did + mount + " drive band Error");
       res.end();
     },
     complete() {
-      console.log("\nFinished " + did + " drive SUCCESS");
+      console.log("\nFinished " + did + mount + " drive band SUCCESS");
       res.end(JSON.stringify({ csv }));
     },
   });
@@ -83,8 +103,8 @@ app.get("/drive-band/:did", (req, res) => {
 app.get("/memory/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_MEMORY(bucket, did);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_MEMORY(bucket, did);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -102,8 +122,8 @@ app.get("/memory/:did", (req, res) => {
 app.get("/memory-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_MEMORY_BAND(bucket, did);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_MEMORY_BAND(bucket, did);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -121,8 +141,8 @@ app.get("/memory-band/:did", (req, res) => {
 app.get("/load/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_LOAD(bucket, did);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_LOAD(bucket, did);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -141,8 +161,8 @@ app.get("/load/:did", (req, res) => {
 app.get("/load-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_LOAD_BAND(bucket, did);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_LOAD_BAND(bucket, did);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -161,8 +181,8 @@ app.get("/load-band/:did", (req, res) => {
 app.get("/cpu/:did/:cpuID", (req, res) => {
   const { did, cpuID } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_CPU(bucket, did, cpuID);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_CPU(bucket, did, cpuID);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -180,8 +200,8 @@ app.get("/cpu/:did/:cpuID", (req, res) => {
 app.get("/cpu-band/:did/:cpuID", (req, res) => {
   const { did, cpuID } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_CPU_BAND(bucket, did, cpuID);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_CPU_BAND(bucket, did, cpuID);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -200,8 +220,8 @@ app.get("/cpu-band/:did/:cpuID", (req, res) => {
 app.get("/uptime/:did/", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_UPTIME(bucket, did);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_UPTIME(bucket, did);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -220,8 +240,8 @@ app.get("/uptime/:did/", (req, res) => {
 app.get("/uptime-band/:did/", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + FLUX_QUERY_UPTIME_BAND(bucket, did);
-  queryApi.queryLines(clientNodeRed, {
+  let fluxQuery = flux`` + FLUX_QUERY_UPTIME_BAND(bucket, did);
+  queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -238,22 +258,22 @@ app.get("/uptime-band/:did/", (req, res) => {
 });
 
 app.get("/influxsql/:bucket/:measurement", (req, res) => {
-  const { bucket, measurement } = req.params
+  const { bucket, measurement } = req.params;
   let csv = "";
-  let clientNodeRed = flux`` + INFLUX_MYSQL_QUERY(bucket, measurement);
-  queryApi.queryLines(clientNodeRed, {
-      next(line) {
-          csv = `${csv}${line}\n`;
-      },
-      error(error) {
-          console.error(error);
-          console.log("\nFinished influxsql query with error");
-          res.end();
-      },
-      complete() {
-          console.log("\nFinished influxsql query with SUCCESS");
-          res.end(JSON.stringify({ csv }));
-      },
+  let fluxQuery = flux`` + INFLUX_MYSQL_QUERY(bucket, measurement);
+  queryApi.queryLines(fluxQuery, {
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished influxsql query with error");
+      res.end();
+    },
+    complete() {
+      console.log("\nFinished influxsql query with SUCCESS");
+      res.end(JSON.stringify({ csv }));
+    },
   });
 });
 
@@ -449,7 +469,7 @@ const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
 
 /* Influx - MySQL */
 const INFLUX_MYSQL_QUERY = (bucket, measurement) =>
-`
+  `
 import "system"
 import "influxdata/influxdb/secrets"
 import "sql"
@@ -481,3 +501,9 @@ c = from(bucket: "${bucket}")
 
 out = join(tables: {key1: b, key2: c}, on: ["device_id", "metric_id", "gateway_id"], method: "inner")
 out`;
+
+const GET_LIST = (bucket, tag) =>
+  `
+  import "influxdata/influxdb/schema"
+  schema.tagValues(bucket: "${bucket}", tag: "${tag}")
+`;

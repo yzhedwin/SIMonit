@@ -11,6 +11,7 @@ import {
   DEFAULT_QUERY_1,
   DEFAULT_GRAPH_TYPE,
   DEFAULT_CPU,
+  DEFAULT_DRIVE,
 } from "../constants";
 import { Main } from "../component/Drawer";
 import Graph from "../component/Graph";
@@ -63,6 +64,8 @@ export default function Dashboard({ openDrawer }) {
         localStorage.getItem("dash_device" + (i + 1)) || DEFAULT_DEVICE;
       let storageCPU =
         localStorage.getItem("dash_cpu" + (i + 1)) || DEFAULT_CPU;
+      let storageDrive =
+        localStorage.getItem("dash_drive" + (i + 1)) || DEFAULT_DRIVE;
       return (
         <div
           key={i}
@@ -82,6 +85,7 @@ export default function Dashboard({ openDrawer }) {
             inputQuery={storageQuery}
             inputDevice={storageDevice}
             inputCPUID={storageCPU}
+            inputDrive={storageDrive}
             toggleLegend={toggle}
             saveName={"dash"}
           />
