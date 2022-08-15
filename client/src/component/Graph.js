@@ -6,11 +6,14 @@ import DataFormatter from "../config/configuration/DataFormatter";
 import LayerConfig from "../config/configuration/LayerConfig";
 import {
   API_REFRESH_RATE, DEFAULT_CPU, DEFAULT_DEVICE,
+  DEFAULT_DRIVE,
   DEFAULT_GRAPH_TYPE,
-  DEFAULT_QUERY_1, REST_URL, STYLE
+  DEFAULT_QUERY_1, REST_URL
 } from "../constants";
 import CPUForm from "../forms/CPUForm";
 import DeviceForm from "../forms/DeviceForm";
+import DrivesForm from "../forms/DrivesForm";
+import GatewayForm from "../forms/GatewayForm";
 import GraphForm from "../forms/GraphForm";
 import QueryForm from "../forms/QueryForm";
 import { findStringColumns, uriSelector } from "../helpers";
@@ -28,10 +31,14 @@ function Graph(props) {
   const [query, setQuery] = useState(props.inputQuery);
   const [device, setDevice] = useState(props.inputDevice);
   const [cpuID, setCPUID] = useState(props.inputCPUID);
+  const [drive, setDrive] = useState(props.inputDrive);
   const [toggleLegend, setToggleLegend] = useState(1);
+  const [measurementList, setMeasurementList] = useState([]);
+  const [driveList, setDriveList] = useState([]);
+  const [cpuList, setCPUList] = useState([]);
 
   const getData = async () => {
-    let uri = uriSelector(graphType, query, device);
+    let uri = uriSelector(graphType, query, device, cpuID, drive);
     try {
       const resp = await axios.get(REST_URL + uri);
       let results = fromFlux(resp.data.csv);
@@ -51,9 +58,39 @@ function Graph(props) {
       console.log(error);
     }
   };
+  const getMeasurements = async () => {
+    try {
+      const resp = await axios.get(REST_URL + "/list/_measurement");
+      const {list} = resp.data;
+      setMeasurementList(list);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getDrives = async () => {
+    try {
+      const resp = await axios.get(REST_URL + "/list/mount");
+      const {list} = resp.data;
+      setDriveList(list);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getCPU = async () => {
+    try {
+      const resp = await axios.get(REST_URL + "/list/cpu");
+      const {list} = resp.data;
+      setCPUList(list);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     //Runs on the first render
     isMount.current = true;
+    getMeasurements();
+    getDrives();
+    getCPU();
     return () => {
       window.clearInterval(animationFrameId);
       setToggleLegend(-1);
@@ -78,7 +115,7 @@ function Graph(props) {
       setTable((prevState) => ({ ...prevState, data: {} }));
     };
     // eslint-disable-next-line
-  }, [graphType, query, device, cpuID]);
+  }, [graphType, query, device, cpuID, drive]);
 
   useEffect(() => {
     setToggleLegend(props.toggleLegend);
@@ -118,6 +155,14 @@ function Graph(props) {
     );
     write(props.id, props.saveName + "_cpu", event.target.value);
   };
+  const handleDriveChange = (event) => {
+    setDrive(event.target.value);
+    localStorage.setItem(
+      props.saveName + "_drive" + props.id,
+      event.target.value
+    );
+    write(props.id, props.saveName + "_drive", event.target.value);
+  };
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
@@ -128,6 +173,7 @@ function Graph(props) {
     localStorage.setItem(props.saveName + "_query", DEFAULT_QUERY_1);
     localStorage.setItem(props.saveName + "_device", DEFAULT_DEVICE);
     localStorage.setItem(props.saveName + "_cpu", DEFAULT_CPU);
+    localStorage.setItem(props.saveName + "_drive", DEFAULT_DRIVE);
   };
 
   const renderPlot = () => {
@@ -157,25 +203,29 @@ function Graph(props) {
       },
     };
     return (
-      <div className="static-graph-component" style={STYLE}>
+      <div className="static-graph-component">
         <div className="draghandle">
           <DragHandleIcon />
         </div>
-        <h2>
-          <DeviceForm onChange={handleDeviceChange} device={device} />
+        <div className="forms">
+          {/* <GatewayForm/> */}
+          <DeviceForm onChange={handleDeviceChange} device={device} measurementList={measurementList} />
           <GraphForm onChange={handleGraphChange} graphType={graphType} />
           <QueryForm onChange={handleQueryChange} query={query} />
-          <CPUForm onChange={handleCPUChange} cpuID={cpuID} query={query} />
-        </h2>
-        <h5>Last Updated: {table.lastUpdated}</h5>
+          <CPUForm onChange={handleCPUChange} query={query} cpuID={cpuID} cpuList={cpuList} />
+          <DrivesForm onChange={handleDriveChange} query={query} drive={drive} driveList={driveList} />
+        </div>
+        <div className="lastUpdate">Last Updated: {table.lastUpdated}</div>
+        <div className="plot">
         <Plot config={config} />
+        </div>
       </div>
     );
   };
 
   const renderEmpty = () => {
     return (
-      <div style={STYLE}>
+      <div className="loadcontainer">
         <button onClick={() => reset()}>Reboot</button>
         <div className="draghandle">
           <DragHandleIcon />

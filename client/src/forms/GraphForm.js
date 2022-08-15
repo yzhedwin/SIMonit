@@ -15,6 +15,7 @@ const GraphForm = (props) => {
           onChange={props.onChange}
           autoWidth
           label="Graph Type"
+          size="small"
         >
           <MenuItem value={"band"}>Band</MenuItem>
           <MenuItem value={"line"}>Line</MenuItem>

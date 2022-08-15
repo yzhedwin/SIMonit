@@ -1,30 +1,24 @@
-import { DEFAULT_CPU } from "./constants";
-
 export const findStringColumns = (table) =>
   table.columnKeys.filter((k) => table.getColumnType(k) === "string");
 
-export function uriSelector(graphType, query, device) {
+export function uriSelector(graphType, query, device, cpu, drive) {
   return graphType.toLowerCase() === "band" && query.toLowerCase() === "memory"
-    ? "/memory-band/" + device
+    ? `/memory-band/${device}`
     : query.toLowerCase() === "memory"
-    ? "/memory/" + device
-    : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
-    ? "/drive-band/" + device
-    : query.toLowerCase() === "drive"
-    ? "/drive/" + device
+    ? `/memory/${device}`
     : graphType.toLowerCase() === "band" && query.toLowerCase() === "load"
-    ? "/load-band/" + device
+    ? `/load-band/${device}`
     : query.toLowerCase() === "load"
-    ? "/load/" + device
+    ? `/load/${device}`
     : graphType.toLowerCase() === "band" && query.toLowerCase() === "cpu"
-    ? "/cpu-band/" + device + "/" + DEFAULT_CPU
+    ? `/cpu-band/${device}/${cpu}`
     : graphType.toLowerCase() === "bar" && query.toLowerCase() === "cpu"
-    ? "/cpu/" + device + "/" + DEFAULT_CPU
+    ? `/cpu/${device}/${cpu}`
     : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
-    ? "/drive-band/" + device
+    ? `/drive-band/${device}?mount=${drive}`
     : query.toLowerCase() === "drive"
-    ? "/drive/" + device
+    ? `/drive/${device}?mount=${drive}`
     : graphType.toLowerCase() === "band" && query.toLowerCase() === "uptime"
-    ? "/uptime-band/" + device
-    : "/uptime/" + device;
+    ? `/uptime-band/${device}`
+    : `/uptime/${device}`;
 }

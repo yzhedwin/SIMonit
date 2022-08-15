@@ -1,3 +1,21 @@
+.static-graph-component {
+ display: flex;
+ flex-direction: column;
+ height: 100%;
+}
+.forms {
+   margin:1px;
+}
+.plot {
+  margin: 20px;
+  flex-grow: 4;
+}
+.lastUpdate {
+  margin:1px;
+}
+.loadcontainer {
+  height: "100%";
+}
 .draghandle {
   position: absolute;
   width: 20px;

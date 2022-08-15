@@ -1,17 +1,15 @@
-export const API_REFRESH_RATE = 5000;
+export const API_REFRESH_RATE = 10000;
 export const DEFAULT_GRAPH_TYPE = "band";
 export const DEFAULT_QUERY_1 = "memory";
 export const DEFAULT_QUERY_2 = "cpu";
 export const DEFAULT_QUERY_3 = "load";
 export const DEFAULT_QUERY_4 = "drive";
 export const DEFAULT_QUERY_5 = "uptime";
-export const DEFAULT_DEVICE = "d3f23b04aa74";
+export const DEFAULT_DEVICE = 'd3f23b04aa74';
 export const DEFAULT_CPU = "0";
 export const DEFAULT_DRIVE = "/";
 export const STYLE = {
-  margin: "5px",
-  height: "60%",
-  width: "90%",
+  height: "100%",
 };
 export const REST_URL = "http://localhost:3001"
 

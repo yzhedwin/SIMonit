@@ -15,6 +15,7 @@ const QueryForm = (props) => {
           onChange={props.onChange}
           autoWidth
           label="Metric"
+          size="small"
         >
           <MenuItem value={"memory"}>Memory</MenuItem>
           <MenuItem value={"load"}>Load</MenuItem>

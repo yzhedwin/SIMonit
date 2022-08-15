@@ -11,16 +11,13 @@ const GatewayForm = (props) => {
         <Select
           labelId="select"
           id="select"
-          value={props.query}
+          value={props.gateway}
           onChange={props.onChange}
           autoWidth
           label="Metric"
+          size="small"
         >
-          <MenuItem value={"memory"}>Memory</MenuItem>
-          <MenuItem value={"load"}>Load</MenuItem>
-          <MenuItem value={"cpu"}>CPU</MenuItem>
-          <MenuItem value={"drive"}>Drives</MenuItem>
-          <MenuItem value={"uptime"}>Uptime</MenuItem>
+
         </Select>
       </FormControl>
     </span>

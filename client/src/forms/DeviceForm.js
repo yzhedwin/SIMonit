@@ -1,11 +1,14 @@
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { DEFAULT_DEVICE } from '../constants';
-
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { DEFAULT_DEVICE } from "../constants";
+/*
+Get all devices and list in menuitem
+*/
 
 const DeviceForm = (props) => {
+  const items = props.measurementList;
   return (
     <span>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
@@ -16,14 +19,15 @@ const DeviceForm = (props) => {
           value={props.device}
           onChange={props.onChange}
           autoWidth
+          size="small"
           label="Device"
         >
-          <MenuItem value={DEFAULT_DEVICE}>Device 1</MenuItem>
-          <MenuItem value={"device2"}>Device 2</MenuItem>
-          <MenuItem value={"device3"}>Device 3</MenuItem>
+          {items.map((item) => {
+            return <MenuItem value={item}>{item}</MenuItem>;
+          })}
         </Select>
       </FormControl>
     </span>
-  )
-}
-export default DeviceForm
+  );
+};
+export default DeviceForm;
