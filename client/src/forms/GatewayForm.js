@@ -17,7 +17,6 @@ const GatewayForm = (props) => {
           label="Metric"
           size="small"
         >
-
         </Select>
       </FormControl>
     </span>

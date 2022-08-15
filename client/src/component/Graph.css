@@ -27,6 +27,12 @@
   background-repeat: no-repeat;
   background-origin: content-box;
 }
+.removebutton {
+    position: absolute;
+    right: 30px;
+    top: 0;
+    cursor: pointer;
+}
 
 .dotwrapper {
   display: flex;
