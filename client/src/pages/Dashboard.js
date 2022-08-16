@@ -40,16 +40,17 @@ function saveToLS(key, value) {
 }
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 //TODO: Migrate to loading from cloud Database
-const storageLayout = getFromLS("dash_layouts") || {};
-const storageCount = localStorage.getItem("dash_count") || 0;
-const storageItems = localStorage.getItem("dash_items") || [];
 
 export default function Dashboard({ openDrawer }) {
-  const [layouts, setLayouts] = useState(
+const storageLayout = getFromLS("dash_layouts") || {};
+const storageCount =  JSON.parse(localStorage.getItem("dash_count")) || 0;
+const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
+
+const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
   );
-  const [items, setItems] = useState(JSON.parse(storageItems));
-  const [count, setCount] = useState(JSON.parse(storageCount));
+  const [items, setItems] = useState(storageItems);
+  const [count, setCount] = useState(storageCount);
   const [toggleLegend, setToggleLegend] = useState(1);
   const [state, setState] = useState({ cols: {}, breakpoint: "" });
 
@@ -57,21 +58,21 @@ export default function Dashboard({ openDrawer }) {
   const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
     let storageQuery =
-      localStorage.getItem("dash_query" + (count + 1)) || DEFAULT_QUERY_1;
+      localStorage.getItem("dash_query_" + item.i) || DEFAULT_QUERY_1;
     let storageGraph =
-      localStorage.getItem("dash_graph" + (count + 1)) || DEFAULT_GRAPH_TYPE;
+      localStorage.getItem("dash_graph_" + item.i) || DEFAULT_GRAPH_TYPE;
     let storageDevice =
-      localStorage.getItem("dash_device" + (count + 1)) || DEFAULT_DEVICE;
+      localStorage.getItem("dash_device_" + item.i) || DEFAULT_DEVICE;
     let storageCPU =
-      localStorage.getItem("dash_cpu" + (count + 1)) || DEFAULT_CPU;
+      localStorage.getItem("dash_cpu_" + item.i) || DEFAULT_CPU;
     let storageDrive =
-      localStorage.getItem("dash_drive" + (count + 1)) || DEFAULT_DRIVE;
+      localStorage.getItem("dash_drive_" + item.i) || DEFAULT_DRIVE;
 
     //TODO: Add database query to load config
     return (
       <div key={item.i} data-grid={item}>
         <Graph
-          id={count + 1}
+          id={item.i}
           inputGraphType={storageGraph}
           inputQuery={storageQuery}
           inputDevice={storageDevice}
@@ -79,6 +80,7 @@ export default function Dashboard({ openDrawer }) {
           inputDrive={storageDrive}
           toggleLegend={toggle}
           saveName={"dash"}
+          handleRemoveItem={() => onRemoveItem(item.i)}
         />
       </div>
     );
@@ -93,15 +95,6 @@ export default function Dashboard({ openDrawer }) {
     }
   };
 
-  // const onItemsChange = (items, count) => {
-  //   const newCount = count + 1;
-  //   setCount(newCount);
-  //   localStorage.setItem("dash_count", JSON.stringify(newCount));
-  //   if (items !== 0) {
-  //     write("", "dash_count", JSON.stringify(newCount));
-  //   }
-  // };
-
   const onBreakpointChange = (breakpoint, cols) => {
     setState({
       breakpoint: breakpoint,
@@ -112,21 +105,17 @@ export default function Dashboard({ openDrawer }) {
     const newNum = num * -1;
     setToggleLegend(newNum);
   };
-  // const handleRemove = () => {
-  //   setIsRemove(true);
-  // };
 
   const onAddItem = () => {
-    /*eslint no-console: 0*/
     const newItem = items.concat({
       // Add a new item. It must have a unique key!
       i: "n" + count,
       x: (count * 2) % (state.cols || 6),
-      y: count, // puts it at the bottom
+      y: count,
       w: 2,
       h: 20,
-      minH: 20,
-      minW: 1,
+      minH: 15,
+      minW: 2,
     });
     const newCount = count + 1;
     setItems(newItem);
@@ -134,12 +123,24 @@ export default function Dashboard({ openDrawer }) {
     localStorage.setItem("dash_count", JSON.stringify(newCount));
     localStorage.setItem("dash_items", JSON.stringify(newItem));
   };
+  const onRemoveItem = (i) => {
+    console.log("removing", i);
+    const index = items.findIndex((item) => item.i === i);
+    let newItems = items;
+    newItems.splice(index, 1)
+    const newCount = count - 1;
+    setItems(newItems);
+    setCount(newCount);
+    localStorage.setItem("dash_count", JSON.stringify(newCount));
+    localStorage.setItem("dash_items", JSON.stringify(newItems));
+  }
 
   const reset = () => {
-    localStorage.clear();
     setLayouts({});
     setItems([]);
     setCount(0);
+    localStorage.clear();
+
   };
   return (
     <Main
@@ -188,10 +189,3 @@ export default function Dashboard({ openDrawer }) {
     </Main>
   );
 }
-
-/*
- if (process.env.STATIC_EXAMPLES === true) {
-   import("../test-hook.jsx").then(fn => fn.default(BoundedLayout));
- }
-
-*/

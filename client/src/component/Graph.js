@@ -1,5 +1,6 @@
 import { fromFlux, Plot } from "@influxdata/giraffe";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
+import AppsIcon from '@mui/icons-material/Apps';
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import DataFormatter from "../config/configuration/DataFormatter";
@@ -124,44 +125,44 @@ function Graph(props) {
   const handleGraphChange = (event) => {
     setGraphType(event.target.value);
     localStorage.setItem(
-      props.saveName + "_graph" + props.id,
+      props.saveName + "_graph_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_graph", event.target.value);
+    write(props.id, props.saveName + "_graph_", event.target.value);
   };
 
   const handleQueryChange = (event) => {
     setQuery(event.target.value);
     localStorage.setItem(
-      props.saveName + "_query" + props.id,
+      props.saveName + "_query_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_query", event.target.value);
+    write(props.id, props.saveName + "_query_", event.target.value);
   };
 
   const handleDeviceChange = (event) => {
     setDevice(event.target.value);
     localStorage.setItem(
-      props.saveName + "_device" + props.id,
+      props.saveName + "_device_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_device", event.target.value);
+    write(props.id, props.saveName + "_device_", event.target.value);
   };
   const handleCPUChange = (event) => {
     setCPUID(event.target.value);
     localStorage.setItem(
-      props.saveName + "_cpu" + props.id,
+      props.saveName + "_cpu_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_cpu", event.target.value);
+    write(props.id, props.saveName + "_cpu_", event.target.value);
   };
   const handleDriveChange = (event) => {
     setDrive(event.target.value);
     localStorage.setItem(
-      props.saveName + "_drive" + props.id,
+      props.saveName + "_drive_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_drive", event.target.value);
+    write(props.id, props.saveName + "_drive_", event.target.value);
   };
 
   const reset = () => {
@@ -206,12 +207,12 @@ function Graph(props) {
       <div className="static-graph-component">
         <span
           className="removebutton"
-          onClick={props.handleRemove}
+          onClick={props.handleRemoveItem}
         >
-          X
+          <DisabledByDefaultIcon color="error"/>
         </span>
         <div className="draghandle">
-          <DragHandleIcon />
+          <AppsIcon />
         </div>
         <div className="forms">
           {/* <GatewayForm/> */}
@@ -234,7 +235,7 @@ function Graph(props) {
       <div className="loadcontainer">
         <button onClick={() => reset()}>Reboot</button>
         <div className="draghandle">
-          <DragHandleIcon />
+          <AppsIcon />
         </div>
         <div className="dotwrapper">
           <p className="loading">Loading</p>
