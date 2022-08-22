@@ -5,7 +5,7 @@ import Select from "@mui/material/Select";
 
 const QueryForm = (props) => {
   return (
-    <span>
+    <>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
         <InputLabel id="select">Metric</InputLabel>
         <Select
@@ -24,7 +24,7 @@ const QueryForm = (props) => {
           <MenuItem value={"uptime"}>Uptime</MenuItem>
         </Select>
       </FormControl>
-    </span>
+    </>
   );
 };
 export default QueryForm;

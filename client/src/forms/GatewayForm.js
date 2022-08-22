@@ -5,7 +5,7 @@ import Select from "@mui/material/Select";
 
 const GatewayForm = (props) => {
   return (
-    <span>
+    <>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
         <InputLabel id="select">Metric</InputLabel>
         <Select
@@ -19,7 +19,7 @@ const GatewayForm = (props) => {
         >
         </Select>
       </FormControl>
-    </span>
+    </>
   );
 };
 export default GatewayForm;

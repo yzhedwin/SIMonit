@@ -104,7 +104,13 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                 handleDrawerOpen={handleDrawerOpen}
                 openDrawer={openDrawer}
               />
-              <Icon sx={{display: { xs: "none", md: "flex" }, mr: 1 , fontSize: 50 }}>
+              <Icon
+                sx={{
+                  display: { xs: "none", md: "flex" },
+                  mr: 1,
+                  fontSize: 50,
+                }}
+              >
                 <img
                   src={
                     "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"
@@ -133,7 +139,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                 SimpleWeb
               </Typography>
 
-             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+              <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
                 <IconButton
                   size="large"
                   aria-label="account of current user"
@@ -174,7 +180,13 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   ))}
                 </Menu>
               </Box>
-              <Icon sx={{display: { xs: "flex", md: "none" }, mr: 1 , fontSize: 50 }}>
+              <Icon
+                sx={{
+                  display: { xs: "flex", md: "none" },
+                  mr: 1,
+                  fontSize: 50,
+                }}
+              >
                 <img
                   src={
                     "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"

@@ -3,10 +3,6 @@
   flex-direction: column;
   height: 100%;
 }
-.forms {
-  display:flex;
-  justify-content: center;
-}
 .plot {
   margin: 20px;
   flex-grow: 4;
@@ -17,6 +13,15 @@
 .loadcontainer {
   height: "100%";
 }
+.topcontainer {
+  margin-inline: 27px;
+}
+
+.forms {
+  display: flex;
+  justify-content: center;
+}
+
 .draghandle {
   position: absolute;
   width: 24px;

@@ -7,7 +7,7 @@ const CPUForm = (props) => {
   if (props.query === "cpu") {
     const items = props.cpuList;
     return (
-      <span>
+      <>
         <FormControl sx={{ m: 1, minWidth: 80 }}>
           <InputLabel id="select">CPU</InputLabel>
           <Select
@@ -24,7 +24,7 @@ const CPUForm = (props) => {
           })}
           </Select>
         </FormControl>
-      </span>
+      </>
     );
   } 
   return null;

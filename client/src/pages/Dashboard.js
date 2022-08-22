@@ -154,6 +154,7 @@ const [layouts, setLayouts] = useState(
       <ButtonGroup
         variant="contained"
         aria-label="outlined primary button group"
+        size="small"
       >
         <Button
           onClick={() => reset()}

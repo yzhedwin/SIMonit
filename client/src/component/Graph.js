@@ -1,15 +1,18 @@
 import { fromFlux, Plot } from "@influxdata/giraffe";
-import AppsIcon from '@mui/icons-material/Apps';
-import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
+import AppsIcon from "@mui/icons-material/Apps";
+import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import DataFormatter from "../config/configuration/DataFormatter";
 import LayerConfig from "../config/configuration/LayerConfig";
 import {
-  API_REFRESH_RATE, DEFAULT_CPU, DEFAULT_DEVICE,
+  API_REFRESH_RATE,
+  DEFAULT_CPU,
+  DEFAULT_DEVICE,
   DEFAULT_DRIVE,
   DEFAULT_GRAPH_TYPE,
-  DEFAULT_QUERY_1, REST_URL
+  DEFAULT_QUERY_1,
+  REST_URL,
 } from "../constants";
 import CPUForm from "../forms/CPUForm";
 import DeviceForm from "../forms/DeviceForm";
@@ -62,7 +65,7 @@ function Graph(props) {
   const getMeasurements = async () => {
     try {
       const resp = await axios.get(REST_URL + "/list/_measurement");
-      const {list} = resp.data;
+      const { list } = resp.data;
       setMeasurementList(list);
     } catch (error) {
       console.log(error);
@@ -71,7 +74,7 @@ function Graph(props) {
   const getDrives = async () => {
     try {
       const resp = await axios.get(REST_URL + "/list/mount");
-      const {list} = resp.data;
+      const { list } = resp.data;
       setDriveList(list);
     } catch (error) {
       console.log(error);
@@ -80,7 +83,7 @@ function Graph(props) {
   const getCPU = async () => {
     try {
       const resp = await axios.get(REST_URL + "/list/cpu");
-      const {list} = resp.data;
+      const { list } = resp.data;
       setCPUList(list);
     } catch (error) {
       console.log(error);
@@ -205,26 +208,39 @@ function Graph(props) {
     };
     return (
       <div className="static-graph-component">
-        <span
-          className="removebutton"
-          onClick={props.handleRemoveItem}
-        >
-          <DisabledByDefaultIcon color="error"/>
-        </span>
-        <div className="draghandle">
-          <AppsIcon />
-        </div>
-        <div className="forms">
-          {/* <GatewayForm/> */}
-          <DeviceForm onChange={handleDeviceChange} device={device} measurementList={measurementList} />
-          <GraphForm onChange={handleGraphChange} graphType={graphType} />
-          <QueryForm onChange={handleQueryChange} query={query} />
-          <CPUForm onChange={handleCPUChange} query={query} cpuID={cpuID} cpuList={cpuList} />
-          <DrivesForm onChange={handleDriveChange} query={query} drive={drive} driveList={driveList} />
+        <div className="topcontainer">
+          <div className="removebutton" onClick={props.handleRemoveItem}>
+            <DisabledByDefaultIcon color="error" />
+          </div>
+          <div className="draghandle">
+            <AppsIcon />
+          </div>
+          <div className="forms">
+            {/* <GatewayForm/> */}
+            <DeviceForm
+              onChange={handleDeviceChange}
+              device={device}
+              measurementList={measurementList}
+            />
+            <GraphForm onChange={handleGraphChange} graphType={graphType} />
+            <QueryForm onChange={handleQueryChange} query={query} />
+            <CPUForm
+              onChange={handleCPUChange}
+              query={query}
+              cpuID={cpuID}
+              cpuList={cpuList}
+            />
+            <DrivesForm
+              onChange={handleDriveChange}
+              query={query}
+              drive={drive}
+              driveList={driveList}
+            />
+          </div>
         </div>
         <div className="lastUpdate">Last Updated: {table.lastUpdated}</div>
         <div className="plot">
-        <Plot config={config} />
+          <Plot config={config} />
         </div>
       </div>
     );
