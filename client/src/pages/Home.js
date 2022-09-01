@@ -27,7 +27,6 @@ const Home = ({openDrawer}) => {
         />
       </div>
     </Main>
-
   );
 };
 

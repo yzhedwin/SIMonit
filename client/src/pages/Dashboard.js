@@ -70,7 +70,7 @@ const [layouts, setLayouts] = useState(
 
     //TODO: Add database query to load config
     return (
-      <div key={item.i} data-grid={item}>
+      <div key={item.i} data-grid={item} className="dashgrid">
         <Graph
           id={item.i}
           inputGraphType={storageGraph}
@@ -146,7 +146,7 @@ const [layouts, setLayouts] = useState(
       openDrawer={openDrawer}
       className="dashboard"
       style={{
-        marginTop: "50px",
+        marginTop: "60px",
         height: "100%",
       }}
     >

@@ -11,6 +11,8 @@ export default function StaticGraph({
   device,
   graphType,
   query,
+  cpu,
+  drive,
   toggleLegend,
 }) {
   const [table, setTable] = useState({
@@ -18,7 +20,7 @@ export default function StaticGraph({
     lastUpdated: "",
   });
   const getData = async () => {
-    let uri = uriSelector(graphType, query, device);
+    let uri = uriSelector(graphType, query, device, cpu, drive);
     const resp = await axios.get(REST_URL + uri);
     try {
       let results = fromFlux(resp.data.csv);
@@ -78,10 +80,10 @@ export default function StaticGraph({
       },
     };
     return (
-      <div className="static-graph-component" style={STYLE}>
-        <h5>Device Stats: {query.toUpperCase()}</h5>
-        <span>Last Updated: {table.lastUpdated}</span>
-        <Plot config={config} />
+      <div className="graph-component">
+        <div className="device-stats">Device Stats: {query.toUpperCase()}</div>
+        <div className="last-update">Last Updated: {table.lastUpdated}</div>
+        <div className="plot"><Plot config={config}/></div>
       </div>
     );
   };

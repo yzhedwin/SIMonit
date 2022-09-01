@@ -18,7 +18,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { DrawerIcon, RenderDrawer } from "./Drawer";
 
-const pages = ["Dashboard", "ResizablePage", "Toolbox"];
+const pages = ["Dashboard", "StaticPage", "Toolbox"];
 
 const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
   let location = useLocation();
@@ -136,7 +136,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   textDecoration: "none",
                 }}
               >
-                SimpleWeb
+                SIMonit
               </Typography>
 
               <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -212,7 +212,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   textDecoration: "none",
                 }}
               >
-                SimpleWeb
+                SIMonit
               </Typography>
               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 {pages.map((page) => (

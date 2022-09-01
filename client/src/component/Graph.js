@@ -62,6 +62,7 @@ function Graph(props) {
       console.log(error);
     }
   };
+  //Gateway SCM-001 -> Display as Edge ID for User
   const getMeasurements = async () => {
     try {
       const resp = await axios.get(REST_URL + "/list/_measurement");
@@ -92,6 +93,11 @@ function Graph(props) {
   useEffect(() => {
     //Runs on the first render
     isMount.current = true;
+    /*
+    getGateway()
+    getDevice()
+    getMetric()
+    */
     getMeasurements();   
     getDrives();
     getCPU();
@@ -207,7 +213,7 @@ function Graph(props) {
       },
     };
     return (
-      <div className="static-graph-component">
+      <div className="graph-component">
         <div className="topcontainer">
           <div className="removebutton" onClick={props.handleRemoveItem}>
             <DisabledByDefaultIcon color="error" />
@@ -238,7 +244,7 @@ function Graph(props) {
             />
           </div>
         </div>
-        <div className="lastUpdate">Last Updated: {table.lastUpdated}</div>
+        <div className="last-update">Last Updated: {table.lastUpdated}</div>
         <div className="plot">
           <Plot config={config} />
         </div>

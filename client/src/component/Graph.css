@@ -1,13 +1,17 @@
-.static-graph-component {
+.graph-component {
   display: flex;
   flex-direction: column;
   height: 100%;
+  border: 1px solid black;
 }
 .plot {
   margin: 20px;
   flex-grow: 4;
 }
-.lastUpdate {
+.last-update {
+  margin-left: 5px;
+}
+.device-stats {
   margin-left: 5px;
 }
 .loadcontainer {
