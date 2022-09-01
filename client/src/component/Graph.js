@@ -24,8 +24,8 @@ import { findStringColumns, uriSelector } from "../helpers";
 import write from "./DBWrite";
 import "./Graph.css";
 
-let animationFrameId = 0;
 function Graph(props) {
+  let animationFrameId = useRef(0);
   let isMount = useRef(false);
   const [table, setTable] = useState({
     data: {},
@@ -92,11 +92,11 @@ function Graph(props) {
   useEffect(() => {
     //Runs on the first render
     isMount.current = true;
-    getMeasurements();
+    getMeasurements();   
     getDrives();
     getCPU();
     return () => {
-      window.clearInterval(animationFrameId);
+      window.clearInterval(animationFrameId.current);
       setToggleLegend(-1);
       isMount.current = false;
     };
@@ -105,17 +105,17 @@ function Graph(props) {
 
   useEffect(() => {
     //reset table
-    //window.clearInterval(animationFrameId);
+    //window.clearInterval(animationFrameId.current);
     setToggleLegend(-1);
     setTable((prevState) => ({ ...prevState, data: {} }));
     try {
       getData();
-      animationFrameId = window.setInterval(getData, API_REFRESH_RATE);
+      animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.log(error);
     }
     return () => {
-      window.clearInterval(animationFrameId);
+      window.clearInterval(animationFrameId.current);
       setTable((prevState) => ({ ...prevState, data: {} }));
     };
     // eslint-disable-next-line
@@ -131,7 +131,7 @@ function Graph(props) {
       props.saveName + "_graph_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_graph_", event.target.value);
+   // write(props.id, props.saveName + "_graph_", event.target.value);
   };
 
   const handleQueryChange = (event) => {
@@ -140,7 +140,7 @@ function Graph(props) {
       props.saveName + "_query_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_query_", event.target.value);
+   // write(props.id, props.saveName + "_query_", event.target.value);
   };
 
   const handleDeviceChange = (event) => {
@@ -149,7 +149,7 @@ function Graph(props) {
       props.saveName + "_device_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_device_", event.target.value);
+  //  write(props.id, props.saveName + "_device_", event.target.value);
   };
   const handleCPUChange = (event) => {
     setCPUID(event.target.value);
@@ -157,7 +157,7 @@ function Graph(props) {
       props.saveName + "_cpu_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_cpu_", event.target.value);
+    //write(props.id, props.saveName + "_cpu_", event.target.value);
   };
   const handleDriveChange = (event) => {
     setDrive(event.target.value);
@@ -165,7 +165,7 @@ function Graph(props) {
       props.saveName + "_drive_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_drive_", event.target.value);
+   // write(props.id, props.saveName + "_drive_", event.target.value);
   };
 
   const reset = () => {

@@ -44,7 +44,7 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 export default function Dashboard({ openDrawer }) {
 const storageLayout = getFromLS("dash_layouts") || {};
 const storageCount =  JSON.parse(localStorage.getItem("dash_count")) || 0;
-const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
+const storageItems = JSON.parse(localStorage.getItem("dash_items")) || {};
 
 const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
@@ -90,9 +90,9 @@ const [layouts, setLayouts] = useState(
   const onLayoutChange = (layout, layouts) => {
     saveToLS("dash_layouts", layouts);
     setLayouts(layouts);
-    if (items !== 0) {
-      write("", "dash_layout", JSON.stringify(layouts));
-    }
+   // if (items !== 0) {
+   //   write("", "dash_layout", JSON.stringify(layouts));
+   // }
   };
 
   const onBreakpointChange = (breakpoint, cols) => {
@@ -105,42 +105,41 @@ const [layouts, setLayouts] = useState(
     const newNum = num * -1;
     setToggleLegend(newNum);
   };
-
+//BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
   const onAddItem = () => {
-    const newItem = items.concat({
-      // Add a new item. It must have a unique key!
-      i: "n" + count,
+    console.log(items)
+    const newItems = ({...items, 
+      [count]: { // Add a new item. It must have a unique key!
+      i: count.toString(),
       x: (count * 2) % (state.cols || 6),
       y: count,
       w: 2,
       h: 20,
       minH: 15,
       minW: 2,
-    });
+    }})
+    setItems(newItems)
     const newCount = count + 1;
-    setItems(newItem);
-    setCount(newCount);
-    localStorage.setItem("dash_count", JSON.stringify(newCount));
-    localStorage.setItem("dash_items", JSON.stringify(newItem));
-  };
-  const onRemoveItem = (i) => {
-    console.log("removing", i);
-    const index = items.findIndex((item) => item.i === i);
-    let newItems = items;
-    newItems.splice(index, 1)
-    const newCount = count - 1;
-    setItems(newItems);
     setCount(newCount);
     localStorage.setItem("dash_count", JSON.stringify(newCount));
     localStorage.setItem("dash_items", JSON.stringify(newItems));
+  };
+  const onRemoveItem = (i) => {
+    console.log(items)
+    console.log("removing", i);
+    delete items[i];
+    const newCount = count - 1;
+    setItems(items);
+    setCount(newCount);
+    localStorage.setItem("dash_count", JSON.stringify(newCount));
+    localStorage.setItem("dash_items", JSON.stringify(items));
   }
 
   const reset = () => {
     setLayouts({});
-    setItems([]);
+    setItems({});
     setCount(0);
     localStorage.clear();
-
   };
   return (
     <Main
