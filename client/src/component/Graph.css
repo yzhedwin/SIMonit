@@ -1,37 +1,51 @@
-.static-graph-component {
- display: flex;
- flex-direction: column;
- height: 100%;
-}
-.forms {
-   margin:1px;
+.graph-component {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid black;
 }
 .plot {
   margin: 20px;
   flex-grow: 4;
 }
-.lastUpdate {
-  margin:1px;
+.last-update {
+  margin-left: 5px;
+}
+.device-stats {
+  margin-left: 5px;
 }
 .loadcontainer {
   height: "100%";
 }
+.topcontainer {
+  margin-inline: 27px;
+}
+
+.forms {
+  display: flex;
+  justify-content: center;
+}
+
 .draghandle {
   position: absolute;
-  width: 20px;
-  height: 20;
+  width: 24px;
+  height: 24px;
   top: 0;
   right: 0;
   background-position: top right;
   padding: 0 3px 0 0;
   background-repeat: no-repeat;
   background-origin: content-box;
+  cursor: grab;
 }
 .removebutton {
-    position: absolute;
-    right: 30px;
-    top: 0;
-    cursor: pointer;
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  left: 0;
+  top: 0;
+  background-position: bottom left;
+  cursor: pointer;
 }
 
 .dotwrapper {

@@ -5,7 +5,7 @@ import Select from "@mui/material/Select";
 
 const GraphForm = (props) => {
   return (
-    <span>
+    <>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
         <InputLabel id="select">Graph Type</InputLabel>
         <Select
@@ -23,7 +23,7 @@ const GraphForm = (props) => {
           <MenuItem value={"bar"}>Histogram</MenuItem>
         </Select>
       </FormControl>
-    </span>
+    </>
   );
 };
 export default GraphForm;

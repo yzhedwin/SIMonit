@@ -7,7 +7,7 @@ const DrivesForm = (props) => {
   if (props.query === "drive") {
     const items = props.driveList;
     return (
-      <span>
+      <>
         <FormControl sx={{ m: 1, minWidth: 80 }}>
           <InputLabel id="select">Drive</InputLabel>
           <Select
@@ -24,7 +24,7 @@ const DrivesForm = (props) => {
           })}
           </Select>
         </FormControl>
-      </span>
+      </>
     );
   } 
   return null;

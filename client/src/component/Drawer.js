@@ -1,4 +1,5 @@
-import { styled,
+import {
+  styled,
   Drawer,
   List,
   ListItem,
@@ -7,7 +8,8 @@ import { styled,
   ListItemText,
   useTheme,
   IconButton,
-  Divider, } from "@mui/material";
+  Divider,
+} from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import InboxIcon from "@mui/icons-material/Inbox";
@@ -16,20 +18,24 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 const drawerWidth = 240;
 
-export const DrawerIcon = ({handleDrawerOpen, openDrawer}) => {
+export const DrawerIcon = ({ handleDrawerOpen, openDrawer }) => {
   return (
     <IconButton
       color="inherit"
       aria-label="open drawer"
       onClick={handleDrawerOpen}
       edge="start"
-      sx={{ mr: 2, ...(openDrawer && { display: "none" }) }}
+      sx={{
+        display: { xs: "none", md: "flex" },
+        mr: 2,
+        ...(openDrawer && { display: "none" }),
+      }}
     >
       <MenuIcon />
     </IconButton>
   );
 };
-export const RenderDrawer = ({openDrawer, handleDrawerClose }) => {
+export const RenderDrawer = ({ openDrawer, handleDrawerClose }) => {
   const theme = useTheme();
   return (
     <Drawer
@@ -84,26 +90,23 @@ export const RenderDrawer = ({openDrawer, handleDrawerClose }) => {
   );
 };
 
-
-
-export const Main =
-  styled("main", { shouldForwardProp: (prop) => prop !== "openDrawer" })(
-    ({ theme, openDrawer }) => ({
-      flexGrow: 1,
-      padding: theme.spacing(3),
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-      ...(openDrawer && {
-        transition: theme.transitions.create("margin", {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: `${drawerWidth}px`,
-      }),
-    })
-  );
+export const Main = styled("main", {
+  shouldForwardProp: (prop) => prop !== "openDrawer",
+})(({ theme, openDrawer }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(openDrawer && {
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: `${drawerWidth}px`,
+  }),
+}));
 
 export const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",

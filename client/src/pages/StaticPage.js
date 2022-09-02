@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import StaticGraph from "../component/StaticGraph";
-import "./StaticPage.css";
 import RGL, { WidthProvider } from "react-grid-layout";
 import _ from "lodash";
 import {
@@ -18,7 +17,9 @@ function StaticPage() {
   const [layouts, setLayouts] = useState({});
   const items = 4;
   const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
-  const graphType = ["band", "line", "band", "bar"];
+  const graphType = ["band", "line", "line", "bar"];
+  const cpu = 0;
+  const drive = '/';
 
   const onLayoutChange = (layout, layouts) => {
     setLayouts(layouts);
@@ -27,6 +28,7 @@ function StaticPage() {
     return _.map(_.range(items), function (i) {
       return (
         <div
+        className="static-grid-item"
           key={i}
           data-grid={{
             w: 1,
@@ -41,6 +43,8 @@ function StaticPage() {
             graphType={graphType[i]}
             query={queries[i]}
             toggleLegend={1}
+            cpu={cpu}
+            drive={drive}
           />
         </div>
       );
@@ -48,11 +52,7 @@ function StaticPage() {
   };
   return (
     <ReactGridLayout
-      className="static"
-      style={{
-        background: "white",
-        border: "1px solid white"
-      }}
+      style={{backgroundColor:"white", marginTop: 0}}
       cols={4}
       rowHeight={4}
       layouts={layouts}

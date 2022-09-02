@@ -1,14 +1,18 @@
 import { fromFlux, Plot } from "@influxdata/giraffe";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
+import AppsIcon from "@mui/icons-material/Apps";
+import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import DataFormatter from "../config/configuration/DataFormatter";
 import LayerConfig from "../config/configuration/LayerConfig";
 import {
-  API_REFRESH_RATE, DEFAULT_CPU, DEFAULT_DEVICE,
+  API_REFRESH_RATE,
+  DEFAULT_CPU,
+  DEFAULT_DEVICE,
   DEFAULT_DRIVE,
   DEFAULT_GRAPH_TYPE,
-  DEFAULT_QUERY_1, REST_URL
+  DEFAULT_QUERY_1,
+  REST_URL,
 } from "../constants";
 import CPUForm from "../forms/CPUForm";
 import DeviceForm from "../forms/DeviceForm";
@@ -20,8 +24,8 @@ import { findStringColumns, uriSelector } from "../helpers";
 import write from "./DBWrite";
 import "./Graph.css";
 
-let animationFrameId = 0;
 function Graph(props) {
+  let animationFrameId = useRef(0);
   let isMount = useRef(false);
   const [table, setTable] = useState({
     data: {},
@@ -58,10 +62,11 @@ function Graph(props) {
       console.log(error);
     }
   };
+  //Gateway SCM-001 -> Display as Edge ID for User
   const getMeasurements = async () => {
     try {
       const resp = await axios.get(REST_URL + "/list/_measurement");
-      const {list} = resp.data;
+      const { list } = resp.data;
       setMeasurementList(list);
     } catch (error) {
       console.log(error);
@@ -70,7 +75,7 @@ function Graph(props) {
   const getDrives = async () => {
     try {
       const resp = await axios.get(REST_URL + "/list/mount");
-      const {list} = resp.data;
+      const { list } = resp.data;
       setDriveList(list);
     } catch (error) {
       console.log(error);
@@ -79,7 +84,7 @@ function Graph(props) {
   const getCPU = async () => {
     try {
       const resp = await axios.get(REST_URL + "/list/cpu");
-      const {list} = resp.data;
+      const { list } = resp.data;
       setCPUList(list);
     } catch (error) {
       console.log(error);
@@ -88,11 +93,16 @@ function Graph(props) {
   useEffect(() => {
     //Runs on the first render
     isMount.current = true;
-    getMeasurements();
+    /*
+    getGateway()
+    getDevice()
+    getMetric()
+    */
+    getMeasurements();   
     getDrives();
     getCPU();
     return () => {
-      window.clearInterval(animationFrameId);
+      window.clearInterval(animationFrameId.current);
       setToggleLegend(-1);
       isMount.current = false;
     };
@@ -101,17 +111,17 @@ function Graph(props) {
 
   useEffect(() => {
     //reset table
-    //window.clearInterval(animationFrameId);
+    //window.clearInterval(animationFrameId.current);
     setToggleLegend(-1);
     setTable((prevState) => ({ ...prevState, data: {} }));
     try {
       getData();
-      animationFrameId = window.setInterval(getData, API_REFRESH_RATE);
+      animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.log(error);
     }
     return () => {
-      window.clearInterval(animationFrameId);
+      window.clearInterval(animationFrameId.current);
       setTable((prevState) => ({ ...prevState, data: {} }));
     };
     // eslint-disable-next-line
@@ -124,44 +134,44 @@ function Graph(props) {
   const handleGraphChange = (event) => {
     setGraphType(event.target.value);
     localStorage.setItem(
-      props.saveName + "_graph" + props.id,
+      props.saveName + "_graph_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_graph", event.target.value);
+   // write(props.id, props.saveName + "_graph_", event.target.value);
   };
 
   const handleQueryChange = (event) => {
     setQuery(event.target.value);
     localStorage.setItem(
-      props.saveName + "_query" + props.id,
+      props.saveName + "_query_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_query", event.target.value);
+   // write(props.id, props.saveName + "_query_", event.target.value);
   };
 
   const handleDeviceChange = (event) => {
     setDevice(event.target.value);
     localStorage.setItem(
-      props.saveName + "_device" + props.id,
+      props.saveName + "_device_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_device", event.target.value);
+  //  write(props.id, props.saveName + "_device_", event.target.value);
   };
   const handleCPUChange = (event) => {
     setCPUID(event.target.value);
     localStorage.setItem(
-      props.saveName + "_cpu" + props.id,
+      props.saveName + "_cpu_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_cpu", event.target.value);
+    //write(props.id, props.saveName + "_cpu_", event.target.value);
   };
   const handleDriveChange = (event) => {
     setDrive(event.target.value);
     localStorage.setItem(
-      props.saveName + "_drive" + props.id,
+      props.saveName + "_drive_" + props.id,
       event.target.value
     );
-    write(props.id, props.saveName + "_drive", event.target.value);
+   // write(props.id, props.saveName + "_drive_", event.target.value);
   };
 
   const reset = () => {
@@ -203,27 +213,40 @@ function Graph(props) {
       },
     };
     return (
-      <div className="static-graph-component">
-        <span
-          className="removebutton"
-          onClick={props.handleRemove}
-        >
-          X
-        </span>
-        <div className="draghandle">
-          <DragHandleIcon />
+      <div className="graph-component">
+        <div className="topcontainer">
+          <div className="removebutton" onClick={props.handleRemoveItem}>
+            <DisabledByDefaultIcon color="error" />
+          </div>
+          <div className="draghandle">
+            <AppsIcon />
+          </div>
+          <div className="forms">
+            {/* <GatewayForm/> */}
+            <DeviceForm
+              onChange={handleDeviceChange}
+              device={device}
+              measurementList={measurementList}
+            />
+            <GraphForm onChange={handleGraphChange} graphType={graphType} />
+            <QueryForm onChange={handleQueryChange} query={query} />
+            <CPUForm
+              onChange={handleCPUChange}
+              query={query}
+              cpuID={cpuID}
+              cpuList={cpuList}
+            />
+            <DrivesForm
+              onChange={handleDriveChange}
+              query={query}
+              drive={drive}
+              driveList={driveList}
+            />
+          </div>
         </div>
-        <div className="forms">
-          {/* <GatewayForm/> */}
-          <DeviceForm onChange={handleDeviceChange} device={device} measurementList={measurementList} />
-          <GraphForm onChange={handleGraphChange} graphType={graphType} />
-          <QueryForm onChange={handleQueryChange} query={query} />
-          <CPUForm onChange={handleCPUChange} query={query} cpuID={cpuID} cpuList={cpuList} />
-          <DrivesForm onChange={handleDriveChange} query={query} drive={drive} driveList={driveList} />
-        </div>
-        <div className="lastUpdate">Last Updated: {table.lastUpdated}</div>
+        <div className="last-update">Last Updated: {table.lastUpdated}</div>
         <div className="plot">
-        <Plot config={config} />
+          <Plot config={config} />
         </div>
       </div>
     );
@@ -234,7 +257,7 @@ function Graph(props) {
       <div className="loadcontainer">
         <button onClick={() => reset()}>Reboot</button>
         <div className="draghandle">
-          <DragHandleIcon />
+          <AppsIcon />
         </div>
         <div className="dotwrapper">
           <p className="loading">Loading</p>

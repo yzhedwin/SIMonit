@@ -18,7 +18,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { DrawerIcon, RenderDrawer } from "./Drawer";
 
-const pages = ["Dashboard", "ResizablePage", "Toolbox"];
+const pages = ["Dashboard", "StaticPage", "Toolbox"];
 
 const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
   let location = useLocation();
@@ -104,7 +104,13 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                 handleDrawerOpen={handleDrawerOpen}
                 openDrawer={openDrawer}
               />
-              <Icon sx={{ fontSize: 50, display: "flex" }}>
+              <Icon
+                sx={{
+                  display: { xs: "none", md: "flex" },
+                  mr: 1,
+                  fontSize: 50,
+                }}
+              >
                 <img
                   src={
                     "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"
@@ -130,7 +136,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   textDecoration: "none",
                 }}
               >
-                SimpleWeb
+                SIMonit
               </Typography>
 
               <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -174,7 +180,22 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   ))}
                 </Menu>
               </Box>
-              <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+              <Icon
+                sx={{
+                  display: { xs: "flex", md: "none" },
+                  mr: 1,
+                  fontSize: 50,
+                }}
+              >
+                <img
+                  src={
+                    "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"
+                  }
+                  height={50}
+                  width={50}
+                  alt=""
+                />
+              </Icon>
               <Typography
                 variant="h5"
                 noWrap
@@ -187,11 +208,11 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   fontFamily: "monospace",
                   fontWeight: 700,
                   letterSpacing: ".3rem",
-                  color: "black",
+                  color: "white",
                   textDecoration: "none",
                 }}
               >
-                SimpleWeb
+                SIMonit
               </Typography>
               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 {pages.map((page) => (

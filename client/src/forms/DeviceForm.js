@@ -9,7 +9,7 @@ Get all devices and list in menuitem
 const DeviceForm = (props) => {
   const items = props.measurementList;
   return (
-    <span>
+    <>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
         <InputLabel id="select">Device</InputLabel>
         <Select
@@ -26,7 +26,7 @@ const DeviceForm = (props) => {
           })}
         </Select>
       </FormControl>
-    </span>
+    </>
   );
 };
 export default DeviceForm;
