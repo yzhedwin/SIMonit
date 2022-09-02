@@ -6,11 +6,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: -webkit-linear-gradient(#2E3B55, #b4b4b4); 
+  /* background: -webkit-linear-gradient(#2E3B55, #b4b4b4); 
   background: -o-linear-gradient(#2E3B55, #b4b4b4); 
   background: -moz-linear-gradient(#2E3B55, #b4b4b4); 
-  background: linear-gradient(#2E3B55, #b4b4b4); 
-  background-color: #2E3B55;
+  background: linear-gradient(#2E3B55, #b4b4b4);  */
+  background-color: white;
   /* -webkit-animation: colorchange 60s infinite; 
     animation: colorchange 60s infinite; */
 } 
