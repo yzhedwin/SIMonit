@@ -4,6 +4,7 @@ import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import DataFormatter from "../config/configuration/DataFormatter";
+import { Button } from "@mui/material";
 import LayerConfig from "../config/configuration/LayerConfig";
 import {
   API_REFRESH_RATE,
@@ -41,7 +42,7 @@ function Graph(props) {
       const resp = await axios.get(
         `${REST_URL}/table/${gateway}/${device?.id}/${metric?.id}`
       );
-      console.log(resp)
+      console.log(resp);
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
       if (results.table.length > 0) {
@@ -194,8 +195,8 @@ function Graph(props) {
     setDevice("");
     setGateway(DEFAULT_GATEWAY);
     localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem(props.saveName + "_metric", '');
-    localStorage.setItem(props.saveName + "_device", '');
+    localStorage.setItem(props.saveName + "_metric", "");
+    localStorage.setItem(props.saveName + "_device", "");
     localStorage.setItem(props.saveName + "_gateway", DEFAULT_GATEWAY);
   };
 
@@ -250,7 +251,7 @@ function Graph(props) {
               metric={metric}
               metricList={metricList}
             />
-            {/* <GraphForm onChange={handleGraphChange} graphType={graphType} /> */}
+            <GraphForm onChange={handleGraphChange} graphType={graphType} />
           </div>
         </div>
         <div className="last-update">Last Updated: {table.lastUpdated}</div>
@@ -287,7 +288,7 @@ function Graph(props) {
               metric={metric}
               metricList={metricList}
             />
-            {/* <GraphForm onChange={handleGraphChange} graphType={graphType} /> */}
+            <GraphForm onChange={handleGraphChange} graphType={graphType} />
           </div>
         </div>
         <div className="dotwrapper">
@@ -296,14 +297,19 @@ function Graph(props) {
           <div className="dot1" />
           <div className="dot2" />
         </div>
-        <button onClick={() => reset()}>Reboot</button>
+        <div className="reset-button">
+          <Button variant="contained" color="primary" onClick={() => reset()}>
+            Reset
+          </Button>
+        </div>
       </div>
     );
   };
 
   const render = () => {
     try {
-      return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
+      return renderEmpty();
+      // return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
     } catch (error) {
       console.log(error);
     }

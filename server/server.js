@@ -620,6 +620,7 @@ out = join(tables: {key1: b, key2: c}, on: ["_measurement", "name", "unit"], met
 |> filter(fn: (r) => r.edge_id == "${edge_id}")
 |> filter(fn: (r) => r.device_id == "${device_id}")
 |> filter(fn: (r) => r.metric_id == "${metric_id}") 
+|> last()
 out
 `;
 

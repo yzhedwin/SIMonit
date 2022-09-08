@@ -89,7 +89,10 @@
   animation: BounceAnimation 0.5s linear infinite;
   animation-delay: 0.2s;
 }
-
+.reset-button {
+  align-self: center;
+  margin-top: 50px;
+}
 @keyframes BounceAnimation {
   0% {
     margin-bottom: 0;
