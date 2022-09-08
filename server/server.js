@@ -10,8 +10,8 @@ const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
 // vars to connect to bucket in influxdb
 const baseURL = process.env.INFLUX_URL;
 const influxToken = process.env.INFLUX_TOKEN;
+const staticBucket = process.env.INFLUX_BUCKET;
 const orgID = process.env.ORG_ID;
-const bucket = process.env.BUCKET_NAME;
 const user = process.env.MYSQL_USER;
 const pass = process.env.MYSQL_PASS;
 const url = process.env.DB_URL;
@@ -38,8 +38,8 @@ const port = 3001;
 app.get("/buckets", (req, res) => {
   getBuckets().then((b) => res.end(JSON.stringify(b)));
 });
-app.get("/list/:tag", (req, res) => {
-  const { tag } = req.params;
+app.get("/influx/:bucket/:tag", (req, res) => {
+  const { tag, bucket } = req.params;
   let list = [];
   let fluxQuery = flux`` + GET_LIST(bucket, tag);
   queryApi.queryRows(fluxQuery, {
@@ -62,7 +62,7 @@ app.get("/drive/:did", (req, res) => {
   const { did } = req.params;
   const mount = req.query.mount;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_DRIVE(bucket, did, mount);
+  let fluxQuery = flux`` + FLUX_QUERY_DRIVE(staticBucket, did, mount);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -83,7 +83,7 @@ app.get("/drive-band/:did", (req, res) => {
   const { did } = req.params;
   const mount = req.query.mount;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_DRIVE_BAND(bucket, did, mount);
+  let fluxQuery = flux`` + FLUX_QUERY_DRIVE_BAND(staticBucket, did, mount);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -103,7 +103,7 @@ app.get("/drive-band/:did", (req, res) => {
 app.get("/memory/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_MEMORY(bucket, did);
+  let fluxQuery = flux`` + FLUX_QUERY_MEMORY(staticBucket, did);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -122,7 +122,7 @@ app.get("/memory/:did", (req, res) => {
 app.get("/memory-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_MEMORY_BAND(bucket, did);
+  let fluxQuery = flux`` + FLUX_QUERY_MEMORY_BAND(staticBucket, did);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -141,7 +141,7 @@ app.get("/memory-band/:did", (req, res) => {
 app.get("/load/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_LOAD(bucket, did);
+  let fluxQuery = flux`` + FLUX_QUERY_LOAD(staticBucket, did);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -161,7 +161,7 @@ app.get("/load/:did", (req, res) => {
 app.get("/load-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_LOAD_BAND(bucket, did);
+  let fluxQuery = flux`` + FLUX_QUERY_LOAD_BAND(staticBucket, did);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -181,7 +181,7 @@ app.get("/load-band/:did", (req, res) => {
 app.get("/cpu/:did/:cpuID", (req, res) => {
   const { did, cpuID } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_CPU(bucket, did, cpuID);
+  let fluxQuery = flux`` + FLUX_QUERY_CPU(staticBucket, did, cpuID);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -200,7 +200,7 @@ app.get("/cpu/:did/:cpuID", (req, res) => {
 app.get("/cpu-band/:did/:cpuID", (req, res) => {
   const { did, cpuID } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_CPU_BAND(bucket, did, cpuID);
+  let fluxQuery = flux`` + FLUX_QUERY_CPU_BAND(staticBucket, did, cpuID);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -220,7 +220,7 @@ app.get("/cpu-band/:did/:cpuID", (req, res) => {
 app.get("/uptime/:did/", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_UPTIME(bucket, did);
+  let fluxQuery = flux`` + FLUX_QUERY_UPTIME(staticBucket, did);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -240,7 +240,7 @@ app.get("/uptime/:did/", (req, res) => {
 app.get("/uptime-band/:did/", (req, res) => {
   const { did } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + FLUX_QUERY_UPTIME_BAND(bucket, did);
+  let fluxQuery = flux`` + FLUX_QUERY_UPTIME_BAND(staticBucket, did);
   queryApi.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
@@ -276,6 +276,83 @@ app.get("/influxsql/:bucket/:measurement", (req, res) => {
     },
   });
 });
+app.get("/gatewaylist", (req, res) => {
+  let list = [];
+  let fluxQuery = flux`` + GET_GATEWAY_LIST();
+  queryApi.queryRows(fluxQuery, {
+    next(row, tableMeta) {
+      const o = tableMeta.toObject(row);
+      list.push({gateway_id: o.gateway_id, edge_id: o.edge_id});
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished ERROR");
+    },
+    complete() {
+      console.log("\nFinished SUCCESS");
+      res.end(JSON.stringify({ list }));
+    },
+  });
+});
+app.get("/devicelist/:gateway/", (req, res) => {
+  const {gateway} = req.params;
+  let list = [];
+  let fluxQuery = flux`` + GET_DEVICE_LIST(gateway);
+  queryApi.queryRows(fluxQuery, {
+    next(row, tableMeta) {
+      const o = tableMeta.toObject(row);
+      list.push({gateway_id: o.gateway_id, device_id: o.device_id, name: o.name});
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished ERROR");
+    },
+    complete() {
+      console.log("\nFinished SUCCESS");
+      res.end(JSON.stringify({ list }));
+    },
+  });
+});
+app.get("/metriclist/:device", (req, res) => {
+  const {device} = req.params;
+  let list = [];
+  let fluxQuery = flux`` + GET_METRIC_LIST(device);
+  queryApi.queryRows(fluxQuery, {
+    next(row, tableMeta) {
+      const o = tableMeta.toObject(row);
+      list.push({metric_id: o.id, device_id: o.device_id, name: o.name});
+    },
+    error(error) {
+      console.error(error);
+      console.log("\nFinished ERROR");
+    },
+    complete() {
+      console.log("\nFinished SUCCESS");
+      res.end(JSON.stringify({ list }));
+    },
+  });
+});
+
+app.get("/table/:gateway/:device/:metric", (req, res) => {
+  const { gateway, device, metric } = req.params;
+  let csv = "";
+  let fluxQuery = flux`` + GET_TABLE(gateway, device, metric);
+    queryApi.queryLines(fluxQuery, {
+      next(line) {
+        csv = `${csv}${line}\n`;
+      },
+      error(error) {
+        console.error(error);
+        console.log("\nFinished " + gateway + "  ERROR");
+        res.end();
+      },
+      complete() {
+        console.log("\nFinished " + gateway + "  SUCCESS");
+        res.end(JSON.stringify({ csv }));
+      },
+  });
+});
+
 
 // app.get('/uptime/:did', (req, res) => {
 //   const { did } = req.params;
@@ -471,7 +548,6 @@ const FLUX_QUERY_DRIVE = (bucket, did, mount) =>
 const INFLUX_MYSQL_QUERY = (bucket, measurement) =>
   `
 import "system"
-import "influxdata/influxdb/secrets"
 import "sql"
 
 
@@ -506,4 +582,85 @@ const GET_LIST = (bucket, tag) =>
   `
   import "influxdata/influxdb/schema"
   schema.tagValues(bucket: "${bucket}", tag: "${tag}")
+`;
+
+const GET_TABLE = (edge_id, device_id, metric_id) =>
+`
+import "system"
+import "influxdata/influxdb/secrets"
+import "sql"
+
+bucket = "SPD"
+
+gateway = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT LOWER(name) as _measurement, id as gateway_id, edge_id from Gateway",
+)
+
+device = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as device_id, gateway_id from Device",
+)
+metric = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT name, id as metric_id, device_id, uom as unit from Metric",
+)
+a = join(tables: {key1: gateway, key2: device}, on: ["gateway_id"], method: "inner")
+b = join(tables: {key1: metric, key2: a}, on: ["device_id"], method: "inner")
+|> map(fn: (r) => ({ r with unit: string(v: r.unit), device_id: string(v: r.device_id), gateway_id: string(v: r.gateway_id), metric_id: string(v: r.metric_id) }))
+
+c = from(bucket: bucket)
+|> range(start: -5m)
+|> group()
+
+out = join(tables: {key1: b, key2: c}, on: ["_measurement", "name", "unit"], method: "inner")
+|> filter(fn: (r) => r.edge_id == "${edge_id}")
+|> filter(fn: (r) => r.edge_id == "${device_id}")
+|> filter(fn: (r) => r.metric_id == "${metric_id}") 
+out
+`;
+
+const GET_GATEWAY_LIST = () => 
+`
+import "system"
+import "sql"
+
+list = sql.from(
+  driverName: "mysql",
+  dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+  query: "SELECT edge_id, id as gateway_id from Gateway",
+)
+list`;
+
+const GET_DEVICE_LIST = (gateway) => 
+`
+import "system"
+import "sql"
+
+a = sql.from(
+  driverName: "mysql",
+  dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+  query: "SELECT id as gateway_id from Gateway where edge_id = '${gateway}'",
+)
+b = sql.from(
+  driverName: "mysql",
+  dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+  query: "SELECT id as device_id, gateway_id, name from Device",
+)
+join(tables: {key1: a, key2: b}, on: ["gateway_id"], method: "inner")
+`;
+
+const GET_METRIC_LIST = (device) => 
+`
+import "system"
+import "sql"
+
+sql.from(
+  driverName: "mysql",
+  dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+  query: "SELECT * from Metric where device_id = ${device}",
+)
 `;

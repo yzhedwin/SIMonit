@@ -1,11 +1,13 @@
 export const API_REFRESH_RATE = 10000;
-export const DEFAULT_GRAPH_TYPE = "band";
+export const DEFAULT_GRAPH_TYPE = "line";
+export const DEFAULT_GATEWAY = "CON000001";
+export const DEFAULT_METRIC_ID = "1";
+export const DEFAULT_DEVICE_ID = '1';
 export const DEFAULT_QUERY_1 = "memory";
 export const DEFAULT_QUERY_2 = "cpu";
 export const DEFAULT_QUERY_3 = "load";
 export const DEFAULT_QUERY_4 = "drive";
 export const DEFAULT_QUERY_5 = "uptime";
-export const DEFAULT_DEVICE = 'd3f23b04aa74';
 export const DEFAULT_CPU = "0";
 export const DEFAULT_DRIVE = "/";
 export const STYLE = {

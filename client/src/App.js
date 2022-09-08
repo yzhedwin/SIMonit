@@ -34,8 +34,8 @@ class App extends React.Component {
           <Route path="Dashboard" element={<Dashboard openDrawer={this.state.openDrawer}/>} />
           <Route path="Toolbox" element={<ToolboxLayout/>} />
           {/* <Route path="ResizablePage" element={<ResizablePage  />} /> */}
-          <Route path="StaticPage" element={<StaticPage />} />
-          <Route path="StaticPage/:did" element={<StaticPage />} />
+          {/* <Route path="StaticPage" element={<StaticPage />} /> */}
+          {/* <Route path="StaticPage/:did" element={<StaticPage />} /> */}
           <Route path="*" element={<NoPage />} />
         </Routes>
       </BrowserRouter>

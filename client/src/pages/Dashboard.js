@@ -7,11 +7,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import write from "../component/DBWrite";
 import {
-  DEFAULT_DEVICE,
-  DEFAULT_QUERY_1,
   DEFAULT_GRAPH_TYPE,
-  DEFAULT_CPU,
-  DEFAULT_DRIVE,
+  DEFAULT_DEVICE_ID,
+  DEFAULT_METRIC_ID,
+  DEFAULT_GATEWAY,
 } from "../constants";
 import { Main } from "../component/Drawer";
 import Graph from "../component/Graph";
@@ -57,27 +56,24 @@ const [layouts, setLayouts] = useState(
   //use index to load config of graph
   const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
-    let storageQuery =
-      localStorage.getItem("dash_query_" + item.i) || DEFAULT_QUERY_1;
+    let storageMetric =
+      localStorage.getItem("dash_metric_" + item.i) || DEFAULT_METRIC_ID;
     let storageGraph =
       localStorage.getItem("dash_graph_" + item.i) || DEFAULT_GRAPH_TYPE;
     let storageDevice =
-      localStorage.getItem("dash_device_" + item.i) || DEFAULT_DEVICE;
-    let storageCPU =
-      localStorage.getItem("dash_cpu_" + item.i) || DEFAULT_CPU;
-    let storageDrive =
-      localStorage.getItem("dash_drive_" + item.i) || DEFAULT_DRIVE;
+      localStorage.getItem("dash_device_" + item.i) || DEFAULT_DEVICE_ID;
+    let storageGateway =
+      localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY;
 
     //TODO: Add database query to load config
     return (
       <div key={item.i} data-grid={item} className="dashgrid">
         <Graph
           id={item.i}
-          inputGraphType={storageGraph}
-          inputQuery={storageQuery}
-          inputDevice={storageDevice}
-          inputCPUID={storageCPU}
-          inputDrive={storageDrive}
+          graphType={storageGraph}
+          metricID={storageMetric}
+          deviceID={storageDevice}
+          gateway={storageGateway}
           toggleLegend={toggle}
           saveName={"dash"}
           handleRemoveItem={() => onRemoveItem(item.i)}
