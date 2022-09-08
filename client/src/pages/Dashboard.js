@@ -59,15 +59,15 @@ export default function Dashboard({ openDrawer }) {
       JSON.parse(localStorage.getItem("dash_device_" + item.i)) || "";
     let storageGateway =
       localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY;
-    let storageGatewayList =
-      JSON.parse(localStorage.getItem("dash_gatewayList_" + item.i)) ||
-      DEFAULT_GATEWAY;
-    let storageDeviceList =
-      JSON.parse(localStorage.getItem("dash_deviceList_" + item.i)) ||
-      DEFAULT_GATEWAY;
-    let storageMetricList =
-      JSON.parse(localStorage.getItem("dash_metricList_" + item.i)) ||
-      DEFAULT_GATEWAY;
+    let storageGatewayList = JSON.parse(
+      localStorage.getItem("dash_gatewayList_" + item.i)
+    ) || [{}];
+    let storageDeviceList = JSON.parse(
+      localStorage.getItem("dash_deviceList_" + item.i)
+    ) || [{}];
+    let storageMetricList = JSON.parse(
+      localStorage.getItem("dash_metricList_" + item.i)
+    ) || [{}];
 
     //TODO: Add database query to load config
     return (

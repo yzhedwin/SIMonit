@@ -308,8 +308,7 @@ function Graph(props) {
 
   const render = () => {
     try {
-      return renderEmpty();
-      // return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
+      return Object.keys(table.data).length > 0 ? renderPlot() : renderEmpty();
     } catch (error) {
       console.log(error);
     }

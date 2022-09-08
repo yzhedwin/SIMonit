@@ -22,6 +22,7 @@ export default function StaticGraph({
   const getData = async () => {
     let uri = uriSelector(graphType, query, device, cpu, drive);
     const resp = await axios.get(REST_URL + uri);
+    console.log(resp)
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
