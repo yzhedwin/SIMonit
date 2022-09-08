@@ -32,15 +32,16 @@ function Graph(props) {
   const [device, setDevice] = useState(props.device);
   const [gateway, setGateway] = useState(props.gateway);
   const [toggleLegend, setToggleLegend] = useState(1);
-  const [gatewayList, setGatewayList] = useState([{}]);
-  const [deviceList, setDeviceList] = useState([{}]);
-  const [metricList, setMetricList] = useState([{}]);
+  const [gatewayList, setGatewayList] = useState(props.gatewayList);
+  const [deviceList, setDeviceList] = useState(props.deviceList);
+  const [metricList, setMetricList] = useState(props.metricList);
 
   const getData = async () => {
     try {
       const resp = await axios.get(
-        `${REST_URL}/table/${gateway}/${device}${metric}`
+        `${REST_URL}/table/${gateway}/${device?.id}/${metric?.id}`
       );
+      console.log(resp)
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
       if (results.table.length > 0) {
@@ -64,17 +65,23 @@ function Graph(props) {
       const resp = await axios.get(REST_URL + "/gatewaylist");
       const { list } = resp.data;
       setGatewayList(list);
+      localStorage.setItem(
+        props.saveName + "_gatewayList_" + props.id,
+        JSON.stringify(list)
+      );
     } catch (error) {
       console.log(error);
     }
   };
   const getMetric = async () => {
     try {
-      const resp = await axios.get(
-        `${REST_URL}/metriclist/${device.device_id}`
-      );
+      const resp = await axios.get(`${REST_URL}/metriclist/${device?.id}`);
       const { list } = resp.data;
       setMetricList(list);
+      localStorage.setItem(
+        props.saveName + "_metricList_" + props.id,
+        JSON.stringify(list)
+      );
     } catch (error) {
       console.log(error);
     }
@@ -84,6 +91,10 @@ function Graph(props) {
       const resp = await axios.get(`${REST_URL}/devicelist/${gateway}/`);
       const { list } = resp.data;
       setDeviceList(list);
+      localStorage.setItem(
+        props.saveName + "_deviceList_" + props.id,
+        JSON.stringify(list)
+      );
     } catch (error) {
       console.log(error);
     }
@@ -107,8 +118,8 @@ function Graph(props) {
     setToggleLegend(-1);
     setTable((prevState) => ({ ...prevState, data: {} }));
     try {
-      //getData();
-      //animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
+      getData();
+      animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.log(error);
     }
@@ -121,13 +132,13 @@ function Graph(props) {
 
   useEffect(() => {
     getDevice();
-    console.log("gateway changed")
+    console.log("gateway changed");
     // eslint-disable-next-line
   }, [gateway]);
 
   useEffect(() => {
     getMetric();
-    console.log("device changed")
+    console.log("device changed");
     // eslint-disable-next-line
   }, [device]);
 
@@ -151,7 +162,7 @@ function Graph(props) {
     setMetric(select[0]);
     localStorage.setItem(
       props.saveName + "_metric_" + props.id,
-      event.target.value
+      JSON.stringify(select[0])
     );
     // write(props.id, props.saveName + "_query_", event.target.value);
   };
@@ -162,8 +173,8 @@ function Graph(props) {
     });
     setDevice(select[0]);
     localStorage.setItem(
-      props.saveName + "_deviceID_" + props.id,
-      event.target.value
+      props.saveName + "_device_" + props.id,
+      JSON.stringify(select[0])
     );
     //  write(props.id, props.saveName + "_device_", event.target.value);
   };
@@ -179,12 +190,12 @@ function Graph(props) {
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
-    setMetric();
-    setDevice();
+    setMetric("");
+    setDevice("");
     setGateway(DEFAULT_GATEWAY);
     localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem(props.saveName + "_metric", DEFAULT_METRIC_ID);
-    localStorage.setItem(props.saveName + "_device", DEFAULT_DEVICE_ID);
+    localStorage.setItem(props.saveName + "_metric", '');
+    localStorage.setItem(props.saveName + "_device", '');
     localStorage.setItem(props.saveName + "_gateway", DEFAULT_GATEWAY);
   };
 
@@ -234,12 +245,12 @@ function Graph(props) {
               device={device}
               deviceList={deviceList}
             ></DeviceForm>
-            {/* <GraphForm onChange={handleGraphChange} graphType={graphType} /> */}
             <MetricForm
               onChange={handleMetricChange}
               metric={metric}
               metricList={metricList}
             />
+            {/* <GraphForm onChange={handleGraphChange} graphType={graphType} /> */}
           </div>
         </div>
         <div className="last-update">Last Updated: {table.lastUpdated}</div>
@@ -271,12 +282,12 @@ function Graph(props) {
               device={device}
               deviceList={deviceList}
             />
-            {/* <GraphForm onChange={handleGraphChange} graphType={graphType} /> */}
             <MetricForm
-            onChange={handleMetricChange}
-            metric={metric}
-            metricList={metricList}
-          />
+              onChange={handleMetricChange}
+              metric={metric}
+              metricList={metricList}
+            />
+            {/* <GraphForm onChange={handleGraphChange} graphType={graphType} /> */}
           </div>
         </div>
         <div className="dotwrapper">

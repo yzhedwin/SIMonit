@@ -6,12 +6,7 @@ import { Button, ButtonGroup } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import write from "../component/DBWrite";
-import {
-  DEFAULT_GRAPH_TYPE,
-  DEFAULT_DEVICE_ID,
-  DEFAULT_METRIC_ID,
-  DEFAULT_GATEWAY,
-} from "../constants";
+import { DEFAULT_GRAPH_TYPE, DEFAULT_GATEWAY } from "../constants";
 import { Main } from "../component/Drawer";
 import Graph from "../component/Graph";
 
@@ -41,11 +36,11 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 //TODO: Migrate to loading from cloud Database
 
 export default function Dashboard({ openDrawer }) {
-const storageLayout = getFromLS("dash_layouts") || {};
-const storageCount =  JSON.parse(localStorage.getItem("dash_count")) || 0;
-const storageItems = JSON.parse(localStorage.getItem("dash_items")) || {};
+  const storageLayout = getFromLS("dash_layouts") || {};
+  const storageCount = JSON.parse(localStorage.getItem("dash_count")) || 0;
+  const storageItems = JSON.parse(localStorage.getItem("dash_items")) || {};
 
-const [layouts, setLayouts] = useState(
+  const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
   );
   const [items, setItems] = useState(storageItems);
@@ -57,13 +52,22 @@ const [layouts, setLayouts] = useState(
   const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
     let storageMetric =
-      localStorage.getItem("dash_metric_" + item.i) || DEFAULT_METRIC_ID;
+      JSON.parse(localStorage.getItem("dash_metric_" + item.i)) || "";
     let storageGraph =
       localStorage.getItem("dash_graph_" + item.i) || DEFAULT_GRAPH_TYPE;
     let storageDevice =
-      localStorage.getItem("dash_device_" + item.i) || DEFAULT_DEVICE_ID;
+      JSON.parse(localStorage.getItem("dash_device_" + item.i)) || "";
     let storageGateway =
       localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY;
+    let storageGatewayList =
+      JSON.parse(localStorage.getItem("dash_gatewayList_" + item.i)) ||
+      DEFAULT_GATEWAY;
+    let storageDeviceList =
+      JSON.parse(localStorage.getItem("dash_deviceList_" + item.i)) ||
+      DEFAULT_GATEWAY;
+    let storageMetricList =
+      JSON.parse(localStorage.getItem("dash_metricList_" + item.i)) ||
+      DEFAULT_GATEWAY;
 
     //TODO: Add database query to load config
     return (
@@ -71,9 +75,12 @@ const [layouts, setLayouts] = useState(
         <Graph
           id={item.i}
           graphType={storageGraph}
-          metricID={storageMetric}
-          deviceID={storageDevice}
+          metric={storageMetric}
+          metricList={storageMetricList}
+          device={storageDevice}
+          deviceList={storageDeviceList}
           gateway={storageGateway}
+          gatewayList={storageGatewayList}
           toggleLegend={toggle}
           saveName={"dash"}
           handleRemoveItem={() => onRemoveItem(item.i)}
@@ -86,9 +93,9 @@ const [layouts, setLayouts] = useState(
   const onLayoutChange = (layout, layouts) => {
     saveToLS("dash_layouts", layouts);
     setLayouts(layouts);
-   // if (items !== 0) {
-   //   write("", "dash_layout", JSON.stringify(layouts));
-   // }
+    // if (items !== 0) {
+    //   write("", "dash_layout", JSON.stringify(layouts));
+    // }
   };
 
   const onBreakpointChange = (breakpoint, cols) => {
@@ -101,27 +108,30 @@ const [layouts, setLayouts] = useState(
     const newNum = num * -1;
     setToggleLegend(newNum);
   };
-//BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
+  //BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
   const onAddItem = () => {
-    console.log(items)
-    const newItems = ({...items, 
-      [count]: { // Add a new item. It must have a unique key!
-      i: count.toString(),
-      x: (count * 2) % (state.cols || 6),
-      y: count,
-      w: 2,
-      h: 20,
-      minH: 15,
-      minW: 2,
-    }})
-    setItems(newItems)
+    console.log(items);
+    const newItems = {
+      ...items,
+      [count]: {
+        // Add a new item. It must have a unique key!
+        i: count.toString(),
+        x: (count * 2) % (state.cols || 6),
+        y: count,
+        w: 2,
+        h: 20,
+        minH: 15,
+        minW: 2,
+      },
+    };
+    setItems(newItems);
     const newCount = count + 1;
     setCount(newCount);
     localStorage.setItem("dash_count", JSON.stringify(newCount));
     localStorage.setItem("dash_items", JSON.stringify(newItems));
   };
   const onRemoveItem = (i) => {
-    console.log(items)
+    console.log(items);
     console.log("removing", i);
     delete items[i];
     const newCount = count - 1;
@@ -129,7 +139,7 @@ const [layouts, setLayouts] = useState(
     setCount(newCount);
     localStorage.setItem("dash_count", JSON.stringify(newCount));
     localStorage.setItem("dash_items", JSON.stringify(items));
-  }
+  };
 
   const reset = () => {
     setLayouts({});

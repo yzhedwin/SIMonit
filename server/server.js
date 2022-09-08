@@ -282,7 +282,7 @@ app.get("/gatewaylist", (req, res) => {
   queryApi.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({gateway_id: o.gateway_id, edge_id: o.edge_id});
+      list.push({id: o.gateway_id, edge_id: o.edge_id});
     },
     error(error) {
       console.error(error);
@@ -301,7 +301,7 @@ app.get("/devicelist/:gateway/", (req, res) => {
   queryApi.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({gateway_id: o.gateway_id, device_id: o.device_id, name: o.name});
+      list.push({gateway_id: o.gateway_id, id: o.device_id, name: o.name});
     },
     error(error) {
       console.error(error);
@@ -320,7 +320,7 @@ app.get("/metriclist/:device", (req, res) => {
   queryApi.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({metric_id: o.id, device_id: o.device_id, name: o.name});
+      list.push({id: o.id, device_id: o.device_id, name: o.name});
     },
     error(error) {
       console.error(error);
@@ -618,7 +618,7 @@ c = from(bucket: bucket)
 
 out = join(tables: {key1: b, key2: c}, on: ["_measurement", "name", "unit"], method: "inner")
 |> filter(fn: (r) => r.edge_id == "${edge_id}")
-|> filter(fn: (r) => r.edge_id == "${device_id}")
+|> filter(fn: (r) => r.device_id == "${device_id}")
 |> filter(fn: (r) => r.metric_id == "${metric_id}") 
 out
 `;
