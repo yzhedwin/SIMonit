@@ -5,7 +5,7 @@ import "./Dashboard.css";
 import { Button, ButtonGroup } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import write from "../component/DBWrite";
+//import write from "../component/DBWrite";
 import { DEFAULT_GRAPH_TYPE, DEFAULT_GATEWAY } from "../constants";
 import { Main } from "../component/Drawer";
 import Graph from "../component/Graph";

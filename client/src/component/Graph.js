@@ -3,22 +3,20 @@ import AppsIcon from "@mui/icons-material/Apps";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import DataFormatter from "../config/configuration/DataFormatter";
+//import DataFormatter from "../config/configuration/DataFormatter";
 import { Button } from "@mui/material";
 import LayerConfig from "../config/configuration/LayerConfig";
 import {
   API_REFRESH_RATE,
-  DEFAULT_DEVICE_ID,
   DEFAULT_GATEWAY,
   DEFAULT_GRAPH_TYPE,
-  DEFAULT_METRIC_ID,
   REST_URL,
 } from "../constants";
 import DeviceForm from "../forms/DeviceForm";
 import GatewayForm from "../forms/GatewayForm";
 import GraphForm from "../forms/GraphForm";
 import MetricForm from "../forms/MetricForm";
-import { findStringColumns, uriSelector } from "../helpers";
+import { findStringColumns } from "../helpers";
 import "./Graph.css";
 
 function Graph(props) {
@@ -42,7 +40,6 @@ function Graph(props) {
       const resp = await axios.get(
         `${REST_URL}/table/${gateway}/${device?.id}/${metric?.id}`
       );
-      console.log(resp);
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
       if (results.table.length > 0) {
@@ -133,13 +130,11 @@ function Graph(props) {
 
   useEffect(() => {
     getDevice();
-    console.log("gateway changed");
     // eslint-disable-next-line
   }, [gateway]);
 
   useEffect(() => {
     getMetric();
-    console.log("device changed");
     // eslint-disable-next-line
   }, [device]);
 
@@ -157,7 +152,7 @@ function Graph(props) {
   };
 
   const handleMetricChange = (event) => {
-    const select = metricList.filter(function (m) {
+    const select = metricList.filter((m) => {
       return m.name === event.target.value;
     });
     setMetric(select[0]);
@@ -169,7 +164,7 @@ function Graph(props) {
   };
 
   const handleDeviceChange = (event) => {
-    const select = deviceList.filter(function (d) {
+    const select = deviceList.filter((d) => {
       return d.name === event.target.value;
     });
     setDevice(select[0]);
@@ -205,6 +200,7 @@ function Graph(props) {
     const config = {
       table: table.data,
       layers: [new LayerConfig(graphType, fill).getConfig()],
+      //todo:format with units
       //valueFormatters: new DataFormatter(metric).getFormat(),
       xScale: "linear",
       yScale: "linear",

@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import StaticPage from "./pages/StaticPage";
-import ResizablePage from "./pages/ResizablePage";
 import Dashboard from "./pages/Dashboard";
 import ToolboxLayout from "./pages/Toolbox";
 import { createTheme } from "@mui/material/styles";
@@ -57,7 +56,6 @@ class App extends React.Component {
               element={<Dashboard openDrawer={this.state.openDrawer} />}
             />
             <Route path="Toolbox" element={<ToolboxLayout />} />
-            {/* <Route path="ResizablePage" element={<ResizablePage  />} /> */}
             <Route path="StaticPage" element={<StaticPage />} />
             <Route path="StaticPage/:did" element={<StaticPage />} />
             <Route path="*" element={<NoPage />} />
