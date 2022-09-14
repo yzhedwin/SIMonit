@@ -33,12 +33,11 @@ function saveToLS(key, value) {
   }
 }
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-//TODO: Migrate to loading from cloud Database
 
 export default function Dashboard({ openDrawer }) {
   const storageLayout = getFromLS("dash_layouts") || {};
   const storageCount = JSON.parse(localStorage.getItem("dash_count")) || 0;
-  const storageItems = JSON.parse(localStorage.getItem("dash_items")) || {};
+  const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
 
   const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
@@ -110,30 +109,52 @@ export default function Dashboard({ openDrawer }) {
   };
   //BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
   const onAddItem = () => {
-    console.log(items);
-    const newItems = {
-      ...items,
-      [count]: {
+    let newItems;
+    let index = 0;
+    while(index < items.length) {
+      if(items[index].i === index.toString()) {
+        index++
+      //Add item at gap of array
+      } else {
+        newItems = {
+          i: index.toString(),
+          x: (index * 2) % (state.cols || 6),
+          y: index,
+          w: 2,
+          h: 20,
+          minH: 15,
+          minW: 2,
+        };
+        break;
+      }
+    }
+    //No gap found, add as per normal
+    if (index === items.length) {
+      newItems = {
         // Add a new item. It must have a unique key!
-        i: count.toString(),
-        x: (count * 2) % (state.cols || 6),
-        y: count,
+        i: index.toString(),
+        x: (index * 2) % (state.cols || 6),
+        y: index,
         w: 2,
         h: 20,
         minH: 15,
         minW: 2,
-      },
-    };
-    setItems(newItems);
-    const newCount = count + 1;
-    setCount(newCount);
-    localStorage.setItem("dash_count", JSON.stringify(newCount));
-    localStorage.setItem("dash_items", JSON.stringify(newItems));
+      };
+      items.push(newItems);
+      //Insert item at gap
+    } else {
+      items.splice(index, 0, newItems);
+    }
+    setItems(items);
+    setCount(items.length);
+    localStorage.setItem("dash_count", JSON.stringify(items.length));
+    localStorage.setItem("dash_items", JSON.stringify(items));
   };
   const onRemoveItem = (i) => {
     console.log(items);
     console.log("removing", i);
-    delete items[i];
+    items.splice(i, 1)
+    //delete items[i];
     const newCount = count - 1;
     setItems(items);
     setCount(newCount);
@@ -143,7 +164,7 @@ export default function Dashboard({ openDrawer }) {
 
   const reset = () => {
     setLayouts({});
-    setItems({});
+    setItems([]);
     setCount(0);
     localStorage.clear();
   };
