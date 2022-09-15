@@ -2,13 +2,15 @@ import cpuFormat from "../data/cpuFormat";
 import driveFormat from "../data/driveFormat";
 import loadFormat from "../data/loadFormat";
 import memFormat from "../data/memFormat";
+import metricFormat from "../data/metricFormat";
 import uptimeFormat from "../data/uptimeFormat";
 
 //TODO: Add data formatting depending on data type
 export default class DataFormatter {
-  constructor(dataType) {
+  constructor(dataType, unit) {
     this.state = {
       dataType,
+      unit,
     };
   }
 
@@ -29,5 +31,6 @@ export default class DataFormatter {
     if (this.state.dataType.indexOf("drive") !== -1) {
       return driveFormat;
     }
+    return metricFormat(this.state.unit);
   }
 }

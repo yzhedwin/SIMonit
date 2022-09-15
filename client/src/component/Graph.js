@@ -18,6 +18,7 @@ import GraphForm from "../forms/GraphForm";
 import MetricForm from "../forms/MetricForm";
 import { findStringColumns } from "../helpers";
 import "./Graph.css";
+import DataFormatter from "../config/configuration/DataFormatter";
 
 function Graph(props) {
   let animationFrameId = useRef(0);
@@ -197,11 +198,12 @@ function Graph(props) {
 
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
+    const { unit } = table.data.columns;
     const config = {
       table: table.data,
       layers: [new LayerConfig(graphType, fill).getConfig()],
       //todo:format with units
-      //valueFormatters: new DataFormatter(metric).getFormat(),
+      valueFormatters: new DataFormatter(metric.name, unit).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",

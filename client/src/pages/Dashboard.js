@@ -109,14 +109,14 @@ export default function Dashboard({ openDrawer }) {
   };
   //BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
   const onAddItem = () => {
-    let newItems;
+    let newItem;
     let index = 0;
     while(index < items.length) {
       if(items[index].i === index.toString()) {
         index++
-      //Add item at gap of array
+      //Set item at gap of array
       } else {
-        newItems = {
+        newItem = {
           i: index.toString(),
           x: (index * 2) % (state.cols || 6),
           y: index,
@@ -128,9 +128,9 @@ export default function Dashboard({ openDrawer }) {
         break;
       }
     }
-    //No gap found, add as per normal
+    //No gap found, add item as per normal
     if (index === items.length) {
-      newItems = {
+      newItem = {
         // Add a new item. It must have a unique key!
         i: index.toString(),
         x: (index * 2) % (state.cols || 6),
@@ -140,10 +140,10 @@ export default function Dashboard({ openDrawer }) {
         minH: 15,
         minW: 2,
       };
-      items.push(newItems);
+      items.push(newItem);
       //Insert item at gap
     } else {
-      items.splice(index, 0, newItems);
+      items.splice(index, 0, newItem);
     }
     setItems(items);
     setCount(items.length);
@@ -154,7 +154,6 @@ export default function Dashboard({ openDrawer }) {
     console.log(items);
     console.log("removing", i);
     items.splice(i, 1)
-    //delete items[i];
     const newCount = count - 1;
     setItems(items);
     setCount(newCount);
