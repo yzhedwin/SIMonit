@@ -23,6 +23,7 @@
 
 .forms {
   display: flex;
+  flex-grow: 1;
   justify-content: center;
 }
 
@@ -50,9 +51,9 @@
 
 .dotwrapper {
   display: flex;
+  flex-grow: 1;
   align-items: flex-end;
   justify-content: center;
-  margin-top: 125px;
 }
 
 .loading {
@@ -90,6 +91,7 @@
   animation-delay: 0.2s;
 }
 .reset-button {
+  flex-grow: 1;
   align-self: center;
   margin-top: 50px;
 }
