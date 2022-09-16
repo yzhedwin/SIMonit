@@ -151,9 +151,12 @@ export default function Dashboard({ openDrawer }) {
     localStorage.setItem("dash_items", JSON.stringify(items));
   };
   const onRemoveItem = (i) => {
-    console.log(items);
-    console.log("removing", i);
-    items.splice(i, 1)
+    console.log(items)
+    items.map(function(item, index) {
+      if(item.i === i.toString()) {
+        return items.splice(index, 1)
+      }
+    },)
     const newCount = count - 1;
     setItems(items);
     setCount(newCount);

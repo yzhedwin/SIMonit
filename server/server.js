@@ -286,10 +286,10 @@ app.get("/gatewaylist", (req, res) => {
     },
     error(error) {
       console.error(error);
-      console.log("\nFinished ERROR");
+      console.log("\nFinished fetching gatewaylist ERROR");
     },
     complete() {
-      console.log("\nFinished SUCCESS");
+      console.log("\nFinished fetching gatewaylist SUCCESS");
       res.end(JSON.stringify({ list }));
     },
   });
@@ -305,10 +305,10 @@ app.get("/devicelist/:gateway/", (req, res) => {
     },
     error(error) {
       console.error(error);
-      console.log("\nFinished ERROR");
+      console.log("\nFinished fetching devicelist ERROR");
     },
     complete() {
-      console.log("\nFinished SUCCESS");
+      console.log("\nFinished fetching devicelist  SUCCESS");
       res.end(JSON.stringify({ list }));
     },
   });
@@ -324,10 +324,10 @@ app.get("/metriclist/:device", (req, res) => {
     },
     error(error) {
       console.error(error);
-      console.log("\nFinished ERROR");
+      console.log("\nFinished fetching mettriclist ERROR");
     },
     complete() {
-      console.log("\nFinished SUCCESS");
+      console.log("\nFinished fetching mettriclist SUCCESS");
       res.end(JSON.stringify({ list }));
     },
   });
@@ -343,11 +343,11 @@ app.get("/table/:gateway/:device/:metric", (req, res) => {
       },
       error(error) {
         console.error(error);
-        console.log("\nFinished " + gateway + "  ERROR");
+        console.log(`\nFinished fetching ${gateway} ERROR`);
         res.end();
       },
       complete() {
-        console.log("\nFinished " + gateway + "  SUCCESS");
+        console.log(`\nFinished fetching ${gateway} SUCCESS`);
         res.end(JSON.stringify({ csv }));
       },
   });

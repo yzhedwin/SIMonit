@@ -12,5 +12,6 @@ export default function lineConfig(fill) {
     lineOpacity: 0.7,
     shadeOpacity: 0.3,
     hoverDimension: "auto",
+    mainColumnName: "last",
   };
 }

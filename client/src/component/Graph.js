@@ -202,7 +202,6 @@ function Graph(props) {
     const config = {
       table: table.data,
       layers: [new LayerConfig(graphType, fill).getConfig()],
-      //todo:format with units
       valueFormatters: new DataFormatter(metric.name, unit).getFormat(),
       xScale: "linear",
       yScale: "linear",
