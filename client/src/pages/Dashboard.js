@@ -152,11 +152,11 @@ export default function Dashboard({ openDrawer }) {
   };
   const onRemoveItem = (i) => {
     console.log(items)
-    items.map(function(item, index) {
+    items.forEach((item, index) => {
       if(item.i === i.toString()) {
-        return items.splice(index, 1)
+        items.splice(index, 1);
       }
-    },)
+    });
     const newCount = count - 1;
     setItems(items);
     setCount(newCount);
