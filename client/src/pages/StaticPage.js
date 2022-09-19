@@ -15,9 +15,9 @@ const ReactGridLayout = WidthProvider(RGL);
 function StaticPage() {
   const { did } = useParams();
   const [layouts, setLayouts] = useState({});
-  const items = 4;
+  const items = 3;
   const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
-  const graphType = ["band", "line", "line", "bar"];
+  const graphType = ["line", "line", "line", "bar"];
   const cpu = 0;
   const drive = '/';
 

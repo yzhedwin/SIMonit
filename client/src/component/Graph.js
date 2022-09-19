@@ -3,26 +3,22 @@ import AppsIcon from "@mui/icons-material/Apps";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import DataFormatter from "../config/configuration/DataFormatter";
+//import DataFormatter from "../config/configuration/DataFormatter";
+import { Button } from "@mui/material";
 import LayerConfig from "../config/configuration/LayerConfig";
 import {
   API_REFRESH_RATE,
-  DEFAULT_CPU,
-  DEFAULT_DEVICE,
-  DEFAULT_DRIVE,
+  DEFAULT_GATEWAY,
   DEFAULT_GRAPH_TYPE,
-  DEFAULT_QUERY_1,
   REST_URL,
 } from "../constants";
-import CPUForm from "../forms/CPUForm";
 import DeviceForm from "../forms/DeviceForm";
-import DrivesForm from "../forms/DrivesForm";
 import GatewayForm from "../forms/GatewayForm";
 import GraphForm from "../forms/GraphForm";
-import QueryForm from "../forms/QueryForm";
-import { findStringColumns, uriSelector } from "../helpers";
-import write from "./DBWrite";
+import MetricForm from "../forms/MetricForm";
+import { findStringColumns } from "../helpers";
 import "./Graph.css";
+import DataFormatter from "../config/configuration/DataFormatter";
 
 function Graph(props) {
   let animationFrameId = useRef(0);
@@ -31,20 +27,20 @@ function Graph(props) {
     data: {},
     lastUpdated: "",
   });
-  const [graphType, setGraphType] = useState(props.inputGraphType);
-  const [query, setQuery] = useState(props.inputQuery);
-  const [device, setDevice] = useState(props.inputDevice);
-  const [cpuID, setCPUID] = useState(props.inputCPUID);
-  const [drive, setDrive] = useState(props.inputDrive);
+  const [graphType, setGraphType] = useState(props.graphType);
+  const [metric, setMetric] = useState(props.metric);
+  const [device, setDevice] = useState(props.device);
+  const [gateway, setGateway] = useState(props.gateway);
   const [toggleLegend, setToggleLegend] = useState(1);
-  const [measurementList, setMeasurementList] = useState([]);
-  const [driveList, setDriveList] = useState([]);
-  const [cpuList, setCPUList] = useState([]);
+  const [gatewayList, setGatewayList] = useState(props.gatewayList);
+  const [deviceList, setDeviceList] = useState(props.deviceList);
+  const [metricList, setMetricList] = useState(props.metricList);
 
   const getData = async () => {
-    let uri = uriSelector(graphType, query, device, cpuID, drive);
     try {
-      const resp = await axios.get(REST_URL + uri);
+      const resp = await axios.get(
+        `${REST_URL}/table/${gateway}/${device?.id}/${metric?.id}`
+      );
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
       if (results.table.length > 0) {
@@ -62,45 +58,51 @@ function Graph(props) {
       console.log(error);
     }
   };
-  //Gateway SCM-001 -> Display as Edge ID for User
-  const getMeasurements = async () => {
+  //Gateway SCM-001 -> Display as Edge ID for User [ {id,name}, {id,name}]
+  const getGateway = async () => {
     try {
-      const resp = await axios.get(REST_URL + "/list/_measurement");
+      const resp = await axios.get(REST_URL + "/gatewaylist");
       const { list } = resp.data;
-      setMeasurementList(list);
+      setGatewayList(list);
+      localStorage.setItem(
+        props.saveName + "_gatewayList_" + props.id,
+        JSON.stringify(list)
+      );
     } catch (error) {
       console.log(error);
     }
   };
-  const getDrives = async () => {
+  const getMetric = async () => {
     try {
-      const resp = await axios.get(REST_URL + "/list/mount");
+      const resp = await axios.get(`${REST_URL}/metriclist/${device?.id}`);
       const { list } = resp.data;
-      setDriveList(list);
+      setMetricList(list);
+      localStorage.setItem(
+        props.saveName + "_metricList_" + props.id,
+        JSON.stringify(list)
+      );
     } catch (error) {
       console.log(error);
     }
   };
-  const getCPU = async () => {
+  const getDevice = async () => {
     try {
-      const resp = await axios.get(REST_URL + "/list/cpu");
+      const resp = await axios.get(`${REST_URL}/devicelist/${gateway}/`);
       const { list } = resp.data;
-      setCPUList(list);
+      setDeviceList(list);
+      localStorage.setItem(
+        props.saveName + "_deviceList_" + props.id,
+        JSON.stringify(list)
+      );
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     //Runs on the first render
     isMount.current = true;
-    /*
-    getGateway()
-    getDevice()
-    getMetric()
-    */
-    getMeasurements();   
-    getDrives();
-    getCPU();
+    getGateway();
     return () => {
       window.clearInterval(animationFrameId.current);
       setToggleLegend(-1);
@@ -125,7 +127,17 @@ function Graph(props) {
       setTable((prevState) => ({ ...prevState, data: {} }));
     };
     // eslint-disable-next-line
-  }, [graphType, query, device, cpuID, drive]);
+  }, [graphType, metric]);
+
+  useEffect(() => {
+    getDevice();
+    // eslint-disable-next-line
+  }, [gateway]);
+
+  useEffect(() => {
+    getMetric();
+    // eslint-disable-next-line
+  }, [device]);
 
   useEffect(() => {
     setToggleLegend(props.toggleLegend);
@@ -137,61 +149,60 @@ function Graph(props) {
       props.saveName + "_graph_" + props.id,
       event.target.value
     );
-   // write(props.id, props.saveName + "_graph_", event.target.value);
+    // write(props.id, props.saveName + "_graph_", event.target.value);
   };
 
-  const handleQueryChange = (event) => {
-    setQuery(event.target.value);
+  const handleMetricChange = (event) => {
+    const select = metricList.filter((m) => {
+      return m.name === event.target.value;
+    });
+    setMetric(select[0]);
     localStorage.setItem(
-      props.saveName + "_query_" + props.id,
-      event.target.value
+      props.saveName + "_metric_" + props.id,
+      JSON.stringify(select[0])
     );
-   // write(props.id, props.saveName + "_query_", event.target.value);
+    // write(props.id, props.saveName + "_query_", event.target.value);
   };
 
   const handleDeviceChange = (event) => {
-    setDevice(event.target.value);
+    const select = deviceList.filter((d) => {
+      return d.name === event.target.value;
+    });
+    setDevice(select[0]);
     localStorage.setItem(
       props.saveName + "_device_" + props.id,
-      event.target.value
+      JSON.stringify(select[0])
     );
-  //  write(props.id, props.saveName + "_device_", event.target.value);
+    //  write(props.id, props.saveName + "_device_", event.target.value);
   };
-  const handleCPUChange = (event) => {
-    setCPUID(event.target.value);
+
+  const handleGatewayChange = (event) => {
+    setGateway(event.target.value);
     localStorage.setItem(
-      props.saveName + "_cpu_" + props.id,
+      props.saveName + "_gateway_" + props.id,
       event.target.value
     );
-    //write(props.id, props.saveName + "_cpu_", event.target.value);
-  };
-  const handleDriveChange = (event) => {
-    setDrive(event.target.value);
-    localStorage.setItem(
-      props.saveName + "_drive_" + props.id,
-      event.target.value
-    );
-   // write(props.id, props.saveName + "_drive_", event.target.value);
+    // write(props.id, props.saveName + "_drive_", event.target.value);
   };
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
-    setQuery(DEFAULT_QUERY_1);
-    setDevice(DEFAULT_DEVICE);
-    setCPUID(DEFAULT_CPU);
+    setMetric("");
+    setDevice("");
+    setGateway(DEFAULT_GATEWAY);
     localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem(props.saveName + "_query", DEFAULT_QUERY_1);
-    localStorage.setItem(props.saveName + "_device", DEFAULT_DEVICE);
-    localStorage.setItem(props.saveName + "_cpu", DEFAULT_CPU);
-    localStorage.setItem(props.saveName + "_drive", DEFAULT_DRIVE);
+    localStorage.setItem(props.saveName + "_metric", "");
+    localStorage.setItem(props.saveName + "_device", "");
+    localStorage.setItem(props.saveName + "_gateway", DEFAULT_GATEWAY);
   };
 
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
+    const { unit } = table.data.columns;
     const config = {
       table: table.data,
       layers: [new LayerConfig(graphType, fill).getConfig()],
-      valueFormatters: new DataFormatter(query).getFormat(),
+      valueFormatters: new DataFormatter(metric.name, unit).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
@@ -222,26 +233,22 @@ function Graph(props) {
             <AppsIcon />
           </div>
           <div className="forms">
-            {/* <GatewayForm/> */}
+            <GatewayForm
+              onChange={handleGatewayChange}
+              gateway={gateway}
+              gatewayList={gatewayList}
+            />
             <DeviceForm
               onChange={handleDeviceChange}
               device={device}
-              measurementList={measurementList}
+              deviceList={deviceList}
+            ></DeviceForm>
+            <MetricForm
+              onChange={handleMetricChange}
+              metric={metric}
+              metricList={metricList}
             />
             <GraphForm onChange={handleGraphChange} graphType={graphType} />
-            <QueryForm onChange={handleQueryChange} query={query} />
-            <CPUForm
-              onChange={handleCPUChange}
-              query={query}
-              cpuID={cpuID}
-              cpuList={cpuList}
-            />
-            <DrivesForm
-              onChange={handleDriveChange}
-              query={query}
-              drive={drive}
-              driveList={driveList}
-            />
           </div>
         </div>
         <div className="last-update">Last Updated: {table.lastUpdated}</div>
@@ -254,16 +261,43 @@ function Graph(props) {
 
   const renderEmpty = () => {
     return (
-      <div className="loadcontainer">
-        <button onClick={() => reset()}>Reboot</button>
-        <div className="draghandle">
-          <AppsIcon />
+      <div className="graph-component">
+        <div className="topcontainer">
+          <div className="removebutton" onClick={props.handleRemoveItem}>
+            <DisabledByDefaultIcon color="error" />
+          </div>
+          <div className="draghandle">
+            <AppsIcon />
+          </div>
+          <div className="forms">
+            <GatewayForm
+              onChange={handleGatewayChange}
+              gateway={gateway}
+              gatewayList={gatewayList}
+            />
+            <DeviceForm
+              onChange={handleDeviceChange}
+              device={device}
+              deviceList={deviceList}
+            />
+            <MetricForm
+              onChange={handleMetricChange}
+              metric={metric}
+              metricList={metricList}
+            />
+            <GraphForm onChange={handleGraphChange} graphType={graphType} />
+          </div>
         </div>
         <div className="dotwrapper">
           <p className="loading">Loading</p>
           <div className="dot0" />
           <div className="dot1" />
           <div className="dot2" />
+        </div>
+        <div className="reset-button">
+          <Button variant="contained" color="primary" onClick={() => reset()}>
+            Reset
+          </Button>
         </div>
       </div>
     );

@@ -5,14 +5,8 @@ import "./Dashboard.css";
 import { Button, ButtonGroup } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import write from "../component/DBWrite";
-import {
-  DEFAULT_DEVICE,
-  DEFAULT_QUERY_1,
-  DEFAULT_GRAPH_TYPE,
-  DEFAULT_CPU,
-  DEFAULT_DRIVE,
-} from "../constants";
+//import write from "../component/DBWrite";
+import { DEFAULT_GRAPH_TYPE, DEFAULT_GATEWAY } from "../constants";
 import { Main } from "../component/Drawer";
 import Graph from "../component/Graph";
 
@@ -39,14 +33,13 @@ function saveToLS(key, value) {
   }
 }
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-//TODO: Migrate to loading from cloud Database
 
 export default function Dashboard({ openDrawer }) {
-const storageLayout = getFromLS("dash_layouts") || {};
-const storageCount =  JSON.parse(localStorage.getItem("dash_count")) || 0;
-const storageItems = JSON.parse(localStorage.getItem("dash_items")) || {};
+  const storageLayout = getFromLS("dash_layouts") || {};
+  const storageCount = JSON.parse(localStorage.getItem("dash_count")) || 0;
+  const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
 
-const [layouts, setLayouts] = useState(
+  const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
   );
   const [items, setItems] = useState(storageItems);
@@ -57,27 +50,36 @@ const [layouts, setLayouts] = useState(
   //use index to load config of graph
   const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
-    let storageQuery =
-      localStorage.getItem("dash_query_" + item.i) || DEFAULT_QUERY_1;
+    let storageMetric =
+      JSON.parse(localStorage.getItem("dash_metric_" + item.i)) || "";
     let storageGraph =
       localStorage.getItem("dash_graph_" + item.i) || DEFAULT_GRAPH_TYPE;
     let storageDevice =
-      localStorage.getItem("dash_device_" + item.i) || DEFAULT_DEVICE;
-    let storageCPU =
-      localStorage.getItem("dash_cpu_" + item.i) || DEFAULT_CPU;
-    let storageDrive =
-      localStorage.getItem("dash_drive_" + item.i) || DEFAULT_DRIVE;
+      JSON.parse(localStorage.getItem("dash_device_" + item.i)) || "";
+    let storageGateway =
+      localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY;
+    let storageGatewayList = JSON.parse(
+      localStorage.getItem("dash_gatewayList_" + item.i)
+    ) || [{}];
+    let storageDeviceList = JSON.parse(
+      localStorage.getItem("dash_deviceList_" + item.i)
+    ) || [{}];
+    let storageMetricList = JSON.parse(
+      localStorage.getItem("dash_metricList_" + item.i)
+    ) || [{}];
 
     //TODO: Add database query to load config
     return (
       <div key={item.i} data-grid={item} className="dashgrid">
         <Graph
           id={item.i}
-          inputGraphType={storageGraph}
-          inputQuery={storageQuery}
-          inputDevice={storageDevice}
-          inputCPUID={storageCPU}
-          inputDrive={storageDrive}
+          graphType={storageGraph}
+          metric={storageMetric}
+          metricList={storageMetricList}
+          device={storageDevice}
+          deviceList={storageDeviceList}
+          gateway={storageGateway}
+          gatewayList={storageGatewayList}
           toggleLegend={toggle}
           saveName={"dash"}
           handleRemoveItem={() => onRemoveItem(item.i)}
@@ -90,9 +92,9 @@ const [layouts, setLayouts] = useState(
   const onLayoutChange = (layout, layouts) => {
     saveToLS("dash_layouts", layouts);
     setLayouts(layouts);
-   // if (items !== 0) {
-   //   write("", "dash_layout", JSON.stringify(layouts));
-   // }
+    // if (items !== 0) {
+    //   write("", "dash_layout", JSON.stringify(layouts));
+    // }
   };
 
   const onBreakpointChange = (breakpoint, cols) => {
@@ -105,39 +107,66 @@ const [layouts, setLayouts] = useState(
     const newNum = num * -1;
     setToggleLegend(newNum);
   };
-//BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
+  //BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
   const onAddItem = () => {
-    console.log(items)
-    const newItems = ({...items, 
-      [count]: { // Add a new item. It must have a unique key!
-      i: count.toString(),
-      x: (count * 2) % (state.cols || 6),
-      y: count,
-      w: 2,
-      h: 20,
-      minH: 15,
-      minW: 2,
-    }})
-    setItems(newItems)
-    const newCount = count + 1;
-    setCount(newCount);
-    localStorage.setItem("dash_count", JSON.stringify(newCount));
-    localStorage.setItem("dash_items", JSON.stringify(newItems));
+    let newItem;
+    let index = 0;
+    while(index < items.length) {
+      if(items[index].i === index.toString()) {
+        index++
+      //Set item at gap of array
+      } else {
+        newItem = {
+          i: index.toString(),
+          x: (index * 2) % (state.cols || 6),
+          y: index,
+          w: 2,
+          h: 20,
+          minH: 15,
+          minW: 2,
+        };
+        break;
+      }
+    }
+    //No gap found, add item as per normal
+    if (index === items.length) {
+      newItem = {
+        // Add a new item. It must have a unique key!
+        i: index.toString(),
+        x: (index * 2) % (state.cols || 6),
+        y: index,
+        w: 2,
+        h: 20,
+        minH: 15,
+        minW: 2,
+      };
+      items.push(newItem);
+      //Insert item at gap
+    } else {
+      items.splice(index, 0, newItem);
+    }
+    setItems(items);
+    setCount(items.length);
+    localStorage.setItem("dash_count", JSON.stringify(items.length));
+    localStorage.setItem("dash_items", JSON.stringify(items));
   };
   const onRemoveItem = (i) => {
     console.log(items)
-    console.log("removing", i);
-    delete items[i];
+    items.forEach((item, index) => {
+      if(item.i === i.toString()) {
+        items.splice(index, 1);
+      }
+    });
     const newCount = count - 1;
     setItems(items);
     setCount(newCount);
     localStorage.setItem("dash_count", JSON.stringify(newCount));
     localStorage.setItem("dash_items", JSON.stringify(items));
-  }
+  };
 
   const reset = () => {
     setLayouts({});
-    setItems({});
+    setItems([]);
     setCount(0);
     localStorage.clear();
   };

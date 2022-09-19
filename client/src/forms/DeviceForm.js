@@ -7,7 +7,7 @@ Get all devices and list in menuitem
 */
 
 const DeviceForm = (props) => {
-  const items = props.measurementList;
+  const items = props.deviceList;
   return (
     <>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
@@ -15,14 +15,18 @@ const DeviceForm = (props) => {
         <Select
           labelId="select"
           id="select"
-          value={props.device}
+          value={props.device.name}
           onChange={props.onChange}
           autoWidth
           size="small"
           label="Device"
         >
           {items.map((item) => {
-            return <MenuItem key={items.indexOf(item)} value={item}>{item}</MenuItem>;
+            return (
+              <MenuItem key={items.indexOf(item)} value={item.name}>
+                {item.name}
+              </MenuItem>
+            );
           })}
         </Select>
       </FormControl>
