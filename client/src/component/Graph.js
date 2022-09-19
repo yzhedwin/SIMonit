@@ -58,7 +58,7 @@ function Graph(props) {
       console.log(error);
     }
   };
-  //Gateway SCM-001 -> Display as Edge ID for User [ {id,name}, {id,name}]
+
   const getGateway = async () => {
     try {
       const resp = await axios.get(REST_URL + "/gatewaylist");
@@ -77,6 +77,8 @@ function Graph(props) {
       const resp = await axios.get(`${REST_URL}/metriclist/${device?.id}`);
       const { list } = resp.data;
       setMetricList(list);
+      setMetric(list[0])
+      localStorage.setItem(props.saveName + "_metric_" + props.id, JSON.stringify(list[0]));
       localStorage.setItem(
         props.saveName + "_metricList_" + props.id,
         JSON.stringify(list)
@@ -90,6 +92,8 @@ function Graph(props) {
       const resp = await axios.get(`${REST_URL}/devicelist/${gateway}/`);
       const { list } = resp.data;
       setDeviceList(list);
+      setDevice(list[0]);
+      localStorage.setItem(props.saveName + "_device_" + props.id, JSON.stringify(list[0]));
       localStorage.setItem(
         props.saveName + "_deviceList_" + props.id,
         JSON.stringify(list)
@@ -130,11 +134,16 @@ function Graph(props) {
   }, [graphType, metric]);
 
   useEffect(() => {
+    //Reset data
+    window.clearInterval(animationFrameId.current);
+    setTable((prevState) => ({ ...prevState, data: {} }));
     getDevice();
     // eslint-disable-next-line
   }, [gateway]);
 
   useEffect(() => {
+    window.clearInterval(animationFrameId.current);
+    setTable((prevState) => ({ ...prevState, data: {} }));
     getMetric();
     // eslint-disable-next-line
   }, [device]);
@@ -187,13 +196,10 @@ function Graph(props) {
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
-    setMetric("");
-    setDevice("");
     setGateway(DEFAULT_GATEWAY);
+    getDevice();
     localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem(props.saveName + "_metric", "");
-    localStorage.setItem(props.saveName + "_device", "");
-    localStorage.setItem(props.saveName + "_gateway", DEFAULT_GATEWAY);
+    localStorage.setItem(props.saveName + "_gateway_" + props.id, DEFAULT_GATEWAY);
   };
 
   const renderPlot = () => {

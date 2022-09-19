@@ -324,10 +324,10 @@ app.get("/metriclist/:device", (req, res) => {
     },
     error(error) {
       console.error(error);
-      console.log("\nFinished fetching mettriclist ERROR");
+      console.log("\nFinished fetching metriclist ERROR");
     },
     complete() {
-      console.log("\nFinished fetching mettriclist SUCCESS");
+      console.log("\nFinished fetching metriclist SUCCESS");
       res.end(JSON.stringify({ list }));
     },
   });

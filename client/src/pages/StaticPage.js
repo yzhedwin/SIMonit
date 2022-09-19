@@ -17,7 +17,7 @@ function StaticPage() {
   const [layouts, setLayouts] = useState({});
   const items = 3;
   const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
-  const graphType = ["line", "line", "line", "bar"];
+  const graphType = ["band", "line", "line", "bar"];
   const cpu = 0;
   const drive = '/';
 
