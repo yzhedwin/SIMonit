@@ -8,27 +8,45 @@ const { InfluxDB, flux } = require("@influxdata/influxdb-client");
 const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
 
 // vars to connect to bucket in influxdb
-const baseURL = process.env.INFLUX_URL;
-const influxToken = process.env.INFLUX_TOKEN;
-const staticBucket = process.env.INFLUX_BUCKET;
-const orgID = process.env.ORG_ID;
+const staticURL = process.env.STATIC_INFLUX_URL;
+const staticInfluxToken = process.env.STATIC_INFLUX_TOKEN;
+const staticBucket = process.env.STATIC_INFLUX_BUCKET;
+const staticOrgID = process.env.STATIC_ORG_ID;
+
+const dashURL = process.env.DASH_INFLUX_URL;
+const dashInfluxToken = process.env.DASH_INFLUX_TOKEN;
+const dashOrgID = process.env.DASH_ORG_ID;
+
 const user = process.env.MYSQL_USER;
 const pass = process.env.MYSQL_PASS;
 const url = process.env.DB_URL;
 const db = process.env.DB_NAME;
 
 // connect to influxdb
-const influxDB = new InfluxDB({ url: baseURL, token: influxToken });
-const queryApi = influxDB.getQueryApi(orgID);
-const bucketsAPI = new BucketsAPI(influxDB);
+const dashInfluxDB = new InfluxDB({ url: dashURL, token: dashInfluxToken });
+const dashQueryAPI = dashInfluxDB.getQueryApi(dashOrgID);
+const dashBucketsAPI = new BucketsAPI(dashInfluxDB);
 
-const influxProxy = axios.create({
-  baseURL,
+const staticInfluxDB = new InfluxDB({ url: staticURL, token: staticInfluxToken });
+const staticQueryAPI = staticInfluxDB.getQueryApi(staticOrgID);
+const staticBucketsAPI = new BucketsAPI(staticInfluxDB);
+
+const staticInfluxProxy = axios.create({
+  staticURL,
   headers: {
-    Authorization: `Token ${influxToken}`,
+    Authorization: `Token ${staticInfluxToken}`,
     "Content-Type": "application/json",
   },
 });
+
+const dashInfluxProxy = axios.create({
+  dashURL,
+  headers: {
+    Authorization: `Token ${dashInfluxToken}`,
+    "Content-Type": "application/json",
+  },
+});
+
 // start the server
 const app = express();
 app.use(cors());
@@ -38,32 +56,32 @@ const port = 3001;
 app.get("/buckets", (req, res) => {
   getBuckets().then((b) => res.end(JSON.stringify(b)));
 });
-app.get("/influx/:bucket/:tag", (req, res) => {
-  const { tag, bucket } = req.params;
-  let list = [];
-  let fluxQuery = flux`` + GET_LIST(bucket, tag);
-  queryApi.queryRows(fluxQuery, {
-    next(row, tableMeta) {
-      const o = tableMeta.toObject(row);
-      list.push(o._value);
-    },
-    error(error) {
-      console.error(error);
-      console.log("\nFinished ERROR");
-    },
-    complete() {
-      console.log("\nFinished SUCCESS");
-      res.end(JSON.stringify({ list }));
-    },
-  });
-});
+// app.get("/influx/:bucket/:tag", (req, res) => {
+//   const { tag, bucket } = req.params;
+//   let list = [];
+//   let fluxQuery = flux`` + GET_LIST(bucket, tag);
+//   staticQueryAPI.queryRows(fluxQuery, {
+//     next(row, tableMeta) {
+//       const o = tableMeta.toObject(row);
+//       list.push(o._value);
+//     },
+//     error(error) {
+//       console.error(error);
+//       console.log("\nFinished ERROR");
+//     },
+//     complete() {
+//       console.log("\nFinished SUCCESS");
+//       res.end(JSON.stringify({ list }));
+//     },
+//   });
+// });
 
 app.get("/drive/:did", (req, res) => {
   const { did } = req.params;
   const mount = req.query.mount;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_DRIVE(staticBucket, did, mount);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -84,7 +102,7 @@ app.get("/drive-band/:did", (req, res) => {
   const mount = req.query.mount;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_DRIVE_BAND(staticBucket, did, mount);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -104,7 +122,7 @@ app.get("/memory/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_MEMORY(staticBucket, did);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -123,7 +141,7 @@ app.get("/memory-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_MEMORY_BAND(staticBucket, did);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -142,7 +160,7 @@ app.get("/load/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_LOAD(staticBucket, did);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -162,7 +180,7 @@ app.get("/load-band/:did", (req, res) => {
   const { did } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_LOAD_BAND(staticBucket, did);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -182,7 +200,7 @@ app.get("/cpu/:did/:cpuID", (req, res) => {
   const { did, cpuID } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_CPU(staticBucket, did, cpuID);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -201,7 +219,7 @@ app.get("/cpu-band/:did/:cpuID", (req, res) => {
   const { did, cpuID } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_CPU_BAND(staticBucket, did, cpuID);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -221,7 +239,7 @@ app.get("/uptime/:did/", (req, res) => {
   const { did } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_UPTIME(staticBucket, did);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -241,7 +259,7 @@ app.get("/uptime-band/:did/", (req, res) => {
   const { did } = req.params;
   let csv = "";
   let fluxQuery = flux`` + FLUX_QUERY_UPTIME_BAND(staticBucket, did);
-  queryApi.queryLines(fluxQuery, {
+  staticQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -261,7 +279,7 @@ app.get("/influxsql/:bucket/:measurement", (req, res) => {
   const { bucket, measurement } = req.params;
   let csv = "";
   let fluxQuery = flux`` + INFLUX_MYSQL_QUERY(bucket, measurement);
-  queryApi.queryLines(fluxQuery, {
+  dashQueryAPI.queryLines(fluxQuery, {
     next(line) {
       csv = `${csv}${line}\n`;
     },
@@ -279,7 +297,7 @@ app.get("/influxsql/:bucket/:measurement", (req, res) => {
 app.get("/gatewaylist", (req, res) => {
   let list = [];
   let fluxQuery = flux`` + GET_GATEWAY_LIST();
-  queryApi.queryRows(fluxQuery, {
+  dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
       list.push({id: o.gateway_id, edge_id: o.edge_id});
@@ -298,7 +316,7 @@ app.get("/devicelist/:gateway/", (req, res) => {
   const {gateway} = req.params;
   let list = [];
   let fluxQuery = flux`` + GET_DEVICE_LIST(gateway);
-  queryApi.queryRows(fluxQuery, {
+  dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
       list.push({gateway_id: o.gateway_id, id: o.device_id, name: o.name});
@@ -317,7 +335,7 @@ app.get("/metriclist/:device", (req, res) => {
   const {device} = req.params;
   let list = [];
   let fluxQuery = flux`` + GET_METRIC_LIST(device);
-  queryApi.queryRows(fluxQuery, {
+  dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
       list.push({id: o.id, device_id: o.device_id, name: o.name});
@@ -337,7 +355,7 @@ app.get("/table/:gateway/:device/:metric", (req, res) => {
   const { gateway, device, metric } = req.params;
   let csv = "";
   let fluxQuery = flux`` + GET_TABLE(gateway, device, metric);
-    queryApi.queryLines(fluxQuery, {
+  dashQueryAPI.queryLines(fluxQuery, {
       next(line) {
         csv = `${csv}${line}\n`;
       },
@@ -384,7 +402,7 @@ app.listen(port, () => {
 });
 
 async function getBuckets() {
-  return await bucketsAPI.getBuckets({ orgID });
+  return await staticBucketsAPI.getBuckets({ staticOrgID });
 }
 
 /* Queries */
@@ -401,43 +419,29 @@ const FLUX_QUERY_MEMORY_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name: "min")
+
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
-|> yield(name: "min")`;
+|> yield(name: "max")`;
 
 const FLUX_QUERY_LOAD_BAND = (bucket, did) =>
   `from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name: "min")
+
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
 const FLUX_QUERY_LOAD = (bucket, did) =>
@@ -454,24 +458,15 @@ const FLUX_QUERY_CPU_BAND = (bucket, did, cpuID) =>
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["cpu"] == "${cpuID}")
 |> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+
+|> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["cpu"] == "${cpuID}")
-|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name: "min")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["cpu"] == "${cpuID}")
-|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")`;
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+|> yield(name: "max")`;
 
 const FLUX_QUERY_CPU = (bucket, did, cpuID) =>
   `from(bucket: "${bucket}")
@@ -487,22 +482,15 @@ const FLUX_QUERY_UPTIME_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "uptime")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "max")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "uptime")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
+|> yield(name: "mean")
+
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["_field"] == "uptime")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "mean")`;
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+|> yield(name: "max")`;
 
 const FLUX_QUERY_UPTIME = (bucket, did) =>
   `from(bucket: "${bucket}")
@@ -519,20 +507,15 @@ const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
 |> filter(fn: (r) => r["mount"] == "${mount}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "min")
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["mount"] == "${mount}")
-|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+|> yield(name: "last")
+
+|> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
-from(bucket: "${bucket}")
-|> range(start: -60m)
-|> filter(fn: (r) => r["_measurement"] == "${did}")
-|> filter(fn: (r) => r["mount"] == "${mount}")
-|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
+
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name: "min")
+
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
 const FLUX_QUERY_DRIVE = (bucket, did, mount) =>

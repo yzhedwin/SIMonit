@@ -8,7 +8,7 @@ const metricFormat = (unit) => {
     }),
     _value: (val) =>
       typeof val === "number"
-        ? `${val}${unit.data[0]}`
+        ? `${val.toFixed((1))}${unit.data[0]}`
         : val,
   };
 };

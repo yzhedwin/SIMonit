@@ -5,6 +5,7 @@ import RGL, { WidthProvider } from "react-grid-layout";
 import _ from "lodash";
 import {
   DEFAULT_DEVICE,
+  DEFAULT_DRIVE,
   DEFAULT_QUERY_1,
   DEFAULT_QUERY_2,
   DEFAULT_QUERY_3,
@@ -15,15 +16,16 @@ const ReactGridLayout = WidthProvider(RGL);
 function StaticPage() {
   const { did } = useParams();
   const [layouts, setLayouts] = useState({});
-  const items = 3;
+  const items = 4;
   const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
   const graphType = ["line", "line", "line", "bar"];
   const cpu = 0;
-  const drive = '/';
+  const drive = DEFAULT_DRIVE;
 
   const onLayoutChange = (layout, layouts) => {
     setLayouts(layouts);
   };
+
   let generateDOM = () => {
     return _.map(_.range(items), function (i) {
       return (
