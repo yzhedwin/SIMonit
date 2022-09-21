@@ -15,6 +15,7 @@ const staticBucket = process.env.STATIC_INFLUX_BUCKET;
 const staticOrgID = process.env.STATIC_ORG_ID;
 
 const dashURL = process.env.DASH_INFLUX_URL;
+const dashBucket = process.env.DASH_INFLUX_BUCKET;
 const dashInfluxToken = process.env.DASH_INFLUX_TOKEN;
 const dashOrgID = process.env.DASH_ORG_ID;
 
@@ -420,13 +421,20 @@ const FLUX_QUERY_MEMORY_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -435,13 +443,20 @@ const FLUX_QUERY_LOAD_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -459,13 +474,22 @@ const FLUX_QUERY_CPU_BAND = (bucket, did, cpuID) =>
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["cpu"] == "${cpuID}")
 |> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -483,13 +507,20 @@ const FLUX_QUERY_UPTIME_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "uptime")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -502,20 +533,26 @@ const FLUX_QUERY_UPTIME = (bucket, did) =>
 |> yield(name: "last")`;
 
 const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
-  `from(bucket: "${bucket}")
+  `
+from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["mount"] == "${mount}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
-
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
-
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -570,13 +607,26 @@ const GET_LIST = (bucket, tag) =>
 
 const GET_TABLE = (gateway, metric) =>
 `
-bucket = "SPD"
-c = from(bucket: bucket)
+from(bucket: "${dashBucket}")
 |> range(start: -5m)
 |> filter(fn: (r) => r._measurement == "${gateway}")
 |> filter(fn: (r) => r.name == "${metric}") 
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name: "min")
+
+from(bucket: "${dashBucket}")
+|> range(start: -5m)
+|> filter(fn: (r) => r._measurement == "${gateway}")
+|> filter(fn: (r) => r.name == "${metric}") 
+|> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
+|> yield(name: "mean")
+
+from(bucket: "${dashBucket}")
+|> range(start: -5m)
+|> filter(fn: (r) => r._measurement == "${gateway}")
+|> filter(fn: (r) => r.name == "${metric}") 
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+|> yield(name: "max")
 `;
 
 const GET_GATEWAY_LIST = () => 
