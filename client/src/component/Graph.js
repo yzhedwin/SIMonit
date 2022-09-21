@@ -100,7 +100,6 @@ function Graph(props) {
   };
 
   useEffect(() => {
-    //Runs on the first render
     isMount.current = true;
     try {
       getGateway();
@@ -119,33 +118,24 @@ function Graph(props) {
 
   useEffect(() => {
     //reset table
-    window.clearInterval(animationFrameId.current);
     setToggleLegend(-1);
     setTable((prevState) => ({ ...prevState, data: {} }));
     try {
+      window.clearInterval(animationFrameId.current);
       getData();
       animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.log(error);
     }
-    return () => {
-      window.clearInterval(animationFrameId.current);
-      setTable((prevState) => ({ ...prevState, data: {} }));
-    };
     // eslint-disable-next-line
   }, [graphType, metric]);
 
   useEffect(() => {
-    //Reset data
-    window.clearInterval(animationFrameId.current);
-    setTable((prevState) => ({ ...prevState, data: {} }));
     getDevice();
     // eslint-disable-next-line
   }, [gateway]);
 
   useEffect(() => {
-    window.clearInterval(animationFrameId.current);
-    setTable((prevState) => ({ ...prevState, data: {} }));
     getMetric();
     // eslint-disable-next-line
   }, [device]);
