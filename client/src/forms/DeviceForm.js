@@ -15,7 +15,7 @@ const DeviceForm = (props) => {
         <Select
           labelId="select"
           id="select"
-          value={props.device.name}
+          value={props.device.name || items[0].name}
           onChange={props.onChange}
           autoWidth
           size="small"

@@ -372,7 +372,6 @@ app.get("/table/:gateway/:device/:metric", (req, res) => {
   });
 });
 
-
 // app.get('/uptime/:did', (req, res) => {
 //   const { did } = req.params;
 //   let apiQuery = flux`` + FLUX_QUERY_UPTIME(bucket, did);
@@ -445,6 +444,7 @@ const FLUX_QUERY_LOAD_BAND = (bucket, did) =>
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
+
 const FLUX_QUERY_LOAD = (bucket, did) =>
   `from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -462,10 +462,8 @@ const FLUX_QUERY_CPU_BAND = (bucket, did, cpuID) =>
 
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
-
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
-
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -507,8 +505,6 @@ const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["mount"] == "${mount}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")
 
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
@@ -604,9 +600,18 @@ out = join(tables: {key1: b, key2: c}, on: ["_measurement", "name", "unit"], met
 |> filter(fn: (r) => r.edge_id == "${edge_id}")
 |> filter(fn: (r) => r.device_id == "${device_id}")
 |> filter(fn: (r) => r.metric_id == "${metric_id}") 
+
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")
-out
+
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+|> yield(name:"max")
+
+|> aggregateWindow(every: 15s, fn: min, createEmpty: false)
+|> yield(name:"min")
+
+|> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
+|> yield(name:"mean")
 `;
 
 const GET_GATEWAY_LIST = () => 

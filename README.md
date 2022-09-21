@@ -1,6 +1,6 @@
 # App-Girrafe
 
-This is a project built using ReactJS and Giraffe Library integrated with InfluxDB.
+This is a project built using React and Giraffe Library integrated with InfluxDB and Express.
 
 ## Objective
 Visualise data using different kinds of plots offered by Giraffe library. Users will be able to 
