@@ -301,7 +301,7 @@ app.get("/gatewaylist", (req, res) => {
   dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({id: o.gateway_id, edge_id: o.edge_id});
+      list.push({id: o.gateway_id, edge_id: o.edge_id, _measurement: o._measurement});
     },
     error(error) {
       console.error(error);
@@ -352,10 +352,10 @@ app.get("/metriclist/:device", (req, res) => {
   });
 });
 
-app.get("/table/:gateway/:device/:metric", (req, res) => {
-  const { gateway, device, metric } = req.params;
+app.get("/table/:gateway/:metric", (req, res) => {
+  const { gateway, metric } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + GET_TABLE(gateway, device, metric);
+  let fluxQuery = flux`` + GET_TABLE(gateway, metric);
   dashQueryAPI.queryLines(fluxQuery, {
       next(line) {
         csv = `${csv}${line}\n`;
@@ -568,45 +568,15 @@ const GET_LIST = (bucket, tag) =>
   schema.tagValues(bucket: "${bucket}", tag: "${tag}")
 `;
 
-const GET_TABLE = (edge_id, device_id, metric_id) =>
+const GET_TABLE = (gateway, metric) =>
 `
-import "system"
-import "influxdata/influxdb/secrets"
-import "sql"
-
 bucket = "SPD"
-
-gateway = sql.from(
-     driverName: "mysql",
-     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-     query: "SELECT LOWER(name) as _measurement, id as gateway_id, edge_id from Gateway",
-)
-
-device = sql.from(
-     driverName: "mysql",
-     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-     query: "SELECT id as device_id, gateway_id from Device",
-)
-metric = sql.from(
-     driverName: "mysql",
-     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-     query: "SELECT name, id as metric_id, device_id, uom as unit from Metric",
-)
-a = join(tables: {key1: gateway, key2: device}, on: ["gateway_id"], method: "inner")
-b = join(tables: {key1: metric, key2: a}, on: ["device_id"], method: "inner")
-|> map(fn: (r) => ({ r with unit: string(v: r.unit), device_id: string(v: r.device_id), gateway_id: string(v: r.gateway_id), metric_id: string(v: r.metric_id) }))
-
 c = from(bucket: bucket)
 |> range(start: -5m)
-|> group()
-
-out = join(tables: {key1: b, key2: c}, on: ["_measurement", "name", "unit"], method: "inner")
-|> filter(fn: (r) => r.edge_id == "${edge_id}")
-|> filter(fn: (r) => r.device_id == "${device_id}")
-|> filter(fn: (r) => r.metric_id == "${metric_id}") 
+|> filter(fn: (r) => r._measurement == "${gateway}")
+|> filter(fn: (r) => r.name == "${metric}") 
 |> aggregateWindow(every: 15s, fn: last, createEmpty: false)
 |> yield(name: "last")
-out
 `;
 
 const GET_GATEWAY_LIST = () => 
@@ -617,26 +587,21 @@ import "sql"
 list = sql.from(
   driverName: "mysql",
   dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT edge_id, id as gateway_id from Gateway",
+  query: "SELECT LOWER(name) as _measurement, edge_id, id as gateway_id from Gateway",
 )
 list`;
 
-const GET_DEVICE_LIST = (gateway) => 
+const GET_DEVICE_LIST = (gateway_id) => 
 `
 import "system"
 import "sql"
 
-a = sql.from(
-  driverName: "mysql",
-  dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT id as gateway_id from Gateway where edge_id = '${gateway}'",
-)
 b = sql.from(
   driverName: "mysql",
   dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT id as device_id, gateway_id, name from Device",
+  query: "SELECT id as device_id, gateway_id, name from Device where gateway_id = '${gateway_id}'",
 )
-join(tables: {key1: a, key2: b}, on: ["gateway_id"], method: "inner")
+b
 `;
 
 const GET_METRIC_LIST = (device) => 
