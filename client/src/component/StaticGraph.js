@@ -54,13 +54,15 @@ export default function StaticGraph({
   }, []);
 
   function checkFills(fill) {
-    if (graphType !== "band") {
-      return fill !== "topic" && fill !== "result";
+    if (graphType === "line") {
+      return fill !== "topic";
     }
     return fill !== "topic";
   }
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
+    //filter data for different graph type
+   // console.log(table.data.columns.result.data.filter((data) => {return data === "last"}))
     const config = {
       table: table.data,
       layers: [new LayerConfig(graphType, fill.filter(checkFills)).getConfig()],

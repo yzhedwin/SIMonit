@@ -1,0 +1,13 @@
+insight.thingsplus.io:3004 {
+        reverse_proxy localhost:3001
+}
+
+insight.thingsplus.io:3003 {
+        reverse_proxy 13.229.70.133:8086
+}
+
+insight.thingsplus.io:3002 {
+        reverse_proxy 13.229.145.161:8086
+}
+
+

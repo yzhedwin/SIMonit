@@ -470,6 +470,7 @@ from(bucket: "${bucket}")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
+
 const FLUX_QUERY_LOAD = (bucket, did) =>
   `from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -551,6 +552,7 @@ from(bucket: "${bucket}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
+
 from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
@@ -558,6 +560,7 @@ from(bucket: "${bucket}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
+
 from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
@@ -616,7 +619,7 @@ const GET_LIST = (bucket, tag) =>
 `;
 
 const GET_TABLE = (gateway, metric) =>
-  `
+`
 from(bucket: "${dashBucket}")
 |> range(start: -5m)
 |> filter(fn: (r) => r._measurement == "${gateway}")

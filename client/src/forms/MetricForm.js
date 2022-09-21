@@ -7,7 +7,6 @@ Get all devices and list in menuitem
 */
 
 const MetricForm = (props) => {
-  if (props.metricList.length > 1) {
     const items = props.metricList;
     return (
       <>
@@ -33,7 +32,5 @@ const MetricForm = (props) => {
         </FormControl>
       </>
     );
-  }
-  return null;
 };
 export default MetricForm;
