@@ -6,7 +6,7 @@ const cors = require("cors");
 const axios = require("axios");
 const { InfluxDB, flux } = require("@influxdata/influxdb-client");
 const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
-const timeout = 20000 // timeout for ping
+const timeout = 20000; // timeout for ping
 
 // vars to connect to bucket in influxdb
 const staticURL = process.env.STATIC_INFLUX_URL;
@@ -15,6 +15,7 @@ const staticBucket = process.env.STATIC_INFLUX_BUCKET;
 const staticOrgID = process.env.STATIC_ORG_ID;
 
 const dashURL = process.env.DASH_INFLUX_URL;
+const dashBucket = process.env.DASH_INFLUX_BUCKET;
 const dashInfluxToken = process.env.DASH_INFLUX_TOKEN;
 const dashOrgID = process.env.DASH_ORG_ID;
 
@@ -24,11 +25,18 @@ const url = process.env.DB_URL;
 const db = process.env.DB_NAME;
 
 // connect to influxdb
-const dashInfluxDB = new InfluxDB({ url: dashURL, token: dashInfluxToken, timeout: timeout });
+const dashInfluxDB = new InfluxDB({
+  url: dashURL,
+  token: dashInfluxToken,
+  timeout: timeout,
+});
 const dashQueryAPI = dashInfluxDB.getQueryApi(dashOrgID);
 const dashBucketsAPI = new BucketsAPI(dashInfluxDB);
 
-const staticInfluxDB = new InfluxDB({ url: staticURL, token: staticInfluxToken });
+const staticInfluxDB = new InfluxDB({
+  url: staticURL,
+  token: staticInfluxToken,
+});
 const staticQueryAPI = staticInfluxDB.getQueryApi(staticOrgID);
 const staticBucketsAPI = new BucketsAPI(staticInfluxDB);
 
@@ -301,7 +309,11 @@ app.get("/gatewaylist", (req, res) => {
   dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({id: o.gateway_id, edge_id: o.edge_id});
+      list.push({
+        id: o.gateway_id,
+        edge_id: o.edge_id,
+        _measurement: o._measurement,
+      });
     },
     error(error) {
       console.error(error);
@@ -314,13 +326,13 @@ app.get("/gatewaylist", (req, res) => {
   });
 });
 app.get("/devicelist/:gateway/", (req, res) => {
-  const {gateway} = req.params;
+  const { gateway } = req.params;
   let list = [];
   let fluxQuery = flux`` + GET_DEVICE_LIST(gateway);
   dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({gateway_id: o.gateway_id, id: o.device_id, name: o.name});
+      list.push({ gateway_id: o.gateway_id, id: o.device_id, name: o.name });
     },
     error(error) {
       console.error(error);
@@ -333,13 +345,13 @@ app.get("/devicelist/:gateway/", (req, res) => {
   });
 });
 app.get("/metriclist/:device", (req, res) => {
-  const {device} = req.params;
+  const { device } = req.params;
   let list = [];
   let fluxQuery = flux`` + GET_METRIC_LIST(device);
   dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({id: o.id, device_id: o.device_id, name: o.name});
+      list.push({ id: o.id, device_id: o.device_id, name: o.name });
     },
     error(error) {
       console.error(error);
@@ -352,23 +364,23 @@ app.get("/metriclist/:device", (req, res) => {
   });
 });
 
-app.get("/table/:gateway/:device/:metric", (req, res) => {
-  const { gateway, device, metric } = req.params;
+app.get("/table/:gateway/:metric", (req, res) => {
+  const { gateway, metric } = req.params;
   let csv = "";
-  let fluxQuery = flux`` + GET_TABLE(gateway, device, metric);
+  let fluxQuery = flux`` + GET_TABLE(gateway, metric);
   dashQueryAPI.queryLines(fluxQuery, {
-      next(line) {
-        csv = `${csv}${line}\n`;
-      },
-      error(error) {
-        console.error(error);
-        console.log(`\nFinished fetching ${gateway} ERROR`);
-        res.end();
-      },
-      complete() {
-        console.log(`\nFinished fetching ${gateway} SUCCESS`);
-        res.end(JSON.stringify({ csv }));
-      },
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log(`\nFinished fetching ${gateway} ERROR`);
+      res.end();
+    },
+    complete() {
+      console.log(`\nFinished fetching ${gateway} SUCCESS`);
+      res.end(JSON.stringify({ csv }));
+    },
   });
 });
 
@@ -419,13 +431,20 @@ const FLUX_QUERY_MEMORY_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "totalmem" or r["_field"] == "memusage" or r["_field"] == "freemem")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -434,13 +453,20 @@ const FLUX_QUERY_LOAD_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "loadavg_2" or r["_field"] == "loadavg_1" or r["_field"] == "loadavg_0")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -459,11 +485,22 @@ const FLUX_QUERY_CPU_BAND = (bucket, did, cpuID) =>
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["cpu"] == "${cpuID}")
 |> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
+
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["cpu"] == "${cpuID}")
+|> filter(fn: (r) => r["_field"] == "speed" or r["_field"] == "times_idle" or r["_field"] == "times_irq" or r["_field"] == "times_nice" or r["_field"] == "times_sys" or r["_field"] == "times_user")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -481,13 +518,20 @@ const FLUX_QUERY_UPTIME_BAND = (bucket, did) =>
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["_field"] == "uptime")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["_field"] == "uptime")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -500,18 +544,28 @@ const FLUX_QUERY_UPTIME = (bucket, did) =>
 |> yield(name: "last")`;
 
 const FLUX_QUERY_DRIVE_BAND = (bucket, did, mount) =>
-  `from(bucket: "${bucket}")
+  `
+from(bucket: "${bucket}")
 |> range(start: -60m)
 |> filter(fn: (r) => r["_measurement"] == "${did}")
 |> filter(fn: (r) => r["mount"] == "${mount}")
 |> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
-
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
 |> yield(name: "mean")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
 |> yield(name: "min")
 
+from(bucket: "${bucket}")
+|> range(start: -60m)
+|> filter(fn: (r) => r["_measurement"] == "${did}")
+|> filter(fn: (r) => r["mount"] == "${mount}")
+|> filter(fn: (r) => r["_field"] == "available" or r["_field"] == "size" or r["_field"] == "used")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
@@ -564,88 +618,57 @@ const GET_LIST = (bucket, tag) =>
   schema.tagValues(bucket: "${bucket}", tag: "${tag}")
 `;
 
-const GET_TABLE = (edge_id, device_id, metric_id) =>
+const GET_TABLE = (gateway, metric) =>
 `
-import "system"
-import "influxdata/influxdb/secrets"
-import "sql"
-
-bucket = "SPD"
-
-gateway = sql.from(
-     driverName: "mysql",
-     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-     query: "SELECT LOWER(name) as _measurement, id as gateway_id, edge_id from Gateway",
-)
-
-device = sql.from(
-     driverName: "mysql",
-     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-     query: "SELECT id as device_id, gateway_id from Device",
-)
-metric = sql.from(
-     driverName: "mysql",
-     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-     query: "SELECT name, id as metric_id, device_id, uom as unit from Metric",
-)
-a = join(tables: {key1: gateway, key2: device}, on: ["gateway_id"], method: "inner")
-b = join(tables: {key1: metric, key2: a}, on: ["device_id"], method: "inner")
-|> map(fn: (r) => ({ r with unit: string(v: r.unit), device_id: string(v: r.device_id), gateway_id: string(v: r.gateway_id), metric_id: string(v: r.metric_id) }))
-
-c = from(bucket: bucket)
+from(bucket: "${dashBucket}")
 |> range(start: -5m)
-|> group()
-
-out = join(tables: {key1: b, key2: c}, on: ["_measurement", "name", "unit"], method: "inner")
-|> filter(fn: (r) => r.edge_id == "${edge_id}")
-|> filter(fn: (r) => r.device_id == "${device_id}")
-|> filter(fn: (r) => r.metric_id == "${metric_id}") 
-
-|> aggregateWindow(every: 15s, fn: last, createEmpty: false)
-|> yield(name: "last")
-
-|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
-|> yield(name:"max")
-
+|> filter(fn: (r) => r._measurement == "${gateway}")
+|> filter(fn: (r) => r.name == "${metric}") 
 |> aggregateWindow(every: 15s, fn: min, createEmpty: false)
-|> yield(name:"min")
+|> yield(name: "min")
 
+from(bucket: "${dashBucket}")
+|> range(start: -5m)
+|> filter(fn: (r) => r._measurement == "${gateway}")
+|> filter(fn: (r) => r.name == "${metric}") 
 |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)
-|> yield(name:"mean")
+|> yield(name: "mean")
+
+from(bucket: "${dashBucket}")
+|> range(start: -5m)
+|> filter(fn: (r) => r._measurement == "${gateway}")
+|> filter(fn: (r) => r.name == "${metric}") 
+|> aggregateWindow(every: 15s, fn: max, createEmpty: false)
+|> yield(name: "max")
 `;
 
-const GET_GATEWAY_LIST = () => 
-`
+const GET_GATEWAY_LIST = () =>
+  `
 import "system"
 import "sql"
 
 list = sql.from(
   driverName: "mysql",
   dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT edge_id, id as gateway_id from Gateway",
+  query: "SELECT LOWER(name) as _measurement, edge_id, id as gateway_id from Gateway",
 )
 list`;
 
-const GET_DEVICE_LIST = (gateway) => 
-`
+const GET_DEVICE_LIST = (gateway_id) =>
+  `
 import "system"
 import "sql"
 
-a = sql.from(
-  driverName: "mysql",
-  dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT id as gateway_id from Gateway where edge_id = '${gateway}'",
-)
 b = sql.from(
   driverName: "mysql",
   dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT id as device_id, gateway_id, name from Device",
+  query: "SELECT id as device_id, gateway_id, name from Device where gateway_id = '${gateway_id}'",
 )
-join(tables: {key1: a, key2: b}, on: ["gateway_id"], method: "inner")
+b
 `;
 
-const GET_METRIC_LIST = (device) => 
-`
+const GET_METRIC_LIST = (device) =>
+  `
 import "system"
 import "sql"
 
