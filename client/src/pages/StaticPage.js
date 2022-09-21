@@ -11,13 +11,18 @@ import {
   DEFAULT_QUERY_3,
   DEFAULT_QUERY_4,
 } from "../constants";
- 
+
 const ReactGridLayout = WidthProvider(RGL);
 function StaticPage() {
   const { did } = useParams();
   const [layouts, setLayouts] = useState({});
   const items = 4;
-  const queries = [DEFAULT_QUERY_1, DEFAULT_QUERY_2, DEFAULT_QUERY_3, DEFAULT_QUERY_4];
+  const queries = [
+    DEFAULT_QUERY_1,
+    DEFAULT_QUERY_2,
+    DEFAULT_QUERY_3,
+    DEFAULT_QUERY_4,
+  ];
   const graphType = ["line", "line", "line", "bar"];
   const cpu = 0;
   const drive = DEFAULT_DRIVE;
@@ -30,7 +35,7 @@ function StaticPage() {
     return _.map(_.range(items), function (i) {
       return (
         <div
-        className="static-grid-item"
+          className="static-grid-item"
           key={i}
           data-grid={{
             w: 1,
@@ -54,7 +59,7 @@ function StaticPage() {
   };
   return (
     <ReactGridLayout
-      style={{backgroundColor:"white", marginTop: 0}}
+      style={{ backgroundColor: "white", marginTop: 0 }}
       cols={4}
       rowHeight={4}
       layouts={layouts}

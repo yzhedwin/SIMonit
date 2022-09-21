@@ -188,7 +188,9 @@ function Graph(props) {
   };
 
   const handleGatewayChange = (event) => {
-    const newGatewayList = gatewayList.filter((gateway) => {return gateway.edge_id === event.target.value})
+    const newGatewayList = gatewayList.filter((gateway) => {
+      return gateway.edge_id === event.target.value;
+    });
     setGateway(newGatewayList[0]);
     localStorage.setItem(
       props.saveName + "_gateway_" + props.id,
@@ -202,7 +204,10 @@ function Graph(props) {
     setGateway(JSON.parse(DEFAULT_GATEWAY));
     getDevice();
     localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem(props.saveName + "_gateway_" + props.id, DEFAULT_GATEWAY);
+    localStorage.setItem(
+      props.saveName + "_gateway_" + props.id,
+      DEFAULT_GATEWAY
+    );
   };
 
   const renderPlot = () => {
@@ -211,7 +216,7 @@ function Graph(props) {
     const config = {
       table: table.data,
       layers: [new LayerConfig(graphType, fill).getConfig()],
-      valueFormatters: new DataFormatter(metric.name, unit).getFormat(),
+      valueFormatters: new DataFormatter(metric?.name, unit).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",

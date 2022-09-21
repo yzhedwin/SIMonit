@@ -56,8 +56,9 @@ export default function Dashboard({ openDrawer }) {
       localStorage.getItem("dash_graph_" + item.i) || DEFAULT_GRAPH_TYPE;
     let storageDevice =
       JSON.parse(localStorage.getItem("dash_device_" + item.i)) || "";
-    let storageGateway =
-      JSON.parse(localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY);
+    let storageGateway = JSON.parse(
+      localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY
+    );
     let storageGatewayList = JSON.parse(
       localStorage.getItem("dash_gatewayList_" + item.i)
     ) || [{}];
@@ -111,10 +112,10 @@ export default function Dashboard({ openDrawer }) {
   const onAddItem = () => {
     let newItem;
     let index = 0;
-    while(index < items.length) {
-      if(items[index].i === index.toString()) {
-        index++
-      //Set item at gap of array
+    while (index < items.length) {
+      if (items[index].i === index.toString()) {
+        index++;
+        //Set item at gap of array
       } else {
         newItem = {
           i: index.toString(),
@@ -151,9 +152,9 @@ export default function Dashboard({ openDrawer }) {
     localStorage.setItem("dash_items", JSON.stringify(items));
   };
   const onRemoveItem = (i) => {
-    console.log(items)
+    console.log(items);
     items.forEach((item, index) => {
-      if(item.i === i.toString()) {
+      if (item.i === i.toString()) {
         items.splice(index, 1);
       }
     });

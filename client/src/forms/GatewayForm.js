@@ -22,7 +22,11 @@ const GatewayForm = (props) => {
           label="Gateway"
         >
           {items.map((item) => {
-            return <MenuItem key={items.indexOf(item)} value={item.edge_id}>{item.edge_id}</MenuItem>;
+            return (
+              <MenuItem key={items.indexOf(item)} value={item.edge_id}>
+                {item.edge_id}
+              </MenuItem>
+            );
           })}
         </Select>
       </FormControl>

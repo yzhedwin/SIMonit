@@ -16,7 +16,7 @@ const MetricForm = (props) => {
           <Select
             labelId="select"
             id="select"
-            value={props.metric.name}
+            value={props.metric.name || props.metric}
             onChange={props.onChange}
             autoWidth
             size="small"

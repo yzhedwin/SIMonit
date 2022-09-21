@@ -6,7 +6,7 @@ const cors = require("cors");
 const axios = require("axios");
 const { InfluxDB, flux } = require("@influxdata/influxdb-client");
 const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
-const timeout = 20000 // timeout for ping
+const timeout = 20000; // timeout for ping
 
 // vars to connect to bucket in influxdb
 const staticURL = process.env.STATIC_INFLUX_URL;
@@ -25,11 +25,18 @@ const url = process.env.DB_URL;
 const db = process.env.DB_NAME;
 
 // connect to influxdb
-const dashInfluxDB = new InfluxDB({ url: dashURL, token: dashInfluxToken, timeout: timeout });
+const dashInfluxDB = new InfluxDB({
+  url: dashURL,
+  token: dashInfluxToken,
+  timeout: timeout,
+});
 const dashQueryAPI = dashInfluxDB.getQueryApi(dashOrgID);
 const dashBucketsAPI = new BucketsAPI(dashInfluxDB);
 
-const staticInfluxDB = new InfluxDB({ url: staticURL, token: staticInfluxToken });
+const staticInfluxDB = new InfluxDB({
+  url: staticURL,
+  token: staticInfluxToken,
+});
 const staticQueryAPI = staticInfluxDB.getQueryApi(staticOrgID);
 const staticBucketsAPI = new BucketsAPI(staticInfluxDB);
 
@@ -302,7 +309,11 @@ app.get("/gatewaylist", (req, res) => {
   dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({id: o.gateway_id, edge_id: o.edge_id, _measurement: o._measurement});
+      list.push({
+        id: o.gateway_id,
+        edge_id: o.edge_id,
+        _measurement: o._measurement,
+      });
     },
     error(error) {
       console.error(error);
@@ -315,13 +326,13 @@ app.get("/gatewaylist", (req, res) => {
   });
 });
 app.get("/devicelist/:gateway/", (req, res) => {
-  const {gateway} = req.params;
+  const { gateway } = req.params;
   let list = [];
   let fluxQuery = flux`` + GET_DEVICE_LIST(gateway);
   dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({gateway_id: o.gateway_id, id: o.device_id, name: o.name});
+      list.push({ gateway_id: o.gateway_id, id: o.device_id, name: o.name });
     },
     error(error) {
       console.error(error);
@@ -334,13 +345,13 @@ app.get("/devicelist/:gateway/", (req, res) => {
   });
 });
 app.get("/metriclist/:device", (req, res) => {
-  const {device} = req.params;
+  const { device } = req.params;
   let list = [];
   let fluxQuery = flux`` + GET_METRIC_LIST(device);
   dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({id: o.id, device_id: o.device_id, name: o.name});
+      list.push({ id: o.id, device_id: o.device_id, name: o.name });
     },
     error(error) {
       console.error(error);
@@ -358,21 +369,20 @@ app.get("/table/:gateway/:metric", (req, res) => {
   let csv = "";
   let fluxQuery = flux`` + GET_TABLE(gateway, metric);
   dashQueryAPI.queryLines(fluxQuery, {
-      next(line) {
-        csv = `${csv}${line}\n`;
-      },
-      error(error) {
-        console.error(error);
-        console.log(`\nFinished fetching ${gateway} ERROR`);
-        res.end();
-      },
-      complete() {
-        console.log(`\nFinished fetching ${gateway} SUCCESS`);
-        res.end(JSON.stringify({ csv }));
-      },
+    next(line) {
+      csv = `${csv}${line}\n`;
+    },
+    error(error) {
+      console.error(error);
+      console.log(`\nFinished fetching ${gateway} ERROR`);
+      res.end();
+    },
+    complete() {
+      console.log(`\nFinished fetching ${gateway} SUCCESS`);
+      res.end(JSON.stringify({ csv }));
+    },
   });
 });
-
 
 // app.get('/uptime/:did', (req, res) => {
 //   const { did } = req.params;
@@ -606,7 +616,7 @@ const GET_LIST = (bucket, tag) =>
 `;
 
 const GET_TABLE = (gateway, metric) =>
-`
+  `
 from(bucket: "${dashBucket}")
 |> range(start: -5m)
 |> filter(fn: (r) => r._measurement == "${gateway}")
@@ -629,8 +639,8 @@ from(bucket: "${dashBucket}")
 |> yield(name: "max")
 `;
 
-const GET_GATEWAY_LIST = () => 
-`
+const GET_GATEWAY_LIST = () =>
+  `
 import "system"
 import "sql"
 
@@ -641,8 +651,8 @@ list = sql.from(
 )
 list`;
 
-const GET_DEVICE_LIST = (gateway_id) => 
-`
+const GET_DEVICE_LIST = (gateway_id) =>
+  `
 import "system"
 import "sql"
 
@@ -654,8 +664,8 @@ b = sql.from(
 b
 `;
 
-const GET_METRIC_LIST = (device) => 
-`
+const GET_METRIC_LIST = (device) =>
+  `
 import "system"
 import "sql"
 
