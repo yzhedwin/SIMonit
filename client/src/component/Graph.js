@@ -39,7 +39,7 @@ function Graph(props) {
   const getData = async () => {
     try {
       const resp = await axios.get(
-        `${REST_URL}/table/${gateway}/${device?.id}/${metric?.id}`
+        `${REST_URL}/table/${gateway?._measurement}/${metric?.name}`
       );
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
@@ -77,8 +77,6 @@ function Graph(props) {
       const resp = await axios.get(`${REST_URL}/metriclist/${device?.id}`);
       const { list } = resp.data;
       setMetricList(list);
-      // setMetric(list[0])
-      // localStorage.setItem(props.saveName + "_metric_" + props.id, JSON.stringify(list[0]));
       localStorage.setItem(
         props.saveName + "_metricList_" + props.id,
         JSON.stringify(list)
@@ -89,11 +87,9 @@ function Graph(props) {
   };
   const getDevice = async () => {
     try {
-      const resp = await axios.get(`${REST_URL}/devicelist/${gateway}/`);
+      const resp = await axios.get(`${REST_URL}/devicelist/${gateway?.id}/`);
       const { list } = resp.data;
       setDeviceList(list);
-      // setDevice(list[0]);
-      // localStorage.setItem(props.saveName + "_device_" + props.id, JSON.stringify(list[0]));
       localStorage.setItem(
         props.saveName + "_deviceList_" + props.id,
         JSON.stringify(list)
@@ -104,7 +100,6 @@ function Graph(props) {
   };
 
   useEffect(() => {
-    //Runs on the first render
     isMount.current = true;
     try {
       getGateway();
@@ -123,33 +118,24 @@ function Graph(props) {
 
   useEffect(() => {
     //reset table
-    //window.clearInterval(animationFrameId.current);
     setToggleLegend(-1);
     setTable((prevState) => ({ ...prevState, data: {} }));
     try {
+      window.clearInterval(animationFrameId.current);
       getData();
       animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.log(error);
     }
-    return () => {
-      window.clearInterval(animationFrameId.current);
-      setTable((prevState) => ({ ...prevState, data: {} }));
-    };
     // eslint-disable-next-line
   }, [graphType, metric]);
 
   useEffect(() => {
-    //Reset data
-    window.clearInterval(animationFrameId.current);
-    setTable((prevState) => ({ ...prevState, data: {} }));
     getDevice();
     // eslint-disable-next-line
   }, [gateway]);
 
   useEffect(() => {
-    window.clearInterval(animationFrameId.current);
-    setTable((prevState) => ({ ...prevState, data: {} }));
     getMetric();
     // eslint-disable-next-line
   }, [device]);
@@ -192,20 +178,26 @@ function Graph(props) {
   };
 
   const handleGatewayChange = (event) => {
-    setGateway(event.target.value);
+    const newGatewayList = gatewayList.filter((gateway) => {
+      return gateway.edge_id === event.target.value;
+    });
+    setGateway(newGatewayList[0]);
     localStorage.setItem(
       props.saveName + "_gateway_" + props.id,
-      event.target.value
+      JSON.stringify(newGatewayList[0])
     );
     // write(props.id, props.saveName + "_drive_", event.target.value);
   };
 
   const reset = () => {
     setGraphType(DEFAULT_GRAPH_TYPE);
-    setGateway(DEFAULT_GATEWAY);
+    setGateway(JSON.parse(DEFAULT_GATEWAY));
     getDevice();
     localStorage.setItem(props.saveName + "_graph", DEFAULT_GRAPH_TYPE);
-    localStorage.setItem(props.saveName + "_gateway_" + props.id, DEFAULT_GATEWAY);
+    localStorage.setItem(
+      props.saveName + "_gateway_" + props.id,
+      DEFAULT_GATEWAY
+    );
   };
 
   const renderPlot = () => {
@@ -214,7 +206,7 @@ function Graph(props) {
     const config = {
       table: table.data,
       layers: [new LayerConfig(graphType, fill).getConfig()],
-      valueFormatters: new DataFormatter(metric.name, unit).getFormat(),
+      valueFormatters: new DataFormatter(metric?.name, unit).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",

@@ -3,7 +3,7 @@ import { fromFlux, Plot } from "@influxdata/giraffe";
 import { findStringColumns, uriSelector } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import { API_REFRESH_RATE, REST_URL, STYLE } from "../constants";
+import { STATIC_API_REFRESH_RATE, REST_URL, STYLE } from "../constants";
 import axios from "axios";
 
 export default function StaticGraph({
@@ -22,7 +22,7 @@ export default function StaticGraph({
   const getData = async () => {
     let uri = uriSelector(graphType, query, device, cpu, drive);
     const resp = await axios.get(REST_URL + uri);
-    console.log(resp)
+    console.log(resp);
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
@@ -39,12 +39,15 @@ export default function StaticGraph({
     //Runs on the first render
     try {
       getData();
-      staticAnimationIDrz.current = window.setInterval(getData, 20000);
+      staticAnimationIDrz.current = window.setInterval(
+        getData,
+        STATIC_API_REFRESH_RATE
+      );
     } catch (error) {
       console.error(error);
     }
     return () => {
-      console.log("unmounted")
+      console.log("unmounted");
       window.clearInterval(staticAnimationIDrz.current);
     };
     // eslint-disable-next-line
@@ -87,7 +90,9 @@ export default function StaticGraph({
       <div className="graph-component">
         <div className="device-stats">Device Stats: {query.toUpperCase()}</div>
         <div className="last-update">Last Updated: {table.lastUpdated}</div>
-        <div className="plot"><Plot config={config}/></div>
+        <div className="plot">
+          <Plot config={config} />
+        </div>
       </div>
     );
   };
@@ -105,4 +110,3 @@ export default function StaticGraph({
   };
   return render();
 }
-

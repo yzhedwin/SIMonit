@@ -15,14 +15,18 @@ const GatewayForm = (props) => {
         <Select
           labelId="select"
           id="select"
-          value={props.gateway}
+          value={props.gateway.edge_id}
           onChange={props.onChange}
           autoWidth
           size="small"
           label="Gateway"
         >
           {items.map((item) => {
-            return <MenuItem key={items.indexOf(item)} value={item.edge_id}>{item.edge_id}</MenuItem>;
+            return (
+              <MenuItem key={items.indexOf(item)} value={item.edge_id}>
+                {item.edge_id}
+              </MenuItem>
+            );
           })}
         </Select>
       </FormControl>

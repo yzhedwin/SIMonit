@@ -19,14 +19,18 @@ const DrivesForm = (props) => {
             size="small"
             label="Drive"
           >
-          {items.map((item) => {
-            return <MenuItem key={items.indexOf(item)} value={item}>{item}</MenuItem>;
-          })}
+            {items.map((item) => {
+              return (
+                <MenuItem key={items.indexOf(item)} value={item}>
+                  {item}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
       </>
     );
-  } 
+  }
   return null;
 };
 export default DrivesForm;
