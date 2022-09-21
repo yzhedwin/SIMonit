@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { fromFlux, Plot } from "@influxdata/giraffe";
 import { findStringColumns, uriSelector } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
@@ -6,7 +6,6 @@ import DataFormatter from "../config/configuration/DataFormatter";
 import { API_REFRESH_RATE, REST_URL, STYLE } from "../constants";
 import axios from "axios";
 
-let animationFrameId = 0;
 export default function StaticGraph({
   device,
   graphType,
@@ -15,6 +14,7 @@ export default function StaticGraph({
   drive,
   toggleLegend,
 }) {
+  let staticAnimationIDrz = useRef(0);
   const [table, setTable] = useState({
     data: {},
     lastUpdated: "",
@@ -39,12 +39,13 @@ export default function StaticGraph({
     //Runs on the first render
     try {
       getData();
-      animationFrameId = window.setInterval(getData, API_REFRESH_RATE);
+      staticAnimationIDrz.current = window.setInterval(getData, 20000);
     } catch (error) {
       console.error(error);
     }
     return () => {
-      window.clearInterval(animationFrameId);
+      console.log("unmounted")
+      window.clearInterval(staticAnimationIDrz.current);
     };
     // eslint-disable-next-line
   }, []);

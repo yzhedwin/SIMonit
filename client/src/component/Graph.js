@@ -77,8 +77,8 @@ function Graph(props) {
       const resp = await axios.get(`${REST_URL}/metriclist/${device?.id}`);
       const { list } = resp.data;
       setMetricList(list);
-      setMetric(list[0])
-      localStorage.setItem(props.saveName + "_metric_" + props.id, JSON.stringify(list[0]));
+      // setMetric(list[0])
+      // localStorage.setItem(props.saveName + "_metric_" + props.id, JSON.stringify(list[0]));
       localStorage.setItem(
         props.saveName + "_metricList_" + props.id,
         JSON.stringify(list)
@@ -92,8 +92,8 @@ function Graph(props) {
       const resp = await axios.get(`${REST_URL}/devicelist/${gateway}/`);
       const { list } = resp.data;
       setDeviceList(list);
-      setDevice(list[0]);
-      localStorage.setItem(props.saveName + "_device_" + props.id, JSON.stringify(list[0]));
+      // setDevice(list[0]);
+      // localStorage.setItem(props.saveName + "_device_" + props.id, JSON.stringify(list[0]));
       localStorage.setItem(
         props.saveName + "_deviceList_" + props.id,
         JSON.stringify(list)
@@ -106,7 +106,13 @@ function Graph(props) {
   useEffect(() => {
     //Runs on the first render
     isMount.current = true;
-    getGateway();
+    try {
+      getGateway();
+      getData();
+      animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
+    } catch (error) {
+      console.log(error);
+    }
     return () => {
       window.clearInterval(animationFrameId.current);
       setToggleLegend(-1);

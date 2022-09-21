@@ -1,5 +1,6 @@
+import dotenv from "dotenv/config";
 /* DASHBOARD */
-export const API_REFRESH_RATE = 10000;
+export const API_REFRESH_RATE = 11000;
 export const DEFAULT_GATEWAY = "CON000001";
 export const DEFAULT_METRIC_ID = "1";
 export const DEFAULT_DEVICE_ID = '1';
@@ -22,4 +23,4 @@ export const DEFAULT_GRAPH_TYPE = "line";
 export const STYLE = {
   height: "100%",
 };
-export const REST_URL = "http://localhost:3001"
+export const REST_URL = process.env.REACT_APP_BACKEND_URL
