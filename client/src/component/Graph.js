@@ -106,7 +106,13 @@ function Graph(props) {
   useEffect(() => {
     //Runs on the first render
     isMount.current = true;
-    getGateway();
+    try {
+      getGateway();
+      getData();
+      animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
+    } catch (error) {
+      console.log(error);
+    }
     return () => {
       window.clearInterval(animationFrameId.current);
       setToggleLegend(-1);

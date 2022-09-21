@@ -6,6 +6,7 @@ const cors = require("cors");
 const axios = require("axios");
 const { InfluxDB, flux } = require("@influxdata/influxdb-client");
 const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
+const timeout = 20000 // timeout for ping
 
 // vars to connect to bucket in influxdb
 const staticURL = process.env.STATIC_INFLUX_URL;
@@ -23,7 +24,7 @@ const url = process.env.DB_URL;
 const db = process.env.DB_NAME;
 
 // connect to influxdb
-const dashInfluxDB = new InfluxDB({ url: dashURL, token: dashInfluxToken });
+const dashInfluxDB = new InfluxDB({ url: dashURL, token: dashInfluxToken, timeout: timeout });
 const dashQueryAPI = dashInfluxDB.getQueryApi(dashOrgID);
 const dashBucketsAPI = new BucketsAPI(dashInfluxDB);
 

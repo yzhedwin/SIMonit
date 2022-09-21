@@ -14,7 +14,7 @@ export default function StaticGraph({
   drive,
   toggleLegend,
 }) {
-  let animationFrameId = useRef(0);
+  let staticAnimationIDrz = useRef(0);
   const [table, setTable] = useState({
     data: {},
     lastUpdated: "",
@@ -39,13 +39,13 @@ export default function StaticGraph({
     //Runs on the first render
     try {
       getData();
-      animationFrameId.current = window.setInterval(getData, 20000);
+      staticAnimationIDrz.current = window.setInterval(getData, 20000);
     } catch (error) {
       console.error(error);
     }
     return () => {
       console.log("unmounted")
-      window.clearInterval(animationFrameId.current);
+      window.clearInterval(staticAnimationIDrz.current);
     };
     // eslint-disable-next-line
   }, []);
