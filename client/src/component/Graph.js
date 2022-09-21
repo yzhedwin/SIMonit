@@ -264,7 +264,6 @@ function Graph(props) {
       </div>
     );
   };
-
   const renderEmpty = () => {
     return (
       <div className="graph-component">
