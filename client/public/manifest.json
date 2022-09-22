@@ -1,9 +1,15 @@
 {
   "short_name": "SIMonit",
   "name": "S&I Dashboard",
+  "description": "S&I real-time data monitoring dashboard",
   "icons": [
     {
-      "src": "si-logo.png",
+      "src": "si-logo512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "si-logo192.png",
       "sizes": "192x192",
       "type": "image/png"
     }
