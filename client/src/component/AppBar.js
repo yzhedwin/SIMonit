@@ -117,10 +117,11 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   }
                   height={50}
                   width={50}
-                  alt=""
+                  alt="si-logo"
                 />
               </Icon>
               <Typography
+                title="home"
                 variant="h6"
                 noWrap
                 component="a"
@@ -142,7 +143,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
               <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
                 <IconButton
                   size="large"
-                  aria-label="account of current user"
+                  aria-label="xs-side-nav"
                   aria-controls="menu-appbar"
                   aria-haspopup="true"
                   onClick={handleOpenNavMenu}
@@ -151,7 +152,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   <MenuIcon />
                 </IconButton>
                 <Menu
-                  id="menu-appbar"
+                  id="xs-menu-appbar"
                   anchorEl={anchorElNav}
                   anchorOrigin={{
                     vertical: "bottom",
@@ -193,14 +194,15 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                   }
                   height={50}
                   width={50}
-                  alt=""
+                  alt="xs-si-logo"
                 />
               </Icon>
               <Typography
+                title="xs-home"
                 variant="h5"
                 noWrap
                 component="a"
-                href=""
+                href="/"
                 sx={{
                   mr: 2,
                   display: { xs: "flex", md: "none" },
