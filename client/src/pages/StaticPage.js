@@ -23,7 +23,7 @@ function StaticPage() {
     DEFAULT_QUERY_3,
     DEFAULT_QUERY_4,
   ];
-  const graphType = ["line", "line", "line", "bar"];
+  const graphType = ["band", "line", "line", "line"];
   const cpu = 0;
   const drive = DEFAULT_DRIVE;
 

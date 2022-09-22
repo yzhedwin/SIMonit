@@ -8,23 +8,23 @@ const { InfluxDB, flux } = require("@influxdata/influxdb-client");
 const { BucketsAPI } = require("@influxdata/influxdb-client-apis");
 const timeout = 20000; // timeout for ping
 
-// vars to connect to bucket in influxdb
-const staticURL = process.env.STATIC_INFLUX_URL;
-const staticInfluxToken = process.env.STATIC_INFLUX_TOKEN;
-const staticBucket = process.env.STATIC_INFLUX_BUCKET;
-const staticOrgID = process.env.STATIC_ORG_ID;
-
+// vars to connect to influxdb
 const dashURL = process.env.DASH_INFLUX_URL;
 const dashBucket = process.env.DASH_INFLUX_BUCKET;
 const dashInfluxToken = process.env.DASH_INFLUX_TOKEN;
 const dashOrgID = process.env.DASH_ORG_ID;
+
+const staticURL = process.env.STATIC_INFLUX_URL;
+const staticInfluxToken = process.env.STATIC_INFLUX_TOKEN;
+const staticBucket = process.env.STATIC_INFLUX_BUCKET;
+const staticOrgID = process.env.STATIC_ORG_ID;
 
 const user = process.env.MYSQL_USER;
 const pass = process.env.MYSQL_PASS;
 const url = process.env.DB_URL;
 const db = process.env.DB_NAME;
 
-// connect to influxdb
+//connections to influxdb
 const dashInfluxDB = new InfluxDB({
   url: dashURL,
   token: dashInfluxToken,
@@ -40,18 +40,18 @@ const staticInfluxDB = new InfluxDB({
 const staticQueryAPI = staticInfluxDB.getQueryApi(staticOrgID);
 const staticBucketsAPI = new BucketsAPI(staticInfluxDB);
 
-const staticInfluxProxy = axios.create({
-  staticURL,
-  headers: {
-    Authorization: `Token ${staticInfluxToken}`,
-    "Content-Type": "application/json",
-  },
-});
-
 const dashInfluxProxy = axios.create({
   dashURL,
   headers: {
     Authorization: `Token ${dashInfluxToken}`,
+    "Content-Type": "application/json",
+  },
+});
+
+const staticInfluxProxy = axios.create({
+  staticURL,
+  headers: {
+    Authorization: `Token ${staticInfluxToken}`,
     "Content-Type": "application/json",
   },
 });
@@ -470,7 +470,6 @@ from(bucket: "${bucket}")
 |> aggregateWindow(every: 15s, fn: max, createEmpty: false)
 |> yield(name: "max")`;
 
-
 const FLUX_QUERY_LOAD = (bucket, did) =>
   `from(bucket: "${bucket}")
 |> range(start: -60m)
@@ -619,7 +618,7 @@ const GET_LIST = (bucket, tag) =>
 `;
 
 const GET_TABLE = (gateway, metric) =>
-`
+  `
 from(bucket: "${dashBucket}")
 |> range(start: -5m)
 |> filter(fn: (r) => r._measurement == "${gateway}")
