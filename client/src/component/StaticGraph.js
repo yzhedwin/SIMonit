@@ -3,7 +3,12 @@ import { fromFlux, Plot } from "@influxdata/giraffe";
 import { findStringColumns, uriSelector } from "../helpers";
 import LayerConfig from "../config/configuration/LayerConfig";
 import DataFormatter from "../config/configuration/DataFormatter";
-import { STATIC_API_REFRESH_RATE, REST_URL, STYLE } from "../constants";
+import {
+  STATIC_API_REFRESH_RATE,
+  REST_URL,
+  STYLE,
+  GraphType,
+} from "../constants";
 import axios from "axios";
 
 export default function StaticGraph({
@@ -53,25 +58,20 @@ export default function StaticGraph({
     // eslint-disable-next-line
   }, []);
 
-  function checkFills(fill) {
-    if (graphType === "line") {
-      return fill !== "topic";
-    }
-    return fill !== "topic";
-  }
   const renderPlot = () => {
     const fill = findStringColumns(table.data);
     //filter data for different graph type
-   // console.log(table.data.columns.result.data.filter((data) => {return data === "last"}))
+    // console.log(table.data.columns.result.data.filter((data) => {return data === "last"}))
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, fill.filter(checkFills)).getConfig()],
+      layers: [new LayerConfig(graphType, fill).getConfig()],
       valueFormatters: new DataFormatter(query).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
-      legendHide: graphType !== "bar" && toggleLegend === 1 ? true : false,
-      showAxes: graphType === "single stat" ? false : true,
+      legendHide:
+        graphType !== GraphType.BAR && toggleLegend === 1 ? true : false,
+      showAxes: graphType === GraphType.SINGLE_STAT ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "1px solid black",
@@ -79,8 +79,8 @@ export default function StaticGraph({
         backgroundColor: "white",
         colorizeRows: false,
         hide:
-          graphType === "bar" ||
-          graphType === "single stat" ||
+          graphType === GraphType.BAR ||
+          graphType === GraphType.SINGLE_STAT ||
           toggleLegend !== 1
             ? true
             : false,

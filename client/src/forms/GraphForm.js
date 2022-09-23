@@ -2,6 +2,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import { GraphType } from "../constants";
 
 const GraphForm = (props) => {
   return (
@@ -17,10 +18,10 @@ const GraphForm = (props) => {
           label="Graph Type"
           size="small"
         >
-          <MenuItem value={"band"}>Band</MenuItem>
-          <MenuItem value={"line"}>Line</MenuItem>
-          <MenuItem value={"single stat"}>Single Stat</MenuItem>
-          <MenuItem value={"bar"}>Histogram</MenuItem>
+          <MenuItem value={GraphType.BAND}>Band</MenuItem>
+          <MenuItem value={GraphType.LINE}>Line</MenuItem>
+          <MenuItem value={GraphType.SINGLE_STAT}>Single Stat</MenuItem>
+          <MenuItem value={GraphType.BAR}>Histogram</MenuItem>
         </Select>
       </FormControl>
     </>
