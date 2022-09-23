@@ -64,8 +64,8 @@ export default function StaticGraph({
     // console.log(table.data.columns.result.data.filter((data) => {return data === "last"}))
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, fill).getConfig()],
-      valueFormatters: new DataFormatter(query).getFormat(),
+      layers: [new LayerConfig(graphType.toUpperCase(), fill).getConfig()],
+      valueFormatters: new DataFormatter(query.toUpperCase()).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
