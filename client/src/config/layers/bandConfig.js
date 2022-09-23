@@ -1,8 +1,9 @@
 import { NINETEEN_EIGHTY_FOUR } from "@influxdata/giraffe";
+import { GraphType } from "../../constants";
 
 export default function bandConfig(fill) {
   return {
-    type: "band",
+    type: GraphType.BAND,
     x: "_time",
     y: "_value",
     fill: fill,

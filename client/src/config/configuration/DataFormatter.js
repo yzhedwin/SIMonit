@@ -1,3 +1,4 @@
+import { StaticMetric } from "../../constants";
 import cpuFormat from "../data/cpuFormat";
 import driveFormat from "../data/driveFormat";
 import loadFormat from "../data/loadFormat";
@@ -15,22 +16,20 @@ export default class DataFormatter {
   }
 
   getFormat() {
-    //get config of specified configtype
-    if (this.state.dataType.indexOf("memory") !== -1) {
-      return memFormat;
+    //get config of specified configtypes
+    switch (StaticMetric[this.state.dataType]) {
+      case StaticMetric.MEMORY:
+        return memFormat;
+      case StaticMetric.LOAD:
+        return loadFormat;
+      case StaticMetric.DRIVE:
+        return driveFormat;
+      case StaticMetric.UPTIME:
+        return uptimeFormat;
+      case StaticMetric.CPU:
+        return cpuFormat;
+      default:
+        return metricFormat(this.state.unit);
     }
-    if (this.state.dataType.indexOf("load") !== -1) {
-      return loadFormat;
-    }
-    if (this.state.dataType.indexOf("uptime") !== -1) {
-      return uptimeFormat;
-    }
-    if (this.state.dataType.indexOf("cpu") !== -1) {
-      return cpuFormat;
-    }
-    if (this.state.dataType.indexOf("drive") !== -1) {
-      return driveFormat;
-    }
-    return metricFormat(this.state.unit);
   }
 }

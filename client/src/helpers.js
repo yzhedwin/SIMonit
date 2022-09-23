@@ -1,24 +1,35 @@
+import { GraphType, StaticMetric } from "./constants";
+
 export const findStringColumns = (table) =>
   table.columnKeys.filter((k) => table.getColumnType(k) === "string");
 
 export function uriSelector(graphType, query, device, cpu, drive) {
-  return graphType.toLowerCase() === "band" && query.toLowerCase() === "memory"
-    ? `/memory-band/${device}`
-    : query.toLowerCase() === "memory"
-    ? `/memory/${device}`
-    : graphType.toLowerCase() === "band" && query.toLowerCase() === "load"
-    ? `/load-band/${device}`
-    : query.toLowerCase() === "load"
-    ? `/load/${device}`
-    : graphType.toLowerCase() === "band" && query.toLowerCase() === "cpu"
-    ? `/cpu-band/${device}/${cpu}`
-    : graphType.toLowerCase() === "bar" && query.toLowerCase() === "cpu"
-    ? `/cpu/${device}/${cpu}`
-    : graphType.toLowerCase() === "band" && query.toLowerCase() === "drive"
-    ? `/drive-band/${device}?mount=${drive}`
-    : query.toLowerCase() === "drive"
-    ? `/drive/${device}?mount=${drive}`
-    : graphType.toLowerCase() === "band" && query.toLowerCase() === "uptime"
-    ? `/uptime-band/${device}`
-    : `/uptime/${device}`;
+  switch (GraphType[graphType.toUpperCase()]) {
+    case GraphType.BAND:
+      switch (StaticMetric[query.toUpperCase()]) {
+        case StaticMetric.MEMORY:
+          return `/memory-band/${device}`;
+        case StaticMetric.LOAD:
+          return `/load-band/${device}`;
+        case StaticMetric.DRIVE:
+          return `/drive-band/${device}?mount=${drive}`;
+        case StaticMetric.CPU:
+          return `/cpu-band/${device}/${cpu}`;
+        default:
+          return `/uptime-band/${device}`;
+      }
+    default:
+      switch (StaticMetric[query.toUpperCase()]) {
+        case StaticMetric.MEMORY:
+          return `/memory/${device}`;
+        case StaticMetric.LOAD:
+          return `/load/${device}`;
+        case StaticMetric.DRIVE:
+          return `/drive/${device}?mount=${drive}`;
+        case StaticMetric.CPU:
+          return `/cpu/${device}/${cpu}`;
+        default:
+          return `/uptime-band/${device}`;
+      }
+  }
 }

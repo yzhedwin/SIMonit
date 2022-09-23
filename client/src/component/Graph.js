@@ -10,6 +10,7 @@ import {
   API_REFRESH_RATE,
   DEFAULT_GATEWAY,
   DEFAULT_GRAPH_TYPE,
+  GraphType,
   REST_URL,
 } from "../constants";
 import DeviceForm from "../forms/DeviceForm";
@@ -212,7 +213,7 @@ function Graph(props) {
       legendFont: "12px sans-serif",
       legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
-      showAxes: graphType === "single stat" ? false : true,
+      showAxes: graphType === GraphType.SINGLE_STAT ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "2px solid black",
@@ -220,8 +221,8 @@ function Graph(props) {
         backgroundColor: "white",
         colorizeRows: false,
         hide:
-          graphType === "bar" ||
-          graphType === "single stat" ||
+          graphType === GraphType.BAR ||
+          graphType === GraphType.SINGLE_STAT ||
           toggleLegend !== 1
             ? true
             : false,
