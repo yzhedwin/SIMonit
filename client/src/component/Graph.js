@@ -295,8 +295,9 @@ function Graph(props) {
             <GraphForm onChange={handleGraphChange} graphType={graphType} />
           </div>
         </div>
+        <div className="nodatatext">No Data Found</div>
         <div className="dotwrapper">
-          <p className="loading">Loading</p>
+          <p className="loading">Retrying</p>
           <div className="dot0" />
           <div className="dot1" />
           <div className="dot2" />
