@@ -4,9 +4,9 @@ export const findStringColumns = (table) =>
   table.columnKeys.filter((k) => table.getColumnType(k) === "string");
 
 export function uriSelector(graphType, query, device, cpu, drive) {
-  switch (GraphType[graphType.toUpperCase()]) {
+  switch (GraphType[graphType]) {
     case GraphType.BAND:
-      switch (StaticMetric[query.toUpperCase()]) {
+      switch (StaticMetric[query]) {
         case StaticMetric.MEMORY:
           return `/memory-band/${device}`;
         case StaticMetric.LOAD:
@@ -19,7 +19,7 @@ export function uriSelector(graphType, query, device, cpu, drive) {
           return `/uptime-band/${device}`;
       }
     default:
-      switch (StaticMetric[query.toUpperCase()]) {
+      switch (StaticMetric[query]) {
         case StaticMetric.MEMORY:
           return `/memory/${device}`;
         case StaticMetric.LOAD:

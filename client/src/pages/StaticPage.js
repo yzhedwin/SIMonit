@@ -6,10 +6,6 @@ import _ from "lodash";
 import {
   DEFAULT_DEVICE,
   DEFAULT_DRIVE,
-  DEFAULT_QUERY_1,
-  DEFAULT_QUERY_2,
-  DEFAULT_QUERY_3,
-  DEFAULT_QUERY_4,
   GraphType,
   StaticMetric,
 } from "../constants";

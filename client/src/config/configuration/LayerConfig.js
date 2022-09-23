@@ -13,21 +13,21 @@ function checkFills(fill) {
 }
 
 export default class LayerConfig {
-  constructor(configType, fill) {
+  constructor(graphType, fill) {
     this.state = {
-      configType,
+      graphType,
       fill: fill.filter(checkFills),
     };
   }
 
   getConfig() {
-    //get config of specified configtype
-    switch (GraphType[this.state.configType]) {
+    //get config of specified graphType
+    switch (GraphType[this.state.graphType]) {
       case GraphType.BAND:
         return bandConfig(this.state.fill);
       case GraphType.LINE:
         return lineConfig(this.state.fill);
-      case GraphType.SINGLE_STAT:
+      case GraphType["SINGLE STAT"]:
         return singleStatConfig();
       case GraphType.GAUGE:
         return gaugeConfig();
