@@ -3,6 +3,7 @@ import singleStatConfig from "../layers/singleStatConfig";
 import gaugeConfig from "../layers/gaugeConfig";
 import lineConfig from "../layers/lineConfig";
 import barConfig from "../layers/barConfig";
+import { GraphType } from "../../constants";
 
 /*
 Filters the columns to be displayed on the graph
@@ -21,16 +22,17 @@ export default class LayerConfig {
 
   getConfig() {
     //get config of specified configtype
-    if (this.state.configType === "band") {
-      return bandConfig(this.state.fill);
-    }  if (this.state.configType === "line") {
-      return lineConfig(this.state.fill);
-    }  if (this.state.configType === "single stat") {
-      return singleStatConfig();
-    } if (this.state.configType === "gauge") {
-      return gaugeConfig();
-    }  if (this.state.configType === "bar") {
-      return barConfig(this.state.fill);
-    } 
+    switch (GraphType[this.state.configType]) {
+      case GraphType.BAND:
+        return bandConfig(this.state.fill);
+      case GraphType.LINE:
+        return lineConfig(this.state.fill);
+      case GraphType.SINGLE_STAT:
+        return singleStatConfig();
+      case GraphType.GAUGE:
+        return gaugeConfig();
+      default:
+        return barConfig(this.state.fill);
+    }
   }
 }

@@ -12,17 +12,24 @@ export const DEFAULT_METRIC_ID = "1";
 export const DEFAULT_DEVICE_ID = "1";
 /* DASHBOARD */
 /* STATIC PAGE */
-export const DEFAULT_QUERY_1 = "memory";
-export const DEFAULT_QUERY_2 = "cpu";
-export const DEFAULT_QUERY_3 = "load";
-export const DEFAULT_QUERY_4 = "drive";
-export const DEFAULT_QUERY_5 = "uptime";
+export const StaticMetric = {
+  MEMORY: "memory",
+  CPU: "cpu",
+  LOAD: "load",
+  DRIVE: "drive",
+  UPTIME: "uptime",
+}
+export const GraphType = {
+  BAND: "band",
+  LINE: "line",
+  SINGLE_STAT: "single_stat",
+  BAR: "bar",
+  GAUGE: "gauge",
+}
 export const CONTEC_QUERY_DRIVE = "drive_contec";
-export const DEFAULT_DEVICE = "d3f23b04aa74";
-// export const DEFAULT_DEVICE = "EC2AMAZ-5FRJVA8";
+export const DEFAULT_DEVICE = process.env.REACT_APP_DEFAULT_DEVICE;
 export const DEFAULT_CPU = "0";
-export const DEFAULT_DRIVE = "C:";
-export const DEFAULT_DRIVE_ROOT = "/";
+export const DEFAULT_DRIVE = process.env.REACT_APP_DEFAULT_DRIVE;
 export const DEFAULT_DRIVE_MMC = "/mnt/ext_mmc";
 /* STATIC PAGE */
 export const DEFAULT_GRAPH_TYPE = "line";

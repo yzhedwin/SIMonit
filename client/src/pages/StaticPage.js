@@ -10,6 +10,8 @@ import {
   DEFAULT_QUERY_2,
   DEFAULT_QUERY_3,
   DEFAULT_QUERY_4,
+  GraphType,
+  StaticMetric,
 } from "../constants";
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -17,13 +19,8 @@ function StaticPage() {
   const { did } = useParams();
   const [layouts, setLayouts] = useState({});
   const items = 4;
-  const queries = [
-    DEFAULT_QUERY_1,
-    DEFAULT_QUERY_2,
-    DEFAULT_QUERY_3,
-    DEFAULT_QUERY_4,
-  ];
-  const graphType = ["band", "line", "line", "line"];
+  const queries = [StaticMetric.MEMORY, StaticMetric.CPU, StaticMetric.LOAD, StaticMetric.DRIVE]
+  const graphType = [GraphType.BAND, GraphType.LINE, GraphType.LINE, GraphType.BAR];
   const cpu = 0;
   const drive = DEFAULT_DRIVE;
 
