@@ -20,7 +20,9 @@
 .topcontainer {
   margin-inline: 27px;
 }
-
+.nodatatext {
+  align-self: center;
+}
 .forms {
   display: flex;
   flex-grow: 1;
@@ -52,7 +54,7 @@
 .dotwrapper {
   display: flex;
   flex-grow: 1;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 }
 

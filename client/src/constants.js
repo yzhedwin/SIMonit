@@ -18,21 +18,21 @@ export const StaticMetric = {
   LOAD: "load",
   DRIVE: "drive",
   UPTIME: "uptime",
-}
+};
 export const GraphType = {
   BAND: "band",
   LINE: "line",
-  SINGLE_STAT: "single_stat",
+  "SINGLE STAT": "single stat",
   BAR: "bar",
   GAUGE: "gauge",
-}
+};
 export const CONTEC_QUERY_DRIVE = "drive_contec";
 export const DEFAULT_DEVICE = process.env.REACT_APP_DEFAULT_DEVICE;
 export const DEFAULT_CPU = "0";
 export const DEFAULT_DRIVE = process.env.REACT_APP_DEFAULT_DRIVE;
 export const DEFAULT_DRIVE_MMC = "/mnt/ext_mmc";
 /* STATIC PAGE */
-export const DEFAULT_GRAPH_TYPE = "line";
+export const DEFAULT_GRAPH_TYPE = GraphType.BAND;
 export const STYLE = {
   height: "100%",
 };

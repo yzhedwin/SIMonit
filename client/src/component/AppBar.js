@@ -18,7 +18,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { DrawerIcon, RenderDrawer } from "./Drawer";
 
-const pages = ["Dashboard", "StaticPage", "Toolbox"];
+const pages = ["Dashboard", "StaticPage"];
 
 const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
   let location = useLocation();

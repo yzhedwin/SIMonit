@@ -132,11 +132,13 @@ function Graph(props) {
   }, [graphType, metric]);
 
   useEffect(() => {
+    setTable((prevState) => ({ ...prevState, data: {} }));
     getDevice();
     // eslint-disable-next-line
   }, [gateway]);
 
   useEffect(() => {
+    setTable((prevState) => ({ ...prevState, data: {} }));
     getMetric();
     // eslint-disable-next-line
   }, [device]);
@@ -146,6 +148,7 @@ function Graph(props) {
   }, [props.toggleLegend]);
 
   const handleGraphChange = (event) => {
+    setTable((prevState) => ({ ...prevState, data: {} }));
     setGraphType(event.target.value);
     localStorage.setItem(
       props.saveName + "_graph_" + props.id,
@@ -206,14 +209,14 @@ function Graph(props) {
     const { unit } = table.data.columns;
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, fill).getConfig()],
+      layers: [new LayerConfig(graphType.toUpperCase(), fill).getConfig()],
       valueFormatters: new DataFormatter(metric?.name, unit).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
       legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
-      showAxes: graphType === GraphType.SINGLE_STAT ? false : true,
+      showAxes: graphType.toUpperCase() === GraphType["SINGLE STAT"] ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "2px solid black",
@@ -221,8 +224,8 @@ function Graph(props) {
         backgroundColor: "white",
         colorizeRows: false,
         hide:
-          graphType === GraphType.BAR ||
-          graphType === GraphType.SINGLE_STAT ||
+          graphType.toUpperCase() === GraphType.BAR ||
+          graphType.toUpperCase() === GraphType["SINGLE STAT"] ||
           toggleLegend !== 1
             ? true
             : false,
@@ -292,8 +295,9 @@ function Graph(props) {
             <GraphForm onChange={handleGraphChange} graphType={graphType} />
           </div>
         </div>
+        <div className="nodatatext">No Data Found</div>
         <div className="dotwrapper">
-          <p className="loading">Loading</p>
+          <p className="loading">Retrying</p>
           <div className="dot0" />
           <div className="dot1" />
           <div className="dot2" />
