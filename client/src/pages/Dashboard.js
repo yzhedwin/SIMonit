@@ -9,6 +9,9 @@ import AddIcon from "@mui/icons-material/Add";
 import { DEFAULT_GRAPH_TYPE, DEFAULT_GATEWAY } from "../constants";
 import { Main } from "../component/Drawer";
 import Graph from "../component/Graph";
+import AppsIcon from "@mui/icons-material/Apps";
+import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
+import Zoom from "@mui/material/Zoom";
 
 //TODO: Load Layout and Items from Database
 function getFromLS(key) {
@@ -70,21 +73,35 @@ export default function Dashboard({ openDrawer }) {
     ) || [{}];
 
     //TODO: Add database query to load config
+    const delay = item.i * 100;
     return (
       <div key={item.i} data-grid={item} className="dashgrid">
-        <Graph
-          id={item.i}
-          graphType={storageGraph}
-          metric={storageMetric}
-          metricList={storageMetricList}
-          device={storageDevice}
-          deviceList={storageDeviceList}
-          gateway={storageGateway}
-          gatewayList={storageGatewayList}
-          toggleLegend={toggle}
-          saveName={"dash"}
-          handleRemoveItem={() => onRemoveItem(item.i)}
-        />
+        <Zoom
+          in={true}
+          style={{ transitionDelay: `${delay}ms` }}
+          timeout={1000}
+        >
+          <div className="itemcontainer">
+            <div className="removebutton" onClick={() => onRemoveItem(item.i)}>
+              <DisabledByDefaultIcon color="error" />
+            </div>
+            <div className="draghandle">
+              <AppsIcon />
+            </div>
+            <Graph
+              id={item.i}
+              graphType={storageGraph}
+              metric={storageMetric}
+              metricList={storageMetricList}
+              device={storageDevice}
+              deviceList={storageDeviceList}
+              gateway={storageGateway}
+              gatewayList={storageGatewayList}
+              toggleLegend={toggle}
+              saveName={"dash"}
+            />
+          </div>
+        </Zoom>
       </div>
     );
   };
@@ -108,7 +125,6 @@ export default function Dashboard({ openDrawer }) {
     const newNum = num * -1;
     setToggleLegend(newNum);
   };
-  //BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
   const onAddItem = () => {
     let newItem;
     let index = 0;
@@ -147,6 +163,7 @@ export default function Dashboard({ openDrawer }) {
       items.splice(index, 0, newItem);
     }
     setItems(items);
+    console.log((index * 2) % state.cols);
     setCount(items.length);
     localStorage.setItem("dash_count", JSON.stringify(items.length));
     localStorage.setItem("dash_items", JSON.stringify(items));
@@ -172,6 +189,7 @@ export default function Dashboard({ openDrawer }) {
     localStorage.clear();
   };
   return (
+    //Add layouts
     <Main
       openDrawer={openDrawer}
       className="dashboard"
@@ -180,42 +198,56 @@ export default function Dashboard({ openDrawer }) {
         height: "100%",
       }}
     >
-      <ButtonGroup
-        variant="contained"
-        aria-label="outlined primary button group"
-        size="small"
-      >
-        <Button
-          onClick={() => reset()}
-          color="error"
-          startIcon={<DeleteIcon />}
-        >
-          Reset All
-        </Button>
-        <Button
-          onClick={() => onAddItem()}
-          color="success"
-          startIcon={<AddIcon />}
-        >
-          Graph
-        </Button>
-        <Button onClick={() => onLegendChange(toggleLegend)} color="warning">
-          Toggle Legend
-        </Button>
-      </ButtonGroup>
-      <ResponsiveReactGridLayout
-        className="layout"
-        cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
-        rowHeight={10}
-        layouts={layouts}
-        items={count}
-        onLayoutChange={(layout, layouts) => onLayoutChange(layout, layouts)}
-        isBounded={true}
-        onBreakpointChange={onBreakpointChange}
-        draggableHandle=".draghandle"
-      >
-        {_.map(items, (item) => generateDOM(item))}
-      </ResponsiveReactGridLayout>
+      <div className="dashboard-container">
+        <div className="layout-menu">
+          <div className="layout-menu-title"><b>Layouts</b></div>
+          <div className="layout-menu-container">container</div>
+        </div>
+        <div className="rgl-container">
+          <ButtonGroup
+            variant="contained"
+            aria-label="outlined primary button group"
+            size="small"
+          >
+            <Button
+              onClick={() => reset()}
+              color="error"
+              startIcon={<DeleteIcon />}
+            >
+              Reset All
+            </Button>
+            <Button
+              onClick={() => onAddItem()}
+              color="success"
+              startIcon={<AddIcon />}
+            >
+              Graph
+            </Button>
+            <Button
+              onClick={() => onLegendChange(toggleLegend)}
+              color="warning"
+            >
+              Toggle Legend
+            </Button>
+          </ButtonGroup>
+          <ResponsiveReactGridLayout
+            className="layout"
+            cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
+            rowHeight={10}
+            layouts={layouts}
+            items={count}
+            onLayoutChange={(layout, layouts) =>
+              onLayoutChange(layout, layouts)
+            }
+            isBounded={true}
+            onBreakpointChange={onBreakpointChange}
+            draggableHandle=".draghandle"
+            useCSSTransforms={true}
+          >
+            {_.map(items, (item) => generateDOM(item))}
+          </ResponsiveReactGridLayout>
+        </div>
+      </div>
     </Main>
   );
 }

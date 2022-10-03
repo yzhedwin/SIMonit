@@ -1,17 +1,16 @@
 import { fromFlux, Plot } from "@influxdata/giraffe";
-import AppsIcon from "@mui/icons-material/Apps";
-import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 //import DataFormatter from "../config/configuration/DataFormatter";
 import { Button } from "@mui/material";
+import DataFormatter from "../config/configuration/DataFormatter";
 import LayerConfig from "../config/configuration/LayerConfig";
 import {
   API_REFRESH_RATE,
   DEFAULT_GATEWAY,
   DEFAULT_GRAPH_TYPE,
   GraphType,
-  REST_URL,
+  REST_URL
 } from "../constants";
 import DeviceForm from "../forms/DeviceForm";
 import GatewayForm from "../forms/GatewayForm";
@@ -19,7 +18,6 @@ import GraphForm from "../forms/GraphForm";
 import MetricForm from "../forms/MetricForm";
 import { findStringColumns } from "../helpers";
 import "./Graph.css";
-import DataFormatter from "../config/configuration/DataFormatter";
 
 function Graph(props) {
   let animationFrameId = useRef(0);
@@ -231,12 +229,6 @@ function Graph(props) {
     return (
       <div className="graph-component">
         <div className="topcontainer">
-          <div className="removebutton" onClick={props.handleRemoveItem}>
-            <DisabledByDefaultIcon color="error" />
-          </div>
-          <div className="draghandle">
-            <AppsIcon />
-          </div>
           <div className="forms">
             <GatewayForm
               onChange={handleGatewayChange}
@@ -267,12 +259,6 @@ function Graph(props) {
     return (
       <div className="graph-component">
         <div className="topcontainer">
-          <div className="removebutton" onClick={props.handleRemoveItem}>
-            <DisabledByDefaultIcon color="error" />
-          </div>
-          <div className="draghandle">
-            <AppsIcon />
-          </div>
           <div className="forms">
             <GatewayForm
               onChange={handleGatewayChange}

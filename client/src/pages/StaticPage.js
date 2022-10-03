@@ -1,17 +1,12 @@
+import _ from "lodash";
 import React, { useState } from "react";
+import RGL, { WidthProvider } from "react-grid-layout";
 import { useParams } from "react-router-dom";
 import StaticGraph from "../component/StaticGraph";
-import RGL, { WidthProvider } from "react-grid-layout";
-import _ from "lodash";
 import {
   DEFAULT_DEVICE,
-  DEFAULT_DRIVE,
-  DEFAULT_QUERY_1,
-  DEFAULT_QUERY_2,
-  DEFAULT_QUERY_3,
-  DEFAULT_QUERY_4,
-  GraphType,
-  StaticMetric,
+  DEFAULT_DRIVE, GraphType,
+  StaticMetric
 } from "../constants";
 
 const ReactGridLayout = WidthProvider(RGL);
