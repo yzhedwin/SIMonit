@@ -17,7 +17,6 @@ import GatewayForm from "../forms/GatewayForm";
 import GraphForm from "../forms/GraphForm";
 import MetricForm from "../forms/MetricForm";
 import { findStringColumns } from "../helpers";
-import "./Graph.css";
 
 function Graph(props) {
   let animationFrameId = useRef(0);

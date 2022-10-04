@@ -1,0 +1,288 @@
+/*Home Page*/
+
+.Home {
+  margin: 0px, auto;
+  overflow: hidden;
+}
+
+.React-logo {
+  display: block;
+  margin-left: -50%;
+  width: 50%;
+  pointer-events: none;
+  animation: Left-logo-move 1s forwards, React-logo-spin 1s forwards 0.2s;
+  position: relative;
+}
+
+.Influx-logo {
+  display: block;
+  margin-left: 90%;
+  margin-top: -40%;
+  width: 50%;
+  pointer-events: none;
+  animation: Right-logo-move 1s forwards 0.5s;
+  position: relative;
+}
+.Nodejs-logo {
+  display: block;
+  transform: scale(0.5);
+  margin-top: -100px;
+  margin-left: 90%;
+  width: 50%;
+  pointer-events: none;
+  animation: Right-logo-move 1s forwards 1s;
+  position: relative;
+}
+.Home-title {
+  display: block;
+  color: white;
+  animation: Home-title-fade 5s forwards;
+  margin-top: 50px;
+  text-align: center;
+  position: relative;
+}
+.Home-images {
+  margin: auto;
+  display: block;
+}
+.Home-header {
+  background-color: #282c34;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.Home-link {
+  color: #61dafb;
+}
+@keyframes Right-logo-move {
+  from {
+    right: 0px;
+  }
+  to {
+    right: 50%;
+  }
+}
+
+@keyframes Left-logo-move {
+  from {
+    left: 0px;
+  }
+  to {
+    left: 50%;
+  }
+}
+
+@keyframes React-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes Home-title-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*Dashboard*/
+
+.dashboard-container {
+  display: flex;
+}
+
+.layout-menu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgb(163, 244, 197);
+  flex-grow: 1;
+  min-height: 100vh;
+  max-width: 80px;
+  border-radius: 10px;
+}
+.layout-menu-title {
+  text-align: center;
+}
+.rgl-container {
+  flex-grow: 3;
+}
+.react-grid-layout {
+  position: relative;
+  display: block;
+  transition: height 200ms ease;
+  background-color: rgb(255, 255, 255);
+}
+.dashgrid {
+  transition: all 300ms ease;
+  transition-property: left, top;
+}
+.itemcontainer {
+  background-color: rgb(193, 193, 193);
+  height: 100%;
+  border-radius: 10px;
+}
+.react-grid-item.cssTransforms {
+  transition-property: transform;
+}
+.react-grid-item.resizing {
+  z-index: 1;
+}
+
+.react-grid-item.react-draggable-dragging {
+  transition: none;
+  z-index: 3;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: #000;
+  opacity: 0.1;
+  transition-duration: 100ms;
+  z-index: 2;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.react-grid-item:hover > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pg08IS0tIEdlbmVyYXRvcjogQWRvYmUgRmlyZXdvcmtzIENTNiwgRXhwb3J0IFNWRyBFeHRlbnNpb24gYnkgQWFyb24gQmVhbGwgKGh0dHA6Ly9maXJld29ya3MuYWJlYWxsLmNvbSkgLiBWZXJzaW9uOiAwLjYuMSAgLS0+DTwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DTxzdmcgaWQ9IlVudGl0bGVkLVBhZ2UlMjAxIiB2aWV3Qm94PSIwIDAgNiA2IiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojZmZmZmZmMDAiIHZlcnNpb249IjEuMSINCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbDpzcGFjZT0icHJlc2VydmUiDQl4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjZweCIgaGVpZ2h0PSI2cHgiDT4NCTxnIG9wYWNpdHk9IjAuMzAyIj4NCQk8cGF0aCBkPSJNIDYgNiBMIDAgNiBMIDAgNC4yIEwgNCA0LjIgTCA0LjIgNC4yIEwgNC4yIDAgTCA2IDAgTCA2IDYgTCA2IDYgWiIgZmlsbD0iIzAwMDAwMCIvPg0JPC9nPg08L3N2Zz4=");
+  background-position: bottom right;
+  padding: 0 3px 3px 0;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  cursor: se-resize;
+}
+/* Graph */
+.graph-component {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+.plot {
+  margin: 20px;
+  flex-grow: 4;
+}
+.last-update {
+  margin-left: 5px;
+}
+.device-stats {
+  margin-left: 5px;
+}
+.loadcontainer {
+  height: "100%";
+}
+.topcontainer {
+  margin-inline: 27px;
+}
+
+.forms {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.draghandle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: 0;
+  right: 0;
+  background-position: top right;
+  padding: 0 3px 0 0;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  cursor: grab;
+}
+.removebutton {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  left: 0;
+  top: 0;
+  background-position: bottom left;
+  cursor: pointer;
+}
+
+.dotwrapper {
+  display: flex;
+  flex-grow: 1;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.loading {
+  margin: 0 5px;
+  font-size: 2rem;
+}
+
+.dot0 {
+  background-color: #61dafb;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin: 0 5px;
+  animation: BounceAnimation 0.5s linear infinite;
+  animation-delay: 0;
+}
+
+.dot1 {
+  background-color: #61dafb;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin: 0 5px;
+  animation: BounceAnimation 0.5s linear infinite;
+  animation-delay: 0.1s;
+}
+
+.dot2 {
+  background-color: #61dafb;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  margin: 0 5px;
+  animation: BounceAnimation 0.5s linear infinite;
+  animation-delay: 0.2s;
+}
+.reset-button {
+  flex-grow: 1;
+  align-self: center;
+  margin-top: 50px;
+}
+@keyframes BounceAnimation {
+  0% {
+    margin-bottom: 0;
+  }
+  50% {
+    margin-bottom: 15px;
+  }
+  100% {
+    margin-bottom: 0;
+  }
+}
+
+/* Appbar */
+.app-bar:hover {
+  opacity: 0.5;
+}

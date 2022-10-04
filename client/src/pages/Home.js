@@ -1,6 +1,5 @@
 import { DrawerHeader, Main } from "../component/Drawer";
 import logo from "../logo.svg";
-import "./Home.css";
 
 const Home = ({openDrawer}) => {
   return (

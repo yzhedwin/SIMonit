@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import * as React from "react";
 import MenuIcon from "@mui/icons-material/Menu";
-import "./AppBar.css";
 import AdbIcon from "@mui/icons-material/Adb";
 import {
   Box,
@@ -95,6 +94,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
           style={{
             opacity: navRef.current,
             backgroundColor: "#2E3B55",
+            transition: "all 500ms ease-in-out"
           }}
           position="fixed"
         >

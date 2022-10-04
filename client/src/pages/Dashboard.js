@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import _ from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import "./Dashboard.css";
 import { Button, ButtonGroup } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -12,6 +11,7 @@ import Graph from "../component/Graph";
 import AppsIcon from "@mui/icons-material/Apps";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import Zoom from "@mui/material/Zoom";
+import Divider from "@mui/material/Divider";
 
 //TODO: Load Layout and Items from Database
 function getFromLS(key) {
@@ -194,42 +194,39 @@ export default function Dashboard({ openDrawer }) {
       openDrawer={openDrawer}
       className="dashboard"
       style={{
-        marginTop: "60px",
-        height: "100%",
+        marginTop: "70px",
+        padding: 0,
       }}
     >
       <div className="dashboard-container">
         <div className="layout-menu">
-          <div className="layout-menu-title"><b>Layouts</b></div>
-          <div className="layout-menu-container">container</div>
+          <div>
+            <ButtonGroup
+              variant="contained"
+              orientation="vertical"
+              aria-label="outlined primary button group"
+              size="small"
+            >
+              <Button onClick={() => reset()} color="error">
+                <DeleteIcon />
+              </Button>
+              <Button onClick={() => onAddItem()} color="success">
+                <AddIcon />
+              </Button>
+              <Button
+                onClick={() => onLegendChange(toggleLegend)}
+                color="warning"
+              >
+                Legend
+              </Button>
+            </ButtonGroup>
+            <Divider />
+            <div className="layout-menu-title">
+              <b>Layouts</b>
+            </div>
+          </div>
         </div>
         <div className="rgl-container">
-          <ButtonGroup
-            variant="contained"
-            aria-label="outlined primary button group"
-            size="small"
-          >
-            <Button
-              onClick={() => reset()}
-              color="error"
-              startIcon={<DeleteIcon />}
-            >
-              Reset All
-            </Button>
-            <Button
-              onClick={() => onAddItem()}
-              color="success"
-              startIcon={<AddIcon />}
-            >
-              Graph
-            </Button>
-            <Button
-              onClick={() => onLegendChange(toggleLegend)}
-              color="warning"
-            >
-              Toggle Legend
-            </Button>
-          </ButtonGroup>
           <ResponsiveReactGridLayout
             className="layout"
             cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
