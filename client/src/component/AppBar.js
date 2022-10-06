@@ -1,27 +1,56 @@
 /* eslint-disable no-unused-vars */
-import * as React from "react";
+import { useTheme } from "@emotion/react";
+import styled from "@emotion/styled";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
-import AdbIcon from "@mui/icons-material/Adb";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
 import {
   Box,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Menu,
-  Container,
   Button,
-  MenuItem,
+  Container,
   Icon,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
 } from "@mui/material";
+import MuiAppBar from "@mui/material/AppBar";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { DrawerIcon, RenderDrawer } from "./Drawer";
+import { DrawerHeader, DrawerIcon, Main } from "./Drawer";
+const pages = ["Dashboard", "StaticPage", "Test"];
+const drawerWidth = 240;
 
-const pages = ["Dashboard", "StaticPage", "Toolbox"];
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  transition: theme.transitions.create(["margin", "width"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
 
 const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
   let location = useLocation();
-
+  const theme = useTheme();
   //MENU STUFF
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [navOpacity, setNavOpacity] = React.useState(1);
@@ -94,8 +123,9 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
           style={{
             opacity: navRef.current,
             backgroundColor: "#2E3B55",
-            transition: "all 500ms ease-in-out"
+            transition: "all 500ms ease-in-out",
           }}
+          open={openDrawer}
           position="fixed"
         >
           <Container maxWidth="xl">
@@ -230,10 +260,43 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
             </Toolbar>
           </Container>
         </AppBar>
-        <RenderDrawer
-          handleDrawerClose={handleDrawerClose}
-          openDrawer={openDrawer}
-        />
+        <Drawer
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={openDrawer}
+        >
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === "ltr" ? (
+                <ChevronLeftIcon />
+              ) : (
+                <ChevronRightIcon />
+              )}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {["Dashboard", "StaticPage", "Test"].map((text, index) => (
+              <ListItem key={text} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+        </Drawer>
       </div>
     );
   };

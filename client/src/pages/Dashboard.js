@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import _ from "lodash";
-import { Responsive, WidthProvider } from "react-grid-layout";
-import { Button, ButtonGroup } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LegendToggleIcon from "@mui/icons-material/LegendToggle";
+import { Button, ButtonGroup } from "@mui/material";
+import _ from "lodash";
+import React, { useState } from "react";
+import { Responsive, WidthProvider } from "react-grid-layout";
 //import write from "../component/DBWrite";
-import { DEFAULT_GRAPH_TYPE, DEFAULT_GATEWAY } from "../constants";
-import { Main } from "../component/Drawer";
-import Graph from "../component/Graph";
 import AppsIcon from "@mui/icons-material/Apps";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import Zoom from "@mui/material/Zoom";
-import Divider from "@mui/material/Divider";
+import { Main } from "../component/Drawer";
+import Graph from "../component/Graph";
+import { DEFAULT_GATEWAY, DEFAULT_GRAPH_TYPE } from "../constants";
+import FormDialog from "../component/FormDialog";
 
 //TODO: Load Layout and Items from Database
 function getFromLS(key) {
@@ -41,14 +42,25 @@ export default function Dashboard({ openDrawer }) {
   const storageLayout = getFromLS("dash_layouts") || {};
   const storageCount = JSON.parse(localStorage.getItem("dash_count")) || 0;
   const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
+  const storageSave = JSON.parse(localStorage.getItem("dash_layouts")) || {};
 
+  // JSON parses Infinity to null which will return
+  // "ReactGridLayout.children[0].y must be a number"
+  if (storageItems.size !== 0) {
+    storageItems.forEach((item) => {
+      if (item.y === null) {
+        item.y = Infinity;
+      }
+    });
+  }
   const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
   );
-  const [items, setItems] = useState(storageItems);
-  const [count, setCount] = useState(storageCount);
   const [toggleLegend, setToggleLegend] = useState(1);
   const [state, setState] = useState({ cols: {}, breakpoint: "" });
+  const [items, setItems] = useState(storageItems);
+  const [count, setCount] = useState(storageCount);
+  const [save, setSave] = useState(storageSave);
 
   //use index to load config of graph
   const generateDOM = (item) => {
@@ -88,7 +100,7 @@ export default function Dashboard({ openDrawer }) {
             <div className="draghandle">
               <AppsIcon />
             </div>
-            <Graph
+            {/* <Graph
               id={item.i}
               graphType={storageGraph}
               metric={storageMetric}
@@ -99,7 +111,7 @@ export default function Dashboard({ openDrawer }) {
               gatewayList={storageGatewayList}
               toggleLegend={toggle}
               saveName={"dash"}
-            />
+            /> */}
           </div>
         </Zoom>
       </div>
@@ -151,7 +163,7 @@ export default function Dashboard({ openDrawer }) {
         // Add a new item. It must have a unique key!
         i: index.toString(),
         x: (index * 2) % (state.cols || 6),
-        y: index,
+        y: Infinity,
         w: 2,
         h: 20,
         minH: 15,
@@ -163,7 +175,6 @@ export default function Dashboard({ openDrawer }) {
       items.splice(index, 0, newItem);
     }
     setItems(items);
-    console.log((index * 2) % state.cols);
     setCount(items.length);
     localStorage.setItem("dash_count", JSON.stringify(items.length));
     localStorage.setItem("dash_items", JSON.stringify(items));
@@ -182,6 +193,14 @@ export default function Dashboard({ openDrawer }) {
     localStorage.setItem("dash_items", JSON.stringify(items));
   };
 
+  const onSaveLayout = (name) => {
+    const newSave = { ...save, [name]: items };
+    setSave(newSave);
+    localStorage.setItem("dash_layouts", JSON.stringify(newSave));
+  };
+  //TODO: Load Layout
+  //Remove Layout
+
   const reset = () => {
     setLayouts({});
     setItems([]);
@@ -191,40 +210,34 @@ export default function Dashboard({ openDrawer }) {
   return (
     //Add layouts
     <Main
-      openDrawer={openDrawer}
+      open={openDrawer}
       className="dashboard"
       style={{
-        marginTop: "70px",
         padding: 0,
+        marginTop: "70px",
       }}
     >
       <div className="dashboard-container">
         <div className="layout-menu">
-          <div>
-            <ButtonGroup
-              variant="contained"
-              orientation="vertical"
-              aria-label="outlined primary button group"
-              size="small"
+          <ButtonGroup
+            variant="contained"
+            orientation="vertical"
+            aria-label="outlined primary button group"
+          >
+            <Button onClick={() => onAddItem()} color="success">
+              <AddIcon />
+            </Button>
+            <Button
+              onClick={() => onLegendChange(toggleLegend)}
+              color="warning"
             >
-              <Button onClick={() => reset()} color="error">
-                <DeleteIcon />
-              </Button>
-              <Button onClick={() => onAddItem()} color="success">
-                <AddIcon />
-              </Button>
-              <Button
-                onClick={() => onLegendChange(toggleLegend)}
-                color="warning"
-              >
-                Legend
-              </Button>
-            </ButtonGroup>
-            <Divider />
-            <div className="layout-menu-title">
-              <b>Layouts</b>
-            </div>
-          </div>
+              <LegendToggleIcon />
+            </Button>
+            <Button onClick={() => reset()} color="error">
+              <DeleteIcon />
+            </Button>
+            <FormDialog onSave={(name) => onSaveLayout(name)} />
+          </ButtonGroup>
         </div>
         <div className="rgl-container">
           <ResponsiveReactGridLayout
@@ -232,14 +245,13 @@ export default function Dashboard({ openDrawer }) {
             cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
             rowHeight={10}
             layouts={layouts}
-            items={count}
+            isBounded={true}
+            draggableHandle=".draghandle"
+            useCSSTransforms={true}
+            onBreakpointChange={onBreakpointChange}
             onLayoutChange={(layout, layouts) =>
               onLayoutChange(layout, layouts)
             }
-            isBounded={true}
-            onBreakpointChange={onBreakpointChange}
-            draggableHandle=".draghandle"
-            useCSSTransforms={true}
           >
             {_.map(items, (item) => generateDOM(item))}
           </ResponsiveReactGridLayout>

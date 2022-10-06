@@ -10,7 +10,7 @@ import {
   DEFAULT_GATEWAY,
   DEFAULT_GRAPH_TYPE,
   GraphType,
-  REST_URL
+  REST_URL,
 } from "../constants";
 import DeviceForm from "../forms/DeviceForm";
 import GatewayForm from "../forms/GatewayForm";
@@ -238,7 +238,7 @@ function Graph(props) {
               onChange={handleDeviceChange}
               device={device}
               deviceList={deviceList}
-            ></DeviceForm>
+            />
             <MetricForm
               onChange={handleMetricChange}
               metric={metric}

@@ -10,7 +10,7 @@ const DeviceForm = (props) => {
   const items = props.deviceList;
   return (
     <>
-      <FormControl sx={{ m: 1, minWidth: 80 }}>
+      <FormControl sx={{ m: 1, }}>
         <InputLabel id="select">Device</InputLabel>
         <Select
           labelId="select"

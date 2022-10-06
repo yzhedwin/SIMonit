@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import StaticPage from "./pages/StaticPage";
 import Dashboard from "./pages/Dashboard";
-import ToolboxLayout from "./pages/Toolbox";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@emotion/react";
 
@@ -55,7 +54,7 @@ class App extends React.Component {
               path="Dashboard"
               element={<Dashboard openDrawer={this.state.openDrawer} />}
             />
-            <Route path="Toolbox" element={<ToolboxLayout />} />
+            {/* <Route path="Test" element={<MiniDrawer />} /> */}
             <Route path="StaticPage" element={<StaticPage />} />
             <Route path="StaticPage/:did" element={<StaticPage />} />
             <Route path="*" element={<NoPage />} />

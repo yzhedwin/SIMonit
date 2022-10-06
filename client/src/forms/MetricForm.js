@@ -10,7 +10,7 @@ const MetricForm = (props) => {
     const items = props.metricList;
     return (
       <>
-        <FormControl sx={{ m: 1, minWidth: 80 }}>
+        <FormControl sx={{ m: 1}}>
           <InputLabel id="select">Metric</InputLabel>
           <Select
             labelId="select"
