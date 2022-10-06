@@ -25,7 +25,7 @@ export default function StaticGraph({
     lastUpdated: "",
   });
   const getData = async () => {
-    let uri = uriSelector(graphType, query, device, cpu, drive);
+    let uri = uriSelector(graphType.toUpperCase(), query.toUpperCase(), device, cpu, drive);
     const resp = await axios.get(REST_URL + uri);
     console.log(resp);
     try {
@@ -64,14 +64,14 @@ export default function StaticGraph({
     // console.log(table.data.columns.result.data.filter((data) => {return data === "last"}))
     const config = {
       table: table.data,
-      layers: [new LayerConfig(graphType, fill).getConfig()],
-      valueFormatters: new DataFormatter(query).getFormat(),
+      layers: [new LayerConfig(graphType.toUpperCase(), fill).getConfig()],
+      valueFormatters: new DataFormatter(query.toUpperCase()).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
       legendHide:
-        graphType !== GraphType.BAR && toggleLegend === 1 ? true : false,
-      showAxes: graphType === GraphType.SINGLE_STAT ? false : true,
+        graphType.toUpperCase() !== GraphType.BAR && toggleLegend === 1 ? true : false,
+      showAxes: graphType.toUpperCase() === GraphType["SINGLE STAT"] ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "1px solid black",
@@ -79,8 +79,8 @@ export default function StaticGraph({
         backgroundColor: "white",
         colorizeRows: false,
         hide:
-          graphType === GraphType.BAR ||
-          graphType === GraphType.SINGLE_STAT ||
+          graphType.toUpperCase() === GraphType.BAR ||
+          graphType.toUpperCase() === GraphType["SINGLE STAT"] ||
           toggleLegend !== 1
             ? true
             : false,

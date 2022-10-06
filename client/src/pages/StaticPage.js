@@ -5,7 +5,8 @@ import { useParams } from "react-router-dom";
 import StaticGraph from "../component/StaticGraph";
 import {
   DEFAULT_DEVICE,
-  DEFAULT_DRIVE, GraphType,
+  DEFAULT_DRIVE,
+  GraphType,
   StaticMetric
 } from "../constants";
 
