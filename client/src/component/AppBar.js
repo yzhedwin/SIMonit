@@ -28,6 +28,7 @@ import ListItemText from "@mui/material/ListItemText";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DrawerHeader, DrawerIcon, Main } from "./Drawer";
+import siLogo from "../assets/si-logo.png";
 const pages = ["Dashboard", "StaticPage", "Test"];
 const drawerWidth = 240;
 
@@ -142,9 +143,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                 }}
               >
                 <img
-                  src={
-                    "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"
-                  }
+                  src={siLogo}
                   height={50}
                   width={50}
                   alt="si-logo"
@@ -219,9 +218,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
                 }}
               >
                 <img
-                  src={
-                    "https://si-asia.com/wp-content/uploads/2019/09/s-l-logo-h.png"
-                  }
+                  src={siLogo}
                   height={50}
                   width={50}
                   alt="xs-si-logo"

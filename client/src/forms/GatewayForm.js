@@ -8,29 +8,29 @@ Get all devices and list in menuitem
 
 const GatewayForm = (props) => {
   const items = props.gatewayList;
-  return (
-    <>
-      <FormControl sx={{ m: 1 }}>
-        <InputLabel id="select">Gateway</InputLabel>
-        <Select
-          labelId="select"
-          id="select"
-          value={props.gateway.edge_id}
-          onChange={props.onChange}
-          autoWidth
-          size="small"
-          label="Gateway"
-        >
-          {items.map((item) => {
-            return (
-              <MenuItem key={items.indexOf(item)} value={item.edge_id}>
-                {item.edge_id}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </FormControl>
-    </>
-  );
+    return (
+      <>
+        <FormControl sx={{ m: 1 }}>
+          <InputLabel id="select">Gateway</InputLabel>
+          <Select
+            labelId="select"
+            id="select"
+            value={props.gateway?.edge_id}
+            onChange={props.onChange}
+            autoWidth
+            size="small"
+            label="Gateway"
+          >
+            {items?.map((item) => {
+              return (
+                <MenuItem key={items?.indexOf(item)} value={item?.edge_id}>
+                  {item?.edge_id}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+      </>
+    );
 };
 export default GatewayForm;

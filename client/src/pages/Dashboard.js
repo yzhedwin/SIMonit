@@ -10,9 +10,8 @@ import AppsIcon from "@mui/icons-material/Apps";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import Zoom from "@mui/material/Zoom";
 import { Main } from "../component/Drawer";
-import Graph from "../component/Graph";
-import { DEFAULT_GATEWAY, DEFAULT_GRAPH_TYPE } from "../constants";
 import FormDialog from "../component/FormDialog";
+import Graph from "../component/Graph";
 
 //TODO: Load Layout and Items from Database
 function getFromLS(key) {
@@ -43,7 +42,6 @@ export default function Dashboard({ openDrawer }) {
   const storageCount = JSON.parse(localStorage.getItem("dash_count")) || 0;
   const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
   const storageSave = JSON.parse(localStorage.getItem("dash_layouts")) || {};
-
   // JSON parses Infinity to null which will return
   // "ReactGridLayout.children[0].y must be a number"
   if (storageItems.size !== 0) {
@@ -65,24 +63,12 @@ export default function Dashboard({ openDrawer }) {
   //use index to load config of graph
   const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
-    let storageMetric =
-      JSON.parse(localStorage.getItem("dash_metric_" + item.i)) || "";
-    let storageGraph =
-      localStorage.getItem("dash_graph_" + item.i) || DEFAULT_GRAPH_TYPE;
-    let storageDevice =
-      JSON.parse(localStorage.getItem("dash_device_" + item.i)) || "";
-    let storageGateway = JSON.parse(
-      localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY
+    let storageGraph = JSON.parse(
+      localStorage.getItem("dash_graph_" + item.i) || "{}"
     );
-    let storageGatewayList = JSON.parse(
-      localStorage.getItem("dash_gatewayList_" + item.i)
-    ) || [{}];
-    let storageDeviceList = JSON.parse(
-      localStorage.getItem("dash_deviceList_" + item.i)
-    ) || [{}];
-    let storageMetricList = JSON.parse(
-      localStorage.getItem("dash_metricList_" + item.i)
-    ) || [{}];
+    let storageList = JSON.parse(
+      localStorage.getItem("dash_list_" + item.i) || "{}"
+    );
 
     //TODO: Add database query to load config
     const delay = item.i * 100;
@@ -100,18 +86,13 @@ export default function Dashboard({ openDrawer }) {
             <div className="draghandle">
               <AppsIcon />
             </div>
-            {/* <Graph
+            <Graph
               id={item.i}
-              graphType={storageGraph}
-              metric={storageMetric}
-              metricList={storageMetricList}
-              device={storageDevice}
-              deviceList={storageDeviceList}
-              gateway={storageGateway}
-              gatewayList={storageGatewayList}
+              graph={storageGraph}
+              list={storageList}
               toggleLegend={toggle}
               saveName={"dash"}
-            /> */}
+            />
           </div>
         </Zoom>
       </div>
@@ -194,7 +175,7 @@ export default function Dashboard({ openDrawer }) {
   };
 
   const onSaveLayout = (name) => {
-    const newSave = { ...save, [name]: items };
+    const newSave = { ...save, [name]: { items: items, count: count } };
     setSave(newSave);
     localStorage.setItem("dash_layouts", JSON.stringify(newSave));
   };
