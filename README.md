@@ -1,4 +1,4 @@
-# App-Girrafe
+# SIMonit
 
 This is a project built using React and Giraffe Library integrated with InfluxDB and Express.
 
