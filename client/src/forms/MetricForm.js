@@ -7,24 +7,24 @@ Get all devices and list in menuitem
 */
 
 const MetricForm = (props) => {
-    const items = props.metricList;
+    const items = props?.metricList;
     return (
       <>
-        <FormControl sx={{ m: 1, minWidth: 80 }}>
+        <FormControl sx={{ m: 1}}>
           <InputLabel id="select">Metric</InputLabel>
           <Select
             labelId="select"
             id="select"
-            value={props.metric.name || props.metric}
+            value={props?.metric?.name || props?.metric}
             onChange={props.onChange}
             autoWidth
             size="small"
             label="Metric"
           >
-            {items.map((item) => {
+            {items?.map((item) => {
               return (
-                <MenuItem key={items.indexOf(item)} value={item.name}>
-                  {item.name}
+                <MenuItem key={items?.indexOf(item)} value={item?.name}>
+                  {item?.name}
                 </MenuItem>
               );
             })}

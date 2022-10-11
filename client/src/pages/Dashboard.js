@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import _ from "lodash";
-import { Responsive, WidthProvider } from "react-grid-layout";
-import "./Dashboard.css";
-import { Button, ButtonGroup } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LegendToggleIcon from "@mui/icons-material/LegendToggle";
+import { Button, ButtonGroup } from "@mui/material";
+import _ from "lodash";
+import React, { useState } from "react";
+import { Responsive, WidthProvider } from "react-grid-layout";
 //import write from "../component/DBWrite";
-import { DEFAULT_GRAPH_TYPE, DEFAULT_GATEWAY } from "../constants";
+import AppsIcon from "@mui/icons-material/Apps";
+import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
+import Tooltip from "@mui/material/Tooltip";
+import Zoom from "@mui/material/Zoom";
 import { Main } from "../component/Drawer";
+import FormDialog from "../component/FormDialog";
 import Graph from "../component/Graph";
 
 //TODO: Load Layout and Items from Database
@@ -38,53 +42,60 @@ export default function Dashboard({ openDrawer }) {
   const storageLayout = getFromLS("dash_layouts") || {};
   const storageCount = JSON.parse(localStorage.getItem("dash_count")) || 0;
   const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
-
+  const storageSave = JSON.parse(localStorage.getItem("dash_layouts")) || {};
+  // JSON parses Infinity to null which will return
+  // "ReactGridLayout.children[0].y must be a number"
+  if (storageItems.size !== 0) {
+    storageItems.forEach((item) => {
+      if (item.y === null) {
+        item.y = Infinity;
+      }
+    });
+  }
   const [layouts, setLayouts] = useState(
     JSON.parse(JSON.stringify(storageLayout))
   );
-  const [items, setItems] = useState(storageItems);
-  const [count, setCount] = useState(storageCount);
   const [toggleLegend, setToggleLegend] = useState(1);
   const [state, setState] = useState({ cols: {}, breakpoint: "" });
+  const [items, setItems] = useState(storageItems);
+  const [count, setCount] = useState(storageCount);
+  const [save, setSave] = useState(storageSave);
 
   //use index to load config of graph
   const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
-    let storageMetric =
-      JSON.parse(localStorage.getItem("dash_metric_" + item.i)) || "";
-    let storageGraph =
-      localStorage.getItem("dash_graph_" + item.i) || DEFAULT_GRAPH_TYPE;
-    let storageDevice =
-      JSON.parse(localStorage.getItem("dash_device_" + item.i)) || "";
-    let storageGateway = JSON.parse(
-      localStorage.getItem("dash_gateway_" + item.i) || DEFAULT_GATEWAY
+    let storageGraph = JSON.parse(
+      localStorage.getItem("dash_graph_" + item.i) || "{}"
     );
-    let storageGatewayList = JSON.parse(
-      localStorage.getItem("dash_gatewayList_" + item.i)
-    ) || [{}];
-    let storageDeviceList = JSON.parse(
-      localStorage.getItem("dash_deviceList_" + item.i)
-    ) || [{}];
-    let storageMetricList = JSON.parse(
-      localStorage.getItem("dash_metricList_" + item.i)
-    ) || [{}];
+    let storageList = JSON.parse(
+      localStorage.getItem("dash_list_" + item.i) || "{}"
+    );
 
     //TODO: Add database query to load config
+    const delay = item.i * 100;
     return (
       <div key={item.i} data-grid={item} className="dashgrid">
-        <Graph
-          id={item.i}
-          graphType={storageGraph}
-          metric={storageMetric}
-          metricList={storageMetricList}
-          device={storageDevice}
-          deviceList={storageDeviceList}
-          gateway={storageGateway}
-          gatewayList={storageGatewayList}
-          toggleLegend={toggle}
-          saveName={"dash"}
-          handleRemoveItem={() => onRemoveItem(item.i)}
-        />
+        <Zoom
+          in={true}
+          style={{ transitionDelay: `${delay}ms` }}
+          timeout={1000}
+        >
+          <div className="itemcontainer">
+            <div className="removebutton" onClick={() => onRemoveItem(item.i)}>
+              <DisabledByDefaultIcon color="error" />
+            </div>
+            <div className="draghandle">
+              <AppsIcon />
+            </div>
+            <Graph
+              id={item.i}
+              graph={storageGraph}
+              list={storageList}
+              toggleLegend={toggle}
+              saveName={"dash"}
+            />
+          </div>
+        </Zoom>
       </div>
     );
   };
@@ -108,7 +119,6 @@ export default function Dashboard({ openDrawer }) {
     const newNum = num * -1;
     setToggleLegend(newNum);
   };
-  //BUG: Delete prev item and adding new item result in duplicate key  count 0 1 2 -> 1 2 count = 2 -> 2 exists
   const onAddItem = () => {
     let newItem;
     let index = 0;
@@ -119,27 +129,28 @@ export default function Dashboard({ openDrawer }) {
       } else {
         newItem = {
           i: index.toString(),
-          x: (index * 2) % (state.cols || 6),
+          x: (index * 2) % (Object.keys(state.cols).length === 0 ? 6 : state.cols),
           y: index,
           w: 2,
           h: 20,
           minH: 15,
-          minW: 2,
+          minW: 1,
         };
         break;
       }
     }
     //No gap found, add item as per normal
     if (index === items.length) {
+
       newItem = {
         // Add a new item. It must have a unique key!
         i: index.toString(),
-        x: (index * 2) % (state.cols || 6),
-        y: index,
+        x: (index * 2) % (Object.keys(state.cols).length === 0 ? 6 : state.cols),
+        y: Infinity,
         w: 2,
         h: 20,
         minH: 15,
-        minW: 2,
+        minW: 1,
       };
       items.push(newItem);
       //Insert item at gap
@@ -165,6 +176,18 @@ export default function Dashboard({ openDrawer }) {
     localStorage.setItem("dash_items", JSON.stringify(items));
   };
 
+  const onSaveLayout = (name) => {
+    const newSave = { ...save, [name]: { items: items, count: count } };
+    setSave(newSave);
+    localStorage.setItem("dash_layouts", JSON.stringify(newSave));
+  };
+  //TODO: Load Layout (menu select layout and set all states)
+
+  const onLoadLayout = (name) => {
+    console.log(name)
+  }
+  //Remove Layout
+
   const reset = () => {
     setLayouts({});
     setItems([]);
@@ -172,50 +195,61 @@ export default function Dashboard({ openDrawer }) {
     localStorage.clear();
   };
   return (
+    //Add layouts
     <Main
-      openDrawer={openDrawer}
+      open={openDrawer}
       className="dashboard"
       style={{
-        marginTop: "60px",
-        height: "100%",
+        padding: 0,
+        marginTop: "69px",
       }}
     >
-      <ButtonGroup
-        variant="contained"
-        aria-label="outlined primary button group"
-        size="small"
-      >
-        <Button
-          onClick={() => reset()}
-          color="error"
-          startIcon={<DeleteIcon />}
-        >
-          Reset All
-        </Button>
-        <Button
-          onClick={() => onAddItem()}
-          color="success"
-          startIcon={<AddIcon />}
-        >
-          Graph
-        </Button>
-        <Button onClick={() => onLegendChange(toggleLegend)} color="warning">
-          Toggle Legend
-        </Button>
-      </ButtonGroup>
-      <ResponsiveReactGridLayout
-        className="layout"
-        cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
-        rowHeight={10}
-        layouts={layouts}
-        items={count}
-        onLayoutChange={(layout, layouts) => onLayoutChange(layout, layouts)}
-        isBounded={true}
-        onBreakpointChange={onBreakpointChange}
-        draggableHandle=".draghandle"
-      >
-        {_.map(items, (item) => generateDOM(item))}
-      </ResponsiveReactGridLayout>
+      <div className="dashboard-container">
+        <div className="dashboard-menu">
+          <ButtonGroup
+            variant="contained"
+            orientation="horizontal"
+            aria-label="outlined primary button group"
+          >
+            <Tooltip title="Add Graph">
+              <Button onClick={() => onAddItem()} color="success">
+                <AddIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Show/Hide Legend">
+              <Button
+                onClick={() => onLegendChange(toggleLegend)}
+                color="warning"
+              >
+                <LegendToggleIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Reset All">
+              <Button onClick={() => reset()} color="error">
+                <DeleteIcon />
+              </Button>
+            </Tooltip>
+            <FormDialog onSave={(name) => onSaveLayout(name)} />
+          </ButtonGroup>
+        </div>
+        <div className="rgl-container">
+          <ResponsiveReactGridLayout
+            className="layout"
+            cols={{ lg: 6, md: 5, sm: 4, xs: 3, xxs: 2 }}
+            rowHeight={10}
+            layouts={layouts}
+            isBounded={true}
+            draggableHandle=".draghandle"
+            useCSSTransforms={true}
+            onBreakpointChange={onBreakpointChange}
+            onLayoutChange={(layout, layouts) =>
+              onLayoutChange(layout, layouts)
+            }
+          >
+            {_.map(items, (item) => generateDOM(item))}
+          </ResponsiveReactGridLayout>
+        </div>
+      </div>
     </Main>
   );
 }

@@ -1,10 +1,9 @@
 import { DrawerHeader, Main } from "../component/Drawer";
 import logo from "../logo.svg";
-import "./Home.css";
 
 const Home = ({openDrawer}) => {
   return (
-    <Main className="Home" openDrawer={openDrawer}>
+    <Main className="Home" open={openDrawer}>
       <DrawerHeader/>
       <h1 className="Home-title">
         Built with

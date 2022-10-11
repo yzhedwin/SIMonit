@@ -7,7 +7,7 @@ import { GraphType } from "../constants";
 const GraphForm = (props) => {
   return (
     <>
-      <FormControl sx={{ m: 1, minWidth: 80 }}>
+      <FormControl sx={{ m: 1 }}>
         <InputLabel id="select">Graph Type</InputLabel>
         <Select
           labelId="select"

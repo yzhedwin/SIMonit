@@ -22,7 +22,7 @@ export const StaticMetric = {
 export const GraphType = {
   BAND: "band",
   LINE: "line",
-  "SINGLE STAT": "single stat",
+  SINGLE_STAT: "single stat",
   BAR: "bar",
   GAUGE: "gauge",
 };

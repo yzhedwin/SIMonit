@@ -17,7 +17,7 @@ export default class DataFormatter {
 
   getFormat() {
     //get config of specified configtypes
-    switch (StaticMetric[this.state.dataType]) {
+    switch (StaticMetric[this.state.dataType.toUpperCase()]) {
       case StaticMetric.MEMORY:
         return memFormat;
       case StaticMetric.LOAD:

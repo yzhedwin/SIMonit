@@ -1,4 +1,4 @@
-# App-Girrafe
+# SIMonit
 
 This is a project built using React and Giraffe Library integrated with InfluxDB and Express.
 
@@ -8,9 +8,9 @@ customise their dashboard to fit any number of different graphs.
 
 ## What's inside:
 
-**Client:**
+**Client**
 
-React app created with [create-react-app](https://github.com/facebook/create-react-app) that uses Giraffe to render plots. See the `client` directory.
+React app created with [create-react-app](https://github.com/facebook/create-react-app) that uses [Giraffe](https://github.com/influxdata/giraffe) and [RGL](https://github.com/react-grid-layout/react-grid-layout) to render plots. See the `client` directory.
 
 **Server**
 
@@ -21,12 +21,12 @@ ExpressJS server that uses both the [InfluxDB API](https://docs.influxdata.com/i
 **Start server**
 1. Navigate to `server` directory
 2. `npm install`
-1. `npm start`
-1. Server starts at `localhost:3001`
+3. `npm run start`
+4. Server starts at `localhost:3001`
 
 **Start UI**
 
 1. Navigate to `client` directory in second terminal
-1. `npm install`
-1. `npm start`
-1. Navigate to `localhost:3000`
+2. `npm install`
+3. `npm run start`
+4. Navigate to `localhost:3000`
