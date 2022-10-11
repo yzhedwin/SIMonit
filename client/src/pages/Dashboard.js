@@ -8,6 +8,7 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 //import write from "../component/DBWrite";
 import AppsIcon from "@mui/icons-material/Apps";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
+import Tooltip from "@mui/material/Tooltip";
 import Zoom from "@mui/material/Zoom";
 import { Main } from "../component/Drawer";
 import FormDialog from "../component/FormDialog";
@@ -195,28 +196,34 @@ export default function Dashboard({ openDrawer }) {
       className="dashboard"
       style={{
         padding: 0,
-        marginTop: "70px",
+        marginTop: "69px",
       }}
     >
       <div className="dashboard-container">
-        <div className="layout-menu">
+        <div className="dashboard-menu">
           <ButtonGroup
             variant="contained"
-            orientation="vertical"
+            orientation="horizontal"
             aria-label="outlined primary button group"
           >
-            <Button onClick={() => onAddItem()} color="success">
-              <AddIcon />
-            </Button>
-            <Button
-              onClick={() => onLegendChange(toggleLegend)}
-              color="warning"
-            >
-              <LegendToggleIcon />
-            </Button>
-            <Button onClick={() => reset()} color="error">
-              <DeleteIcon />
-            </Button>
+            <Tooltip title="Add Graph">
+              <Button onClick={() => onAddItem()} color="success">
+                <AddIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Show/Hide Legend">
+              <Button
+                onClick={() => onLegendChange(toggleLegend)}
+                color="warning"
+              >
+                <LegendToggleIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Reset All">
+              <Button onClick={() => reset()} color="error">
+                <DeleteIcon />
+              </Button>
+            </Tooltip>
             <FormDialog onSave={(name) => onSaveLayout(name)} />
           </ButtonGroup>
         </div>

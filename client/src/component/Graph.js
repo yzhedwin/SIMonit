@@ -5,15 +5,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@mui/material";
 import DataFormatter from "../config/configuration/DataFormatter";
 import LayerConfig from "../config/configuration/LayerConfig";
-import {
-  API_REFRESH_RATE, GraphType,
-  REST_URL
-} from "../constants";
+import { API_REFRESH_RATE, GraphType, REST_URL } from "../constants";
 import DeviceForm from "../forms/DeviceForm";
 import GatewayForm from "../forms/GatewayForm";
 import GraphForm from "../forms/GraphForm";
 import MetricForm from "../forms/MetricForm";
 import { findStringColumns } from "../helpers";
+import Alert from "@mui/material/Alert";
 
 function Graph(props) {
   let animationFrameId = useRef(0);
@@ -54,10 +52,10 @@ function Graph(props) {
     try {
       const resp = await axios.get(REST_URL + "/gatewaylist");
       const { list } = resp.data;
-      setLists((prevState) => ({...prevState, gateway: list}))
+      setLists((prevState) => ({ ...prevState, gateway: list }));
       localStorage.setItem(
         props.saveName + "_lists_" + props.id,
-        JSON.stringify({...lists, gateway: list})
+        JSON.stringify({ ...lists, gateway: list })
       );
     } catch (error) {
       console.log(error);
@@ -65,12 +63,14 @@ function Graph(props) {
   };
   const getMetric = async () => {
     try {
-      const resp = await axios.get(`${REST_URL}/metriclist/${graph?.device?.id}`);
+      const resp = await axios.get(
+        `${REST_URL}/metriclist/${graph?.device?.id}`
+      );
       const { list } = resp.data;
-      setLists((prevState) => ({...prevState, metric: list}));
+      setLists((prevState) => ({ ...prevState, metric: list }));
       localStorage.setItem(
         props.saveName + "_lists_" + props.id,
-        JSON.stringify({...lists, metric: list})
+        JSON.stringify({ ...lists, metric: list })
       );
     } catch (error) {
       console.log(error);
@@ -78,12 +78,14 @@ function Graph(props) {
   };
   const getDevice = async () => {
     try {
-      const resp = await axios.get(`${REST_URL}/devicelist/${graph?.gateway?.id}/`);
+      const resp = await axios.get(
+        `${REST_URL}/devicelist/${graph?.gateway?.id}/`
+      );
       const { list } = resp.data;
-      setLists((prevState) => ({...prevState, device: list}));
+      setLists((prevState) => ({ ...prevState, device: list }));
       localStorage.setItem(
         props.saveName + "_lists_" + props.id,
-        JSON.stringify({...lists, device: list})
+        JSON.stringify({ ...lists, device: list })
       );
     } catch (error) {
       console.log(error);
@@ -95,7 +97,7 @@ function Graph(props) {
     try {
       getGateway();
       getData();
-     animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
+      animationFrameId.current = window.setInterval(getData, API_REFRESH_RATE);
     } catch (error) {
       console.log(error);
     }
@@ -140,10 +142,10 @@ function Graph(props) {
   //graphtype:[{graphtype,metric,device,gateway,gatewaylist,devicelist,metricelist},]
   const handleGraphChange = (event) => {
     setTable((prevState) => ({ ...prevState, data: {} }));
-    setGraph((prevState) => ({ ...prevState, type: event.target.value}));
+    setGraph((prevState) => ({ ...prevState, type: event.target.value }));
     localStorage.setItem(
       props.saveName + "_graph_" + props.id,
-      JSON.stringify({...graph, type: event.target.value})
+      JSON.stringify({ ...graph, type: event.target.value })
     );
     // write(props.id, props.saveName + "_graph_", event.target.value);
   };
@@ -152,10 +154,10 @@ function Graph(props) {
     const select = lists?.metric?.filter((m) => {
       return m.name === event.target.value;
     });
-    setGraph((prevState) => ({ ...prevState, metric: select[0]}));
+    setGraph((prevState) => ({ ...prevState, metric: select[0] }));
     localStorage.setItem(
       props.saveName + "_graph_" + props.id,
-      JSON.stringify({...graph, metric: select[0]})
+      JSON.stringify({ ...graph, metric: select[0] })
     );
     // write(props.id, props.saveName + "_query_", event.target.value);
   };
@@ -164,10 +166,10 @@ function Graph(props) {
     const select = lists?.device?.filter((d) => {
       return d.name === event.target.value;
     });
-    setGraph((prevState) => ({ ...prevState, device: select[0]}));
+    setGraph((prevState) => ({ ...prevState, device: select[0] }));
     localStorage.setItem(
       props.saveName + "_graph_" + props.id,
-      JSON.stringify({...graph, device: select[0]})
+      JSON.stringify({ ...graph, device: select[0] })
     );
     //  write(props.id, props.saveName + "_device_", event.target.value);
   };
@@ -176,17 +178,17 @@ function Graph(props) {
     const select = lists?.gateway?.filter((gateway) => {
       return gateway.edge_id === event.target.value;
     });
-    setGraph((prevState) => ({ ...prevState, gateway: select[0]}));
+    setGraph((prevState) => ({ ...prevState, gateway: select[0] }));
     localStorage.setItem(
       props.saveName + "_graph_" + props.id,
-      JSON.stringify({...graph, gateway: select[0]})
+      JSON.stringify({ ...graph, gateway: select[0] })
     );
     // write(props.id, props.saveName + "_drive_", event.target.value);
   };
 
   const reset = () => {
     setGraph([]);
-   // getDevice();
+    // getDevice();
     localStorage.setItem(props.saveName + "_graph", []);
   };
 
@@ -202,7 +204,8 @@ function Graph(props) {
       legendFont: "12px sans-serif",
       legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
-      showAxes: graph.type?.toUpperCase() === GraphType["SINGLE STAT"] ? false : true,
+      showAxes:
+        graph.type?.toUpperCase() === GraphType["SINGLE STAT"] ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "2px solid black",
@@ -269,7 +272,11 @@ function Graph(props) {
             <GraphForm onChange={handleGraphChange} graphType={graph?.type} />
           </div>
         </div>
-        <div className="nodatatext">No Data Found</div>
+        <div className="nodatatext">
+          <Alert severity="warning" variant="filled">
+            No data found!
+          </Alert>
+        </div>
         <div className="dotwrapper">
           <p className="loading">Retrying</p>
           <div className="dot0" />

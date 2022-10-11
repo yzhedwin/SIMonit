@@ -98,22 +98,23 @@
 
 .dashboard-container {
   display: flex;
+  flex-direction: column;
 }
 
-.layout-menu {
+.dashboard-menu {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
   background-color: #2e3b55;
-  flex-grow: 1;
-  min-height: 100vh;
-  max-width: 60px;
-  border-radius: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  margin-top: -3px;
 }
-.layout-menu-title {
-  text-align: center;
-  color: white;
+.dashboard-menu-title {
+  /* text-align: center;
+  color: white; */
 }
 .rgl-container {
   flex-grow: 3;
@@ -196,7 +197,9 @@
 .topcontainer {
   margin-inline: 27px;
 }
-
+.nodatatext {
+  align-self: center;
+}
 .forms {
   display: flex;
   flex-grow: 1;
@@ -228,7 +231,7 @@
 .dotwrapper {
   display: flex;
   flex-grow: 1;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 }
 

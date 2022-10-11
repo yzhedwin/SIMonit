@@ -1,7 +1,5 @@
-import MenuIcon from "@mui/icons-material/Menu";
-import {
-  IconButton, styled
-} from "@mui/material";
+import { IconButton, styled } from "@mui/material";
+import siLogo from "../assets/si-logo.png";
 
 const drawerWidth = 240;
 
@@ -18,29 +16,29 @@ export const DrawerIcon = ({ handleDrawerOpen, openDrawer }) => {
         ...(openDrawer && { display: "none" }),
       }}
     >
-      <MenuIcon />
+      <img src={siLogo} height={50} width={50} alt="si-logo" />
     </IconButton>
   );
 };
 
-export const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: 0,
-    ...(open && {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: `${drawerWidth}px`,
-    }),
+export const Main = styled("main", {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
   }),
-);
+  marginLeft: 0,
+  ...(open && {
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: `${drawerWidth}px`,
+  }),
+}));
 
 export const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
