@@ -129,27 +129,28 @@ export default function Dashboard({ openDrawer }) {
       } else {
         newItem = {
           i: index.toString(),
-          x: (index * 2) % (state.cols || 6),
+          x: (index * 2) % (Object.keys(state.cols).length === 0 ? 6 : state.cols),
           y: index,
           w: 2,
           h: 20,
           minH: 15,
-          minW: 2,
+          minW: 1,
         };
         break;
       }
     }
     //No gap found, add item as per normal
     if (index === items.length) {
+
       newItem = {
         // Add a new item. It must have a unique key!
         i: index.toString(),
-        x: (index * 2) % (state.cols || 6),
+        x: (index * 2) % (Object.keys(state.cols).length === 0 ? 6 : state.cols),
         y: Infinity,
         w: 2,
         h: 20,
         minH: 15,
-        minW: 2,
+        minW: 1,
       };
       items.push(newItem);
       //Insert item at gap
@@ -180,7 +181,11 @@ export default function Dashboard({ openDrawer }) {
     setSave(newSave);
     localStorage.setItem("dash_layouts", JSON.stringify(newSave));
   };
-  //TODO: Load Layout
+  //TODO: Load Layout (menu select layout and set all states)
+
+  const onLoadLayout = (name) => {
+    console.log(name)
+  }
   //Remove Layout
 
   const reset = () => {

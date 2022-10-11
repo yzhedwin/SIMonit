@@ -29,7 +29,7 @@ const data = [
   { icon: <PermMedia />, label: "Test" },
 ];
 
-const FireNav = styled(List)({
+const Nav = styled(List)({
   "& .MuiListItemButton-root": {
     paddingLeft: 24,
     paddingRight: 24,
@@ -73,7 +73,7 @@ export default function AppMenu(props) {
             minHeight: "100vh",
           }}
         >
-          <FireNav component="nav" disablePadding>
+          <Nav component="nav" disablePadding>
             <div style={{ display: "flex", alignItems: "center" }}>
               <ListItemButton component="a" href="/">
                 <Icon
@@ -200,25 +200,31 @@ export default function AppMenu(props) {
               </ListItemButton>
               {open &&
                 data.map((item) => (
-                  <ListItemButton
-                    key={item.label}
-                    sx={{ py: 0, minHeight: 32, color: "rgba(255,255,255,.8)" }}
-                    onClick={() => navigate("/" + item.label)}
-                  >
-                    <ListItemIcon sx={{ color: "inherit" }}>
-                      {item.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.label}
-                      primaryTypographyProps={{
-                        fontSize: 14,
-                        fontWeight: "medium",
+                  <Tooltip key={item.label} title={"Go to " + item.label}>
+                    <ListItemButton
+                      key={item.label}
+                      sx={{
+                        py: 0,
+                        minHeight: 32,
+                        color: "rgba(255,255,255,.8)",
                       }}
-                    />
-                  </ListItemButton>
+                      onClick={() => navigate("/" + item.label)}
+                    >
+                      <ListItemIcon sx={{ color: "inherit" }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.label}
+                        primaryTypographyProps={{
+                          fontSize: 14,
+                          fontWeight: "medium",
+                        }}
+                      />
+                    </ListItemButton>
+                  </Tooltip>
                 ))}
             </Box>
-          </FireNav>
+          </Nav>
         </Paper>
       </ThemeProvider>
     </Box>
