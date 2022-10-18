@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LegendToggleIcon from "@mui/icons-material/LegendToggle";
+import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import { Button, ButtonGroup } from "@mui/material";
 import _ from "lodash";
 import React, { useState } from "react";
@@ -230,6 +231,11 @@ export default function Dashboard({ openDrawer }) {
               </Button>
             </Tooltip>
             <FormDialog onSave={(name) => onSaveLayout(name)} />
+            <Tooltip title="Load Layout">
+              <Button onClick={() => onLoadLayout()} color="secondary">
+                <SaveAltIcon />
+              </Button>
+            </Tooltip>
           </ButtonGroup>
         </div>
         <div className="rgl-container">

@@ -1,0 +1,68 @@
+import "system"
+import "influxdata/influxdb/secrets"
+import "sql"
+
+user = secrets.get(key: "MYSQL_USER")
+pass = secrets.get(key: "MYSQL_PASS")
+url = secrets.get(key: "DB_URL")
+db = secrets.get(key: "DB_NAME")
+
+gateway = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT name as _measurement, id as gateway_id from Gateway",
+)
+device = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as device_id, gateway_id from Device",
+)
+metric = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT name as metric_name, id as metric_id, device_id from Metric",
+)
+a = join(tables: {key1: gateway, key2: device}, on: ["gateway_id"], method: "inner")
+join(tables: {key1: metric, key2: a}, on: ["device_id"], method: "inner")
+|> set(key: "_field", value: "value")
+|> set(key: "_value", value: "1234")
+|> map(fn: (r) => ({ r with _time: now(), device_id: string(v: r.device_id), gateway_id: string(v: r.gateway_id), metric_id: string(v: r.metric_id), metric_name: string(v: r.metric_name) }))
+|> to(bucket: "mysql")
+
+
+#Query
+
+import "system"
+import "influxdata/influxdb/secrets"
+import "sql"
+
+user = secrets.get(key: "MYSQL_USER")
+pass = secrets.get(key: "MYSQL_PASS")
+url = secrets.get(key: "DB_URL")
+db = secrets.get(key: "DB_NAME")
+
+gateway = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as gateway_id from Gateway",
+)
+device = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as device_id, gateway_id from Device",
+)
+metric = sql.from(
+     driverName: "mysql",
+     dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
+     query: "SELECT id as metric_id, device_id, uom from Metric",
+)
+a = join(tables: {key1: gateway, key2: device}, on: ["gateway_id"], method: "inner")
+b = join(tables: {key1: metric, key2: a}, on: ["device_id"], method: "inner")
+|> map(fn: (r) => ({ r with uom: string(v: r.uom), device_id: string(v: r.device_id), gateway_id: string(v: r.gateway_id), metric_id: string(v: r.metric_id) }))
+
+c = from(bucket: "mysql")
+|> range(start: -1h)
+|> group()
+
+out = join(tables: {key1: b, key2: c}, on: ["device_id", "metric_id", "gateway_id"], method: "inner")
+out
