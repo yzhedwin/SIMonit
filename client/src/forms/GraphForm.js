@@ -12,7 +12,7 @@ const GraphForm = (props) => {
         <Select
           labelId="select"
           id="select"
-          value={props.graphType}
+          value={props.graphType || ''}
           onChange={props.onChange}
           autoWidth
           label="Graph Type"
@@ -20,7 +20,7 @@ const GraphForm = (props) => {
         >
           <MenuItem value={GraphType.BAND}>Band</MenuItem>
           <MenuItem value={GraphType.LINE}>Line</MenuItem>
-          <MenuItem value={GraphType["SINGLE STAT"]}>Single Stat</MenuItem>
+          <MenuItem value={GraphType.SINGLE_STAT}>Single Stat</MenuItem>
           <MenuItem value={GraphType.BAR}>Histogram</MenuItem>
         </Select>
       </FormControl>

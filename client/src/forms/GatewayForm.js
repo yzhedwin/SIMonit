@@ -15,7 +15,7 @@ const GatewayForm = (props) => {
           <Select
             labelId="select"
             id="select"
-            value={props.gateway?.edge_id}
+            value={props.gateway?.edge_id || ''}
             onChange={props.onChange}
             autoWidth
             size="small"

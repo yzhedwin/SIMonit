@@ -112,10 +112,11 @@
   padding-left: 5px;
   margin-top: -3px;
 }
-.dashboard-menu-title {
-  /* text-align: center;
-  color: white; */
-}
+
+/* .dashboard-menu-title {
+  text-align: center;
+  color: white;
+} */
 .rgl-container {
   flex-grow: 3;
 }
