@@ -2,29 +2,26 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-/*
-Get all devices and list in menuitem
-*/
 
-const DeviceForm = (props) => {
-  const items = props?.deviceList;
+const SaveForm = (props) => {
+  const keys = Object.keys(props?.saves);
   return (
     <>
-      <FormControl sx={{ m: 1, }}>
-        <InputLabel id="select">Device</InputLabel>
+      <FormControl sx={{m:1, minWidth: 150, backgroundColor: "white", borderRadius: 1 }}>
+        <InputLabel id="select">[<b>Load Save</b>]</InputLabel>
         <Select
           labelId="select"
           id="select"
-          value={props.device?.name || props.device || ''}
+          value=''
           onChange={props.onChange}
           autoWidth
+          label="Select Save"
           size="small"
-          label="Device"
         >
-          {items?.map((item) => {
+          {keys?.map((item) => {
             return (
-              <MenuItem key={items?.indexOf(item)} value={item?.name}>
-                {item?.name}
+              <MenuItem key={keys?.indexOf(item)} value={props.saves[item]}>
+                {props.saves[item].name}
               </MenuItem>
             );
           })}
@@ -33,4 +30,4 @@ const DeviceForm = (props) => {
     </>
   );
 };
-export default DeviceForm;
+export default SaveForm;

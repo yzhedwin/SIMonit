@@ -1,7 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LegendToggleIcon from "@mui/icons-material/LegendToggle";
-import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import { Button, ButtonGroup } from "@mui/material";
 import _ from "lodash";
 import React, { useState } from "react";
@@ -14,6 +13,7 @@ import Zoom from "@mui/material/Zoom";
 import { Main } from "../component/Drawer";
 import FormDialog from "../component/FormDialog";
 import Graph from "../component/Graph";
+import SaveForm from "../forms/SaveForm";
 
 //TODO: Load Layout and Items from Database
 function getFromLS(key) {
@@ -43,7 +43,7 @@ export default function Dashboard({ openDrawer }) {
   const storageLayout = getFromLS("dash_layouts") || {};
   const storageCount = JSON.parse(localStorage.getItem("dash_count")) || 0;
   const storageItems = JSON.parse(localStorage.getItem("dash_items")) || [];
-  const storageSave = JSON.parse(localStorage.getItem("dash_layouts")) || {};
+  const storageSaves = JSON.parse(localStorage.getItem("dash_saves")) || {};
   // JSON parses Infinity to null which will return
   // "ReactGridLayout.children[0].y must be a number"
   if (storageItems.size !== 0) {
@@ -60,7 +60,7 @@ export default function Dashboard({ openDrawer }) {
   const [state, setState] = useState({ cols: {}, breakpoint: "" });
   const [items, setItems] = useState(storageItems);
   const [count, setCount] = useState(storageCount);
-  const [save, setSave] = useState(storageSave);
+  const [saves, setSaves] = useState(storageSaves);
 
   //use index to load config of graph
   const generateDOM = (item) => {
@@ -122,6 +122,7 @@ export default function Dashboard({ openDrawer }) {
   };
   const onAddItem = () => {
     let newItem;
+    let newItems = items.slice(0);
     let index = 0;
     while (index < items.length) {
       if (items[index].i === index.toString()) {
@@ -130,7 +131,9 @@ export default function Dashboard({ openDrawer }) {
       } else {
         newItem = {
           i: index.toString(),
-          x: (index * 2) % (Object.keys(state.cols).length === 0 ? 6 : state.cols),
+          x:
+            (index * 2) %
+            (Object.keys(state.cols).length === 0 ? 6 : state.cols),
           y: index,
           w: 2,
           h: 20,
@@ -142,51 +145,74 @@ export default function Dashboard({ openDrawer }) {
     }
     //No gap found, add item as per normal
     if (index === items.length) {
-
       newItem = {
         // Add a new item. It must have a unique key!
         i: index.toString(),
-        x: (index * 2) % (Object.keys(state.cols).length === 0 ? 6 : state.cols),
+        x:
+          (index * 2) % (Object.keys(state.cols).length === 0 ? 6 : state.cols),
         y: Infinity,
         w: 2,
         h: 20,
         minH: 15,
         minW: 1,
       };
-      items.push(newItem);
+      newItems.push(newItem);
       //Insert item at gap
     } else {
-      items.splice(index, 0, newItem);
+      newItems.splice(index, 0, newItem);
     }
-    setItems(items);
-    setCount(items.length);
-    localStorage.setItem("dash_count", JSON.stringify(items.length));
-    localStorage.setItem("dash_items", JSON.stringify(items));
+    setItems(newItems);
+    setCount(newItems.length);
+    localStorage.setItem("dash_count", JSON.stringify(newItems.length));
+    localStorage.setItem("dash_items", JSON.stringify(newItems));
   };
   const onRemoveItem = (i) => {
-    console.log(items);
-    items.forEach((item, index) => {
+    let newItems = items.slice(0);
+    newItems.forEach((item, index) => {
       if (item.i === i.toString()) {
-        items.splice(index, 1);
+        newItems.splice(index, 1);
       }
     });
     const newCount = count - 1;
-    setItems(items);
+    setItems(newItems);
     setCount(newCount);
     localStorage.setItem("dash_count", JSON.stringify(newCount));
-    localStorage.setItem("dash_items", JSON.stringify(items));
+    localStorage.setItem("dash_items", JSON.stringify(newItems));
   };
 
   const onSaveLayout = (name) => {
-    const newSave = { ...save, [name]: { items: items, count: count } };
-    setSave(newSave);
-    localStorage.setItem("dash_layouts", JSON.stringify(newSave));
+    const keys = Object.keys(localStorage);
+    let newSaves = { ...saves };
+    let data = {};
+    keys.forEach((key) => {
+      data = { ...data, [key]: JSON.parse(localStorage.getItem(key)) };
+    });
+    if (!keys.find((element) => element === "dash_saves")) {
+      data = { ...data, dash_saves: data };
+    }
+    newSaves = { ...newSaves, [name]: { name, data } };
+    setSaves(newSaves);
+    localStorage.setItem("dash_saves", JSON.stringify(newSaves));
   };
   //TODO: Load Layout (menu select layout and set all states)
 
-  const onLoadLayout = (name) => {
-    console.log(name)
-  }
+  const onLoadLayout = (event) => {
+    const save = event.target.value["data"];
+
+    if (save["dash_items"].size !== 0) {
+      save["dash_items"].forEach((item) => {
+        if (item.y === null) {
+          item.y = Infinity;
+        }
+      });
+    }
+    localStorage.clear();
+    setItems(save["dash_items"]);
+    setCount(save["dash_count"]);
+    localStorage.setItem("dash_items", JSON.stringify(save["dash_items"]));
+    localStorage.setItem("dash_count", JSON.stringify(save["dash_count"]));
+    localStorage.setItem("dash_saves", JSON.stringify(save["dash_saves"]));
+  };
   //Remove Layout
 
   const reset = () => {
@@ -208,6 +234,7 @@ export default function Dashboard({ openDrawer }) {
       <div className="dashboard-container">
         <div className="dashboard-menu">
           <ButtonGroup
+            sx={{ m: 1 }}
             variant="contained"
             orientation="horizontal"
             aria-label="outlined primary button group"
@@ -231,12 +258,8 @@ export default function Dashboard({ openDrawer }) {
               </Button>
             </Tooltip>
             <FormDialog onSave={(name) => onSaveLayout(name)} />
-            <Tooltip title="Load Layout">
-              <Button onClick={() => onLoadLayout()} color="secondary">
-                <SaveAltIcon />
-              </Button>
-            </Tooltip>
           </ButtonGroup>
+          <SaveForm onChange={onLoadLayout} saves={saves} />
         </div>
         <div className="rgl-container">
           <ResponsiveReactGridLayout

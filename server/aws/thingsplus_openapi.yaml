@@ -69,10 +69,10 @@ paths:
     parameters:
       - $ref: '#/components/parameters/GatewayID'
     get:
-      description: Get all deviecs under a specific gateway.
+      description: Get all devices connected to a specific gateway.
       responses:
         '200':
-          description: All devices associate with a specific gateway are succesfully returned.
+          description: All devices associated with a specific gateway are succesfully returned.
           content:
             application/json:
               schema:
@@ -84,7 +84,7 @@ paths:
       - $ref: '#/components/parameters/GatewayID'
       - $ref: '#/components/parameters/DeviceID'
     get:
-      description: Get a specific deviec associated with a specific gateway.
+      description: Get a specific device associated with a specific gateway.
       responses:
         '200':
           description: target device from a specific gateway is succesfully returned.
