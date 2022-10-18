@@ -1,15 +1,15 @@
-const dotenv = require("dotenv/config");
-
+const dotenv = require("dotenv").config();
+const env = process.env.NODE_ENV.toUpperCase();
 // vars to connect to influxdb
-exports.dashURL = process.env.DASH_INFLUX_URL;
-exports.dashBucket = process.env.DASH_INFLUX_BUCKET;
-exports.dashInfluxToken = process.env.DASH_INFLUX_TOKEN;
-exports.dashOrgID = process.env.DASH_ORG_ID;
+exports.dashURL = process.env["DASH_INFLUX_URL_" + env];
+exports.dashBucket = process.env["DASH_INFLUX_BUCKET_" + env];
+exports.dashInfluxToken = process.env["DASH_INFLUX_TOKEN_" + env];
+exports.dashOrgID = process.env["DASH_ORG_ID_" + env];
 
-exports.staticURL = process.env.STATIC_INFLUX_URL;
-exports.staticInfluxToken = process.env.STATIC_INFLUX_TOKEN;
-exports.staticBucket = process.env.STATIC_INFLUX_BUCKET;
-exports.staticOrgID = process.env.STATIC_ORG_ID;
+exports.staticURL = process.env["STATIC_INFLUX_URL_" + env];
+exports.staticInfluxToken = process.env["STATIC_INFLUX_TOKEN_" + env];
+exports.staticBucket = process.env["STATIC_INFLUX_BUCKET_" + env];
+exports.staticOrgID = process.env["STATIC_ORG_ID_" + env];
 
 const user = process.env.MYSQL_USER;
 const pass = process.env.MYSQL_PASS;

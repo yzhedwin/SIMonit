@@ -194,7 +194,7 @@ export default function Dashboard({ openDrawer }) {
     setSaves(newSaves);
     localStorage.setItem("dash_saves", JSON.stringify(newSaves));
   };
-  //TODO: Load Layout (menu select layout and set all states)
+  //TODO: Optimise loading each graph selection graph0 graph1...
 
   const onLoadLayout = (event) => {
     const save = event.target.value["data"];
