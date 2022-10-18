@@ -114,7 +114,7 @@ const ResponsiveAppBar = ({ openDrawer, onOpenDrawerChange }) => {
           style={{
             opacity: navRef.current,
             backgroundColor: "#2E3B55",
-            transition: "all 500ms ease-in-out",
+            transition: "all 200ms ease-in-out",
           }}
           open={openDrawer}
           position="fixed"

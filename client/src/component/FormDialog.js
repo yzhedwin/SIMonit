@@ -1,4 +1,4 @@
-import SaveAltIcon from "@mui/icons-material/SaveAlt";
+import UploadIcon from '@mui/icons-material/Upload';
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -31,7 +31,7 @@ export default function FormDialog(props) {
     <div>
       <Tooltip title="Save Current Layout">
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
-          <SaveAltIcon />
+          <UploadIcon />
         </Button>
       </Tooltip>
       <Dialog open={open} onClose={handleCancel}>
