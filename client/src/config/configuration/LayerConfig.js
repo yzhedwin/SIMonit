@@ -22,7 +22,7 @@ export default class LayerConfig {
 
   getConfig() {
     //get config of specified configtype
-    switch (GraphType[this.state.configType.toUpperCase()]) {
+    switch (GraphType[this.state.graphType.toUpperCase()]) {
       case GraphType.BAND:
         return bandConfig(this.state.fill);
       case GraphType.LINE:
