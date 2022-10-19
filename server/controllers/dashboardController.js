@@ -15,8 +15,8 @@ exports.gatewaylist = (req, res) => {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
       list.push({
-        id: o.gateway_id,
-        edge_id: o.edge_id,
+        id: o.gid,
+        edge_id: o.eid,
         _measurement: o._measurement,
       });
     },
@@ -39,7 +39,7 @@ exports.devicelist = (req, res) => {
     config.dashQueryAPI.queryRows(fluxQuery, {
       next(row, tableMeta) {
         const o = tableMeta.toObject(row);
-        list.push({ gateway_id: o.gateway_id, id: o.device_id, name: o.name });
+        list.push({ gateway_id: o.gid, id: o.did, name: o.name });
       },
       error(error) {
         console.error(error);
@@ -60,7 +60,7 @@ exports.metriclist = (req, res) => {
   config.dashQueryAPI.queryRows(fluxQuery, {
     next(row, tableMeta) {
       const o = tableMeta.toObject(row);
-      list.push({ id: o.id, device_id: o.device_id, name: o.name });
+      list.push({ id: o.id, device_id: o.did, name: o.name });
     },
     error(error) {
       console.error(error);

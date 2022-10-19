@@ -251,7 +251,7 @@ import "sql"
 list = sql.from(
   driverName: "mysql",
   dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT LOWER(name) as _measurement, edge_id, id as gateway_id from Gateway",
+  query: "SELECT LOWER(name) as _measurement, edge_id as eid, id as gid from Gateway",
 )
 list`;
 
@@ -263,12 +263,12 @@ import "sql"
 b = sql.from(
   driverName: "mysql",
   dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT id as device_id, gateway_id, name from Device where gateway_id = '${gateway_id}'",
+  query: "SELECT id as did, gateway_id as gid, name from Device where gateway_id = '${gateway_id}'",
 )
 b
 `;
 
-exports.GET_METRIC_LIST = (device) =>
+exports.GET_METRIC_LIST = (device_id) =>
   `
 import "system"
 import "sql"
@@ -276,6 +276,6 @@ import "sql"
 sql.from(
   driverName: "mysql",
   dataSourceName: "${user}:${pass}@tcp(${url})/${db}",
-  query: "SELECT * from Metric where device_id = ${device}",
+  query: "SELECT id, device_id as did, name from Metric where device_id = ${device_id}",
 )
 `;
