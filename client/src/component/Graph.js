@@ -198,14 +198,14 @@ function Graph(props) {
     const config = {
       table: table.data,
       layers: [new LayerConfig(graph.type?.toUpperCase(), fill).getConfig()],
-      valueFormatters: new DataFormatter(graph.metric?.name, unit).getFormat(),
+      valueFormatters: new DataFormatter(graph?.metric?.name, unit).getFormat(),
       xScale: "linear",
       yScale: "linear",
       legendFont: "12px sans-serif",
       legendHide: toggleLegend === 1 ? true : false,
       tickFont: "12px sans-serif",
       showAxes:
-        graph.type?.toUpperCase() === GraphType["SINGLE STAT"] ? false : true,
+        graph?.type?.toUpperCase() === GraphType["SINGLE STAT"] ? false : true,
       staticLegend: {
         heightRatio: 0.4,
         border: "2px solid black",
@@ -213,8 +213,8 @@ function Graph(props) {
         backgroundColor: "white",
         colorizeRows: false,
         hide:
-          graph.type?.toUpperCase() === GraphType.BAR ||
-          graph.type?.toUpperCase() === GraphType["SINGLE STAT"] ||
+          graph?.type?.toUpperCase() === GraphType.BAR ||
+          graph?.type?.toUpperCase() === GraphType["SINGLE STAT"] ||
           toggleLegend !== 1
             ? true
             : false,

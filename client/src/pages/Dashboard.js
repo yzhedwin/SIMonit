@@ -66,7 +66,7 @@ export default function Dashboard({ openDrawer }) {
   const generateDOM = (item) => {
     const toggle = toggleLegend || 1;
     let storageGraph = JSON.parse(
-      localStorage.getItem("dash_graph_" + item.i) || "{}"
+      localStorage.getItem("dash_graph_" + item.i) || JSON.stringify({type: 'band'})
     );
     let storageList = JSON.parse(
       localStorage.getItem("dash_list_" + item.i) || "{}"
