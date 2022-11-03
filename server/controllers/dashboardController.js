@@ -1,5 +1,3 @@
-//const BookInstance = require("../models/bookinstance");
-//const Book = require("../models/book");
 const queries = require("../config/constants");
 const config = require("../config/index");
 const { flux } = require("@influxdata/influxdb-client");

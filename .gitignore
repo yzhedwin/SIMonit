@@ -117,4 +117,4 @@ dist
 .pnp.*
 
 **/package-lock.json
-aws/
+**.zip

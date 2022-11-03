@@ -220,7 +220,7 @@ exports.GET_LIST = (bucket, tag) =>
 `;
 
 exports.GET_TABLE = (gateway, metric) =>
-  `
+`
 from(bucket: "${this.dashBucket}")
 |> range(start: -5m)
 |> filter(fn: (r) => r._measurement == "${gateway}")
