@@ -1,0 +1,444 @@
+openapi: 3.0.0
+info:
+  title: S&I Cloud API
+  version: 0.1.2
+  description: API for retrieving and writing metric data of the S&I cloud.
+  contact:
+    email: roshanc@ecyber.com
+    name: Roshan Chamal
+paths:
+  /gateways:
+    get:
+      description: Get all gateways under the account.
+      responses:
+        '200':
+          description: All gateways under the account are successfully returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Gateway'
+  /gateways/{gid}:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+    get:
+      description: Get a specific gateway.
+      responses:
+        '200':
+          description: The gateway is succesfully returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gateway'
+  /gateways/{gid}/status:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+    get:
+      description: Health Status (online/offline) of a specific gateway.
+      responses:
+        '200':
+          description: The gateway status is succesfully returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayStatus'
+                
+  /gateways/{gid}/command:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+    post:
+      description: Send command to a specific gateway.
+      parameters:
+        - name: value
+          in: query
+          description: Value need to write to the gateway.
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: (1 mute,2 unmute,3 reboot, 4 connect to jump server)
+      responses:
+        '200':
+          description: The gateway command is successfull.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayStatus'
+  /gateways/{gid}/devices:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+    get:
+      description: Get all devices connected to a specific gateway.
+      responses:
+        '200':
+          description: All devices associated with a specific gateway are succesfully returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+  /gateways/{gid}/devices/{did}:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+    get:
+      description: Get a specific device associated with a specific gateway.
+      responses:
+        '200':
+          description: target device from a specific gateway is succesfully returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+                  
+  /gateways/{gid}/devices/{did}/status:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+    get:
+      description: Health status of a specific Device (online/offline) from a specific gateway.
+      responses:
+        '200':
+          description: The Device status is successfully returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'                
+                  
+  /gateways/{gid}/devices/{did}/metrics:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+    get:
+      description: Get all metrics from a specific device under a specific gateway.
+      responses:
+        '200':
+          description: All metrics from the specific device are succesfully returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Metric'
+  /gateways/{gid}/devices/{did}/metrics/{mid}:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+      - $ref: '#/components/parameters/MetricID'
+    get:
+      description: Get a specific metric from a specific device under a specific gateway.
+      responses:
+        '200':
+          description: The metric is successfully returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metric'
+  
+  /gateways/{gid}/devices/{did}/command:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+    post:
+      description: Send command to a specific Device from a specific gateway.
+      parameters:
+        - name: value
+          in: query
+          description: value need to write to the controller point.
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: (1 turn on, 2 turn off)
+      responses:
+        '200':
+          description: The device command is successfull.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'
+
+  /gateways/{gid}/devices/{did}/metrics/{mid}/trenddata:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+      - $ref: '#/components/parameters/MetricID'
+    get:
+      description: Get timeseries of present value of specific metric from a specific device under a specific gateway.
+      parameters:
+        - name: start
+          in: query
+          description: Start time.
+          required: true
+          schema:
+            type: string
+            format: date-time
+          example: '2021-01-01T00:00:00+08:00'
+        - name: end
+          in: query
+          description: End time.
+          required: true
+          schema:
+            type: string
+            format: date-time
+          example: '2021-01-01T00:00:00+08:00'
+        - name: property
+          in: query
+          description: property need to read.
+          required: true
+          schema:
+            type: string
+          example: energy-usage
+      responses:
+        '200':
+          description: Timeseries data are succesfully returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataPoint'
+  /gateway/{gid}/Device/{did}/metric/{mid}/rpdata:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+      - $ref: '#/components/parameters/MetricID'
+    get:
+      description: Get real-time present value for a specific metric from a specific device under a specific gateway.
+      parameters:
+        - name: property
+          in: query
+          description: property need to read
+          required: true
+          schema:
+            type: string
+          example: energy-usage, current, voltage
+      responses:
+        '200':
+          description: Real-time present values are succesfully returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataPoint'
+  /gateway/{gid}/Device/{did}/metric/rpmdata:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+      - $ref: '#/components/parameters/DeviceID'
+    get:
+      description: Get real-time present value of multiple metrices from a specific device under a specific gateway.
+      parameters:
+        - name: mids
+          in: query
+          description: list of metric identifiers
+          required: true
+          schema:
+            type: string
+          example: 9e4a04ac-468b-4409-b692-fb928cfd4ddb, 564a04ac-468b-4409-b692-fb928cfd4gdt
+        - name: property
+          in: query
+          description: property need to read
+          required: true
+          schema:
+            type: string
+            items:
+              $ref: '#/components/schemas/Property'
+          example: energy-usage, current, voltage
+      responses:
+        '200':
+          description: Multiple metric real-time data for given property.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataPoint'
+  /gateway/{gid}/metric/trenddata:
+    parameters:
+      - $ref: '#/components/parameters/GatewayID'
+    get:
+      description: Get time series data of multiple metrices from a specific gateway.
+      parameters:
+        - name: mids
+          in: query
+          description: list of metric identifiers
+          required: true
+          schema:
+            type: string
+          example: '[9e4a04ac-468b-4409-b692-fb928cfd4ddb, 564a04ac-468b-4409-b692-fb928cfd4gdt]'
+        - name: property
+          in: query
+          description: property need to read
+          required: true
+          schema:
+            type: string
+            items:
+              $ref: '#/components/schemas/Property'
+          example: energy-usage, current, voltage
+        - name: start
+          in: query
+          description: Start time.
+          required: true
+          schema:
+            type: string
+            format: date-time
+          example: '2021-01-01T00:00:00+08:00'
+        - name: end
+          in: query
+          description: End time.
+          required: true
+          schema:
+            type: string
+            format: date-time
+          example: '2021-01-01T00:00:00+08:00'
+      responses:
+        '200':
+          description: Multiple metric real-time data for given property.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataPoint'
+components:
+  schemas:
+    Gateway:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Gateway identifier.
+          example: SCM-001
+        description:
+          type: string
+          description: Gateway description.
+          example: Gateway connected to S&I Cloud
+    GatewayStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Gateway identifier.
+          example: SCM-001
+        description:
+          type: string
+          description: Gateway description.
+          example: Gateway connected to S&I Cloud
+        status:
+          type: integer
+          description: online/ offline status.
+          example: 1 or 0
+        time:
+          type: string
+          format: date-time
+          description: Timestamp of the last status update.
+          example: '2021-01-01T00:00:00+08:00'
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Device identifier.
+          example: Datalogger01
+        description:
+          type: string
+          description: Device description.
+          example: Devices connected to the gateway
+    DeviceStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Device identifier.
+          example: Datalogger01
+        description:
+          type: string
+          description: Device description.
+          example: Device connected to the gateway
+        status:
+          type: integer
+          description: online/ offline status.
+          example: 1 or 0
+        time:
+          type: string
+          format: date-time
+          description: Timestamp of the last status update.
+          example: '2021-01-01T00:00:00+08:00'
+    Metric:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Metric identifier.
+          example: pv_1_active_energy_total
+        description:
+          type: string
+          description: Metric description.
+          example: active energy
+        uom:
+          type: string
+          description: Unit of measurement.
+          example: watt-hour
+    DataPoint:
+      type: object
+      properties:
+        p:
+          type: string
+          description: Property of the data point.
+          example: energy usage
+        t:
+          type: string
+          format: date-time
+          description: Timestamp of the data point.
+          example: '2021-01-01T00:00:00+08:00'
+        v:
+          type: number
+          format: double
+          description: Value of the data point.
+          example: 123.456
+        e:
+          type: string
+          description: Last error of the data point.
+          example: time out
+    Property:
+      type: string
+      properties:
+        n:
+          type: string
+          description: Name of proprty.
+          example: energy-usage, voltage
+        t:
+          type: number
+          format: double
+          description: data type of the property.
+          example: 123.456
+  parameters:
+    GatewayID:
+      name: gid
+      in: path
+      description: Gateway identifier.
+      required: true
+      schema:
+        type: string
+      example: SCM-001
+    DeviceID:
+      name: did
+      in: path
+      description: Device identifier.
+      required: true
+      schema:
+        type: string
+      example: Datalogger01
+    MetricID:
+      name: mid
+      in: path
+      description: Metric identifier.
+      required: true
+      schema:
+        type: string
+      example: pv_1_active_energy_total
