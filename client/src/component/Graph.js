@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@mui/material";
 import DataFormatter from "../config/configuration/DataFormatter";
 import LayerConfig from "../config/configuration/LayerConfig";
-import { API_REFRESH_RATE, GraphType, REST_URL } from "../constants";
+import { API_REFRESH_RATE, AWS_API_URL, AWS_AUTH, GraphType } from "../constants";
 import DeviceForm from "../forms/DeviceForm";
 import GatewayForm from "../forms/GatewayForm";
 import GraphForm from "../forms/GraphForm";
@@ -26,11 +26,10 @@ function Graph(props) {
 
   const getData = async () => {
     try {
-      const resp = await axios.get(
-        `${REST_URL}/table/${graph?.gateway?._measurement}/${graph?.metric?.name}`
-      );
-
+     const url = AWS_API_URL + `/gateways/trenddata?metric=${graph?.metric?.name}&gateway=${graph?.gateway?._measurement}`
+    const resp = await axios.get(url, AWS_AUTH)
       let results = fromFlux(resp.data.csv);
+      console.log(results)
       let currentDate = new Date();
       if (results.table.length > 0) {
         setTable({
@@ -47,11 +46,16 @@ function Graph(props) {
       console.log(error);
     }
   };
-
+  //id, edge_id, measurement
   const getGateway = async () => {
     try {
-      const resp = await axios.get(REST_URL + "/gatewaylist");
-      const { list } = resp.data;
+      const url = AWS_API_URL + `/gateways`;
+      const resp = await axios.get(url, AWS_AUTH);
+      const list = [];
+      JSON.parse(resp.data.body).map((item) => {
+        const newObj = { id: item.id, edge_id: item.edge_id, name: item.name.toLowerCase() };
+        return list.push(newObj);
+      });
       setLists((prevState) => ({ ...prevState, gateway: list }));
       localStorage.setItem(
         props.saveName + "_lists_" + props.id,
@@ -61,12 +65,16 @@ function Graph(props) {
       console.log(error);
     }
   };
+  //id device_id name
   const getMetric = async () => {
     try {
-      const resp = await axios.get(
-        `${REST_URL}/metriclist/${graph?.device?.id}`
-      );
-      const { list } = resp.data;
+      const url = AWS_API_URL + `/gateways/${graph?.gateway?.id}/devices/${graph?.device?.id}/metrics`;
+      const resp = await axios.get(url, AWS_AUTH);
+      const list = [];
+      resp.data.map((item) => {
+        const newObj = { id: item.id, device_id: item.device_id, name: item.name };
+        return list.push(newObj);
+      });
       setLists((prevState) => ({ ...prevState, metric: list }));
       localStorage.setItem(
         props.saveName + "_lists_" + props.id,
@@ -78,10 +86,13 @@ function Graph(props) {
   };
   const getDevice = async () => {
     try {
-      const resp = await axios.get(
-        `${REST_URL}/devicelist/${graph?.gateway?.id}/`
-      );
-      const { list } = resp.data;
+      const url = AWS_API_URL + `/gateways/${graph?.gateway?.id}/devices`;
+      const resp = await axios.get(url, AWS_AUTH);
+      const list = [];
+      resp.data.map((item) => {
+        const newObj = { id: item.id, gateway_id: item.gateway_id,  name: item.name };
+        return list.push(newObj);
+      });
       setLists((prevState) => ({ ...prevState, device: list }));
       localStorage.setItem(
         props.saveName + "_lists_" + props.id,
