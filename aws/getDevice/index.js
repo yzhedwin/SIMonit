@@ -13,7 +13,7 @@ exports.handler = async (event) => {
       return null;
     });
   let response;
-  let params = event["queryStringParameters"];
+  let params = event.pathParameters;
   if (!dbconn) {
     response = {
       statusCode: 400,

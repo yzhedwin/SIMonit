@@ -1,8 +1,8 @@
 const mysql = require("mysql2/promise");
 
 const tableList = { gateway: "Gateway", metric: "Metric", device: "Device" };
-
 exports.handler = async (event) => {
+  console.log(tableList[event.table.toLowerCase()]);
   const dbconn = await mysql
     .createConnection({
       host: process.env.MYSQL_HOST,
@@ -50,7 +50,7 @@ exports.handler = async (event) => {
   }
   const sql = `UPDATE ${tableList[event.table.toLowerCase()]} SET ${
     event.field
-  }='${event.newVal}' WHERE id='${event.id}'`;
+  } = '${event.newVal}' WHERE id = ${event.id}`;
   response = await dbconn
     .execute(sql)
     .then(([rows, fields]) => {
@@ -61,7 +61,6 @@ exports.handler = async (event) => {
         },
         body: JSON.stringify(rows),
       };
-      console.log(JSON.parse(response.body));
       return response;
     })
     .catch((e) => {
