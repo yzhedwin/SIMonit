@@ -26,16 +26,13 @@ from(bucket: "${bucket}")
 |> yield(name: "max")
 `;
 
-// Execute query and collect result rows in a Promise.
-// Use with caution, it copies the whole stream of results into memory.
-async function collectRows(dbQueryAPI, gateway, metric) {
-  let fluxQuery =
-    flux`` + GET_TABLE(gateway, metric, process.env.INFLUX_BUCKET);
-  const data = await dbQueryAPI.collectRows(
-    fluxQuery //, you can also specify a row mapper as a second argument
-  );
-  console.log("\nCollect ROWS SUCCESS");
-  return data;
+async function iterateLines(dbQueryAPI, fluxQuery) {
+  let csv = "";
+  const data = await dbQueryAPI.collectLines(fluxQuery);
+  data.forEach((line) => {
+    csv = `${csv}${line}\n`;
+  });
+  return { csv };
 }
 
 exports.handler = async (event) => {
@@ -48,32 +45,68 @@ exports.handler = async (event) => {
 
   let response;
   let params = event["queryStringParameters"];
+  //let params = event.pathParameters;
   //check connection to db
   if (!dbClient) {
     response = {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify("Failed to connect"),
     };
     return response;
   }
   //check params
-  if (!params || !params.metric || !params.gateway) {
+  if (!params) {
     response = {
-      statusCode: 200,
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(
-        "Missing parameters gid or mid. Please check that parameters are keyed in!"
+        "Missing parameters gateway name or metric name. Please check that parameters are keyed in!"
       ),
     };
     return response;
   }
-
+  if (!params.metric) {
+    response = {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify(
+        "Missing parameters metric name. Please check that parameters are keyed in!"
+      ),
+    };
+    return response;
+  }
+  if (!params.gateway) {
+    response = {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify(
+        "Missing parameters gateway name. Please check that parameters are keyed in!"
+      ),
+    };
+    return response;
+  }
+  let fluxQuery =
+    flux`` +
+    GET_TABLE(params.gateway, params.metric, process.env.INFLUX_BUCKET);
   //fetch data
-  const rows = await collectRows(dbQueryAPI, params.gateway, params.metric).catch((error) =>
+  const csv = await iterateLines(dbQueryAPI, fluxQuery).catch((error) =>
     console.error("CollectRows ERROR", error)
   );
   response = {
     statusCode: 200,
-    body: JSON.stringify(rows),
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+    body: JSON.stringify(csv),
   };
   return response;
 };

@@ -13,10 +13,14 @@ exports.handler = async (event) => {
       return null;
     });
   let response;
-  let params = event["queryStringParameters"];
+ // let params = event["queryStringParameters"];
+  let params = event.pathParameters;
   if (!dbconn) {
     response = {
       statusCode: 400,
+      "headers": {
+          'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify("Failed to connect"),
     };
     return response;
@@ -24,6 +28,9 @@ exports.handler = async (event) => {
   if (!params || !params.gid) {
     response = {
       statusCode: 200,
+      "headers": {
+          'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify("Please enter valid Gateway ID"),
     };
     dbconn.end();
@@ -32,12 +39,15 @@ exports.handler = async (event) => {
 
   response = await dbconn
     .execute(
-      "SELECT id as did, gateway_id as gid, name from Device where gateway_id = ?",
+      "SELECT Device.* from Device where gateway_id = ?",
       [params.gid]
     )
     .then(([rows, fields]) => {
       response = {
         statusCode: 200,
+        "headers": {
+            'Access-Control-Allow-Origin': '*',
+        },
         body: JSON.stringify(rows),
       };
       return response;

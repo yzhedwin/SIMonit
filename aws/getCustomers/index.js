@@ -1,4 +1,4 @@
-const mysql = require("mysql2/promise");
+var mysql = require("mysql2/promise");
 
 exports.handler = async (event) => {
   const dbconn = await mysql
@@ -21,9 +21,19 @@ exports.handler = async (event) => {
     };
     return response;
   }
-  const sql = "SELECT Gateway.* from Gateway";
+  if (!params || !params.did) {
+    response = {
+      statusCode: 200,
+      body: JSON.stringify("Please enter valid Device ID"),
+    };
+    dbconn.end();
+    return response;
+  }
   response = await dbconn
-    .execute(sql)
+    .execute(
+      "SELECT id as did, gateway_id as gid, name from Device where id =  ?",
+      [params.did]
+    )
     .then(([rows, fields]) => {
       response = {
         statusCode: 200,
@@ -35,6 +45,5 @@ exports.handler = async (event) => {
       console.error(e);
     })
     .finally(() => dbconn.end());
-
   return response;
 };

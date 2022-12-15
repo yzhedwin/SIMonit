@@ -1,6 +1,8 @@
-var mysql = require("mysql2/promise");
+const mysql = require("mysql2/promise");
 
+const tableList = { gateway: "Gateway", metric: "Metric", device: "Device" };
 exports.handler = async (event) => {
+  console.log(tableList[event.table.toLowerCase()]);
   const dbconn = await mysql
     .createConnection({
       host: process.env.MYSQL_HOST,
@@ -12,34 +14,45 @@ exports.handler = async (event) => {
       console.error(e);
       return null;
     });
-
   let response;
-  // let params = event["queryStringParameters"];
-  let params = event.pathParameters;
   if (!dbconn) {
     response = {
+      statusCode: 400,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      statusCode: 400,
       body: JSON.stringify("Failed to connect"),
     };
     return response;
   }
-  if (!params || !params.did) {
+  if (!event || !event.id || !event.table || !event.field) {
     response = {
-      statusCode: 200,
+      statusCode: 400,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify("Please enter valid Device ID"),
+      body: JSON.stringify("Missing parameters!"),
     };
-    dbconn.end();
     return response;
   }
-
+  if (!event.newVal) {
+    event.newVal = "";
+  }
+  if (!tableList[event.table.toLowerCase()]) {
+    response = {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify("Table does not exist"),
+    };
+    return response;
+  }
+  const sql = `UPDATE ${tableList[event.table.toLowerCase()]} SET ${
+    event.field
+  } = '${event.newVal}' WHERE id = ${event.id}`;
   response = await dbconn
-    .execute("SELECT * from Metric where device_id =  ?", [params.did])
+    .execute(sql)
     .then(([rows, fields]) => {
       response = {
         statusCode: 200,
@@ -54,5 +67,6 @@ exports.handler = async (event) => {
       console.error(e);
     })
     .finally(() => dbconn.end());
+
   return response;
 };
