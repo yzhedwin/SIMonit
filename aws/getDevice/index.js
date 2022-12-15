@@ -17,6 +17,9 @@ exports.handler = async (event) => {
   if (!dbconn) {
     response = {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify("Failed to connect"),
     };
     return response;
@@ -24,19 +27,22 @@ exports.handler = async (event) => {
   if (!params || !params.did) {
     response = {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify("Please enter valid Device ID"),
     };
     dbconn.end();
     return response;
   }
   response = await dbconn
-    .execute(
-      "SELECT id as did, gateway_id as gid, name from Device where id =  ?",
-      [params.did]
-    )
+    .execute("SELECT * from Device where id =  ?", [params.did])
     .then(([rows, fields]) => {
       response = {
         statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify(rows),
       };
       return response;

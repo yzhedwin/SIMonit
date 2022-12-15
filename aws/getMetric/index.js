@@ -12,12 +12,15 @@ exports.handler = async (event) => {
       console.error(e);
       return null;
     });
-
   let response;
-  let params = event["queryStringParameters"];
+  // let params = event["queryStringParameters"];
+  let params = event.pathParameters;
   if (!dbconn) {
     response = {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify("Failed to connect"),
     };
     return response;
@@ -25,17 +28,23 @@ exports.handler = async (event) => {
   if (!params || !params.mid) {
     response = {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify("Please enter valid Metric ID"),
     };
     return response;
   }
   response = await dbconn
-    .execute("SELECT id, device_id as did, name from Metric where id =  ?", [
+    .execute("SELECT * from Metric where id =  ?", [
       params.mid,
     ])
     .then(([rows, fields]) => {
       response = {
         statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify(rows),
       };
       return response;
