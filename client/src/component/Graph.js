@@ -33,7 +33,7 @@ function Graph(props) {
     try {
       const url =
         AWS_API_URL +
-        `/gateways/trenddata?metric=${graph?.metric?.name}&gateway=${graph?.gateway?._measurement}`;
+        `/gateways/trenddata?metric=${graph?.metric?.name}&gateway=${graph?.gateway?.name}`;
       const resp = await axios.get(url, AWS_AUTH);
       let results = fromFlux(resp.data.csv);
       console.log(results);
@@ -59,13 +59,16 @@ function Graph(props) {
       const url = AWS_API_URL + `/gateways`;
       const resp = await axios.get(url, AWS_AUTH);
       const list = [];
-      JSON.parse(resp.data.body).map((item) => {
+      if (resp.data.length < 1) {
+        return;
+      }
+      resp.data.forEach((item) => {
         const newObj = {
           id: item.id,
           edge_id: item.edge_id,
           name: item.name.toLowerCase(),
         };
-        return list.push(newObj);
+        list?.push(newObj);
       });
       setLists((prevState) => ({ ...prevState, gateway: list }));
       localStorage.setItem(

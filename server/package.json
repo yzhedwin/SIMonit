@@ -13,7 +13,7 @@
         "nodemon": "^2.0.6"
     },
     "scripts": {
-        "server:dev": "NODE_ENV=development nodemon server.js",
-        "server:prod": "NODE_ENV=production nodemon server.js"
+        "server:dev": "set NODE_ENV=development&& nodemon server.js",
+        "server:prod": "set NODE_ENV=production&& nodemon server.js"
     }
 }

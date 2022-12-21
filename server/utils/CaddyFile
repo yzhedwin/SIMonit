@@ -1,13 +1,23 @@
+//Data Grid App
+insight.thingsplus.io:3006 {
+        reverse_proxy localhost:3005
+}
+//Express.js
 insight.thingsplus.io:3004 {
         reverse_proxy localhost:3001
 }
 
+//InfluxDB instance(Static Graph)
 insight.thingsplus.io:3003 {
         reverse_proxy 13.229.70.133:8086
 }
 
+//InfluxDB instance(Dashboard)
 insight.thingsplus.io:3002 {
         reverse_proxy 13.229.145.161:8086
 }
 
-
+//Dashboard
+insight.thingsplus.io:3007 {
+        reverse_proxy localhost:3000
+}

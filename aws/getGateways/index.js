@@ -1,6 +1,6 @@
 const mysql = require("mysql2/promise");
 
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
   const dbconn = await mysql
     .createConnection({
       host: process.env.MYSQL_HOST,
@@ -17,17 +17,38 @@ exports.handler = async (event) => {
   if (!dbconn) {
     response = {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify("Failed to connect"),
     };
     return response;
   }
-  const sql = "SELECT Gateway.* from Gateway";
+  const user = event.requestContext.authorizer.principalId;
+
+  let condition;
+  switch (user?.toUpperCase()) {
+    case "SPD":
+      condition = "WHERE cust_id = 1";
+      break;
+    case "ACME":
+      condition = "WHERE cust_id = 2";
+      break;
+    default:
+      condition = "";
+      break;
+  }
+
+  const sql = "SELECT Gateway.* from Gateway " + condition;
   response = await dbconn
     .execute(sql)
     .then(([rows, fields]) => {
       response = {
         statusCode: 200,
-        body: JSON.stringify(rows),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify(user.toUpperCase()),
       };
       return response;
     })

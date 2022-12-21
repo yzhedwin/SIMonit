@@ -37,7 +37,7 @@ export const STYLE = {
   height: "100%",
 };
 export const REST_URL = process.env.REACT_APP_BACKEND_URL;
-export const AWS_API_URL = process.env.REACT_APP_AWS_GATEWAY;
+export const AWS_API_URL = process.env.REACT_APP_AWS_API_URL;
 export const AWS_AUTH = {
   headers: {
     "Content-Type": "application/json",
