@@ -17,6 +17,9 @@ exports.handler = async (event) => {
   if (!dbconn) {
     response = {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify("Failed to connect"),
     };
     return response;
@@ -54,6 +57,9 @@ exports.handler = async (event) => {
     .then(([rows, fields]) => {
       response = {
         statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify(rows),
       };
       console.log(JSON.parse(response.body));
