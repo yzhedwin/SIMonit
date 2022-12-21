@@ -50,7 +50,7 @@ Uses [Nodemon](https://nodemon.io/) to allow automatic restart upon saving code 
 - `REACT_APP_BACKEND_URL`=http://localhost:3001
 - `REACT_APP_DEFAULT_DEVICE`=EC2AMAZ-5FRJVA8
 - `REACT_APP_DEFAULT_DRIVE`=/
-- `REACT_APP_AWS_GATEWAY`=
+- `REACT_APP_REACT_APP_AWS_API_URL`=
 - `REACT_APP_AUTH`=
 
 1. Navigate to `client` directory in second terminal
