@@ -19,6 +19,23 @@ ExpressJS server that uses both the [InfluxDB API](https://docs.influxdata.com/i
 Uses [Nodemon](https://nodemon.io/) to allow automatic restart upon saving code in editor for continuous testing.
 
 ## Setup and Usage:
+**Environment**
+1. Fill in the .env file and place it in root of client folder
+
+[DASH_INFLUX_URL_DEVELOPMENT=]
+[DASH_INFLUX_BUCKET_DEVELOPMENT=]
+[DASH_ORG_ID_DEVELOPMENT=]
+[DASH_INFLUX_TOKEN_DEVELOPMENT=]
+
+[STATIC_INFLUX_URL_DEVELOPMENT=]
+[STATIC_INFLUX_BUCKET_DEVELOPMENT=]
+[STATIC_ORG_ID_DEVELOPMENT=]
+[STATIC_INFLUX_TOKEN_DEVELOPMENT=]
+
+[MYSQL_USER_DEVELOPMENT=]
+[MYSQL_PASS_DEVELOPMENT=]
+[DB_URL_DEVELOPMENT=]
+[DB_NAME_DEVELOPMENT=]
 
 **Start server**
 1. Navigate to `server` directory
@@ -27,6 +44,14 @@ Uses [Nodemon](https://nodemon.io/) to allow automatic restart upon saving code 
 4. Server starts at `localhost:3001`
 
 **Start UI**
+**Environment**
+1. Fill in the .env file and place it in root of server folder
+
+[REACT_APP_BACKEND_URL=http://localhost:3001]
+[REACT_APP_DEFAULT_DEVICE=EC2AMAZ-5FRJVA8]
+[REACT_APP_DEFAULT_DRIVE=/]
+[REACT_APP_AWS_GATEWAY=]
+[REACT_APP_AUTH=]
 
 1. Navigate to `client` directory in second terminal
 2. `npm install`

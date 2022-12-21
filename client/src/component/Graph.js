@@ -59,7 +59,7 @@ function Graph(props) {
       const url = AWS_API_URL + `/gateways`;
       const resp = await axios.get(url, AWS_AUTH);
       const list = [];
-      if (!resp.data.length < 1) {
+      if (resp.data.length < 1) {
         return;
       }
       resp.data.forEach((item) => {
