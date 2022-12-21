@@ -31,10 +31,17 @@ export default function StaticGraph({
     try {
       let results = fromFlux(resp.data.csv);
       let currentDate = new Date();
-      setTable({
-        data: results.table,
-        lastUpdated: currentDate.toLocaleTimeString(),
-      });
+      if (results.table.length > 0) {
+        setTable({
+          data: results.table,
+          lastUpdated: currentDate.toLocaleTimeString(),
+        });
+      } else {
+        setTable({
+          data: {},
+          lastUpdated: currentDate.toLocaleTimeString(),
+        });
+      }
     } catch (error) {
       console.error("error", error.message);
     }
