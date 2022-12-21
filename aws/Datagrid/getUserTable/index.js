@@ -21,7 +21,34 @@ exports.handler = async (event) => {
     };
     return response;
   }
-  const sql = `WITH t1 AS (SELECT Gateway.*, Gateway.id as gateway_id, Gateway.name as gateway_name, Device.id as device_id, Device.name as device_name from Gateway LEFT OUTER JOIN Device ON Gateway.id = Device.gateway_id), t2 AS(SELECT M.id as metric_id, M.name as metric_name, M.device_id, M.decs, M.modified, M.uom, M.created, M.profile from Metric M) SELECT * from t1 LEFT JOIN t2 ON t1.device_id = t2.device_id ;`;
+  const user = event.requestContext.authorizer.principalId;
+
+  let condition;
+  //Add users to cust_id here
+  switch (user?.toUpperCase()) {
+    case "SPD":
+      condition = "WHERE cust_id = 1";
+      break;
+    case "ACME":
+      condition = "WHERE cust_id = 2";
+      break;
+    default:
+      condition = "";
+      break;
+  }
+
+  const sql = `WITH t1 AS 
+  (SELECT Gateway.*, Gateway.id as gateway_id, Gateway.name as gateway_name, Device.id as device_id, Device.name as device_name 
+    from Gateway 
+    LEFT OUTER JOIN Device 
+    ON Gateway.id = Device.gateway_id
+    ${condition}),
+
+   t2 AS
+   (SELECT M.id as metric_id, M.name as metric_name, M.device_id, M.decs, M.modified, M.uom, M.created, M.profile 
+    from Metric M) 
+
+   SELECT * from t1 LEFT JOIN t2 ON t1.device_id = t2.device_id ;`;
   response = await dbconn
     .execute(sql)
     .then(([rows, fields]) => {
